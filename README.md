@@ -13,6 +13,7 @@ AutomapHostsOnResolve 1
 TransPort 9040
 SocksPort 9050
 DNSPort 53
+RunAsDaemon 1
 ```
 
 #### 2 - Chmod and run the program as a root
