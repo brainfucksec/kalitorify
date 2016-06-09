@@ -32,10 +32,10 @@ program="kalitorify"
 version="1.2"
 
 # define colors
-export red=$'\e[1;91m'
-export green=$'\e[1;92m'
-export blue=$'\e[1;94m'
-export white=$'\e[1;97m'
+export red=$'\e[0;91m'
+export green=$'\e[0;92m'
+export blue=$'\e[0;94m'
+export white=$'\e[0;97m'
 export endc=$'\e[0m'
 
 # destinations you don't want routed through Tor 
