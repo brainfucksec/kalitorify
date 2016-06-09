@@ -156,6 +156,7 @@ function start {
 
 	printf "\n${blue}::${endc} ${green}Starting Transparent Proxy${endc}\n"
 	disable_ufw
+	sleep 1
 	
 	# start tor.service
 	printf "${blue}::${endc} ${green}Start Tor service${endc}\n"
@@ -223,6 +224,7 @@ function stop {
 	check_root
 
 	printf "\n${blue}::${endc} ${green}Stopping Transparent Proxy${endc}\n"
+	sleep 2
 
 	# flush iptables
 	printf "${blue}::${endc} ${green}Flush iptables rules${endc}\n"
