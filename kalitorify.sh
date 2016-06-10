@@ -39,7 +39,7 @@ export white=$'\e[0;97m'
 export endc=$'\e[0m'
 
 # destinations you don't want routed through Tor 
-non_tor="192.168.0.0/16 172.16.0.0 10.0.0.8"
+non_tor="192.168.1.0/24 192.168.0.0/24"
 
 # UID --> 'ps -e | grep tor'
 tor_uid="debian-tor"
