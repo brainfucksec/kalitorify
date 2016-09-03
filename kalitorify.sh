@@ -123,11 +123,11 @@ function check_default {
 	# check file '/etc/tor/torrc'
 	# 
 	# VirtualAddrNetworkIPv4 10.192.0.0/10
-    # AutomapHostsOnResolve 1
-    # TransPort 9040
-    # SocksPort 9050
-    # DNSPort 53
-    # RunAsDaemon 1
+        # AutomapHostsOnResolve 1
+        # TransPort 9040
+        # SocksPort 9050
+        # DNSPort 53
+        # RunAsDaemon 1
 	grep -q -x 'VirtualAddrNetworkIPv4 10.192.0.0/10' /etc/tor/torrc
 	VAR1=$?
 
