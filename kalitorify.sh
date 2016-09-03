@@ -60,7 +60,7 @@ printf "${white}
 
 Transparent proxy trough Tor, simply
 
-Version: 1.3.0 - kali-linux-2016.2
+Version: 1.3.0
 Dev: Brainfuck${endc}\n"
 }
 
