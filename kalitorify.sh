@@ -1,12 +1,12 @@
 #!/bin/bash
 
 # Program: kalitorify.sh
-# Version: 1.2 - 02/06/2016
+# Version: 1.3.0 - 01/09/2016
 # Operative System: Kali Linux 
-# Description: Bash script for transparent proxy trought Tor
+# Description: Transparent proxy trough Tor, simply.
 # Dev: Brainfuck
 # https://github.com/BrainfuckSec
-# Dependencies: Tor (apt-get install tor)
+# Dependencies: tor, wget
 #
 # Kalitorify is KISS version of Parrot AnonSurf Module, developed  
 # by "Pirates' Crew" of FrozenBox - https://github.com/parrotsec/anonsurf
@@ -29,7 +29,7 @@
 
 # program / version
 program="kalitorify"
-version="1.2"
+version="1.3.0"
 
 # define colors
 export red=$'\e[0;91m'
@@ -37,8 +37,9 @@ export green=$'\e[0;92m'
 export blue=$'\e[0;94m'
 export white=$'\e[0;97m'
 export endc=$'\e[0m'
+#export cyan=$'\e[0;36m'
 
-# destinations you don't want routed through Tor 
+# destinations you don't want routed through Tor
 non_tor="192.168.1.0/24 192.168.0.0/24"
 
 # UID --> 'ps -e | grep tor'
@@ -48,17 +49,19 @@ tor_uid="debian-tor"
 trans_port="9040"
 
 
-# banner (font: Small)
+# print banner
 function banner {
-cat << "EOF"
-  _  __     _ _ _           _  __      
- | |/ /__ _| (_) |_ ___ _ _(_)/ _|_  _ 
- | ' </ _` | | |  _/ _ \ '_| |  _| || |
- |_|\_\__,_|_|_|\__\___/_| |_|_|  \_, |
-                                  |__/ 
-Version: 1.2                           
-Dev: Brainfuck
-EOF
+printf "${white}
+ _____     _ _ _           _ ___     
+|  |  |___| |_| |_ ___ ___|_|  _|_ _ 
+|    -| .'| | |  _| . |  _| |  _| | |
+|__|__|__,|_|_|_| |___|_| |_|_| |_  |
+                                |___|
+
+Transparent proxy trough Tor, simply
+
+Version: 1.3.0 - kali-linux-2016.2
+Dev: Brainfuck${endc}\n"
 }
 
 
@@ -98,7 +101,7 @@ function enable_ufw {
 }
 
 
-# check current public IP 
+# print public IP on the screen  
 function check_ip {
 	local ext_ip=$(wget -qO- ipinfo.io/ip)
 	local city=$(wget -qO- ipinfo.io/city)
@@ -107,11 +110,24 @@ function check_ip {
 }
 
 
-# check if tor is installed and default configurations in /etc/tor/torrc file
+# check default configurations
 function check_default {
+	# tor is installed?
 	command -v tor > /dev/null 2>&1 ||
-	{ printf "\n${red}[!] Tor isn't installed, exiting...${endc}"; exit 1; }
-	
+	{ printf "\n${red}[ failed ] tor isn't installed, exiting...${endc}"; exit 1; }
+
+	# wget is installed?
+	command -v wget > /dev/null 2>&1 ||
+	{ printf "\n${red}[ failed ] wget isn't installed, exiting..${endc}\n"; exit 1; }
+
+	# check file '/etc/tor/torrc'
+	# 
+	# VirtualAddrNetworkIPv4 10.192.0.0/10
+    # AutomapHostsOnResolve 1
+    # TransPort 9040
+    # SocksPort 9050
+    # DNSPort 53
+    # RunAsDaemon 1
 	grep -q -x 'VirtualAddrNetworkIPv4 10.192.0.0/10' /etc/tor/torrc
 	VAR1=$?
 
@@ -136,7 +152,7 @@ function check_default {
 		[ $VAR4 -ne 0 ] || 
 		[ $VAR5 -ne 0 ] ||
 		[ $VAR6 -ne 0 ]; then
-		printf "\n${red}[!]${endc} ${green}To enable the transparent proxy add the following of /etc/tor/torrc file:${endc}\n" >&2
+		printf "\n${red}[ failed ]${endc} ${green}To enable the transparent proxy add the following of /etc/tor/torrc file:${endc}\n" >&2
 		printf "${white}VirtualAddrNetworkIPv4 10.192.0.0/10${endc}\n"
 		printf "${white}AutomapHostsOnResolve 1${endc}\n"
 		printf "${white}TransPort 9040${endc}\n"
@@ -154,9 +170,30 @@ function start {
 	check_root
 	check_default
 
+	# check status of tor.service and stop it is active
+	if systemctl is-active tor.service > /dev/null 2>&1; then
+		systemctl stop tor.service
+	fi
+
 	printf "\n${blue}::${endc} ${green}Starting Transparent Proxy${endc}\n"
 	disable_ufw
 	sleep 1
+
+	# if you want, get fresh Tor entry guards by regenerating Tor state file
+	# delete file: /var/lib/tor/state
+	# when tor.service starting, a new file 'state' it's generated
+	# when you connect to Tor network, a new Tor entry guards will be written
+	# on this file.
+	printf "${blue}::${endc} ${green}Get fresh Tor entry guards? [y/n]${endc}"
+	read -p "${green}:${endc} " yn
+	case $yn in
+		[yY]|[y|Y] )
+			rm -i -v /var/lib/tor/state
+			printf "${blue}[ ok ]${endc} ${white}New Tor entry guards obtained${endc}\n"
+			;;
+		*)
+			;;
+	esac
 	
 	# start tor.service
 	printf "${blue}::${endc} ${green}Start Tor service${endc}\n"
@@ -214,16 +251,16 @@ function start {
 	iptables -A OUTPUT -j REJECT
 	sleep 4
 
-	printf "${blue}[+]${endc} ${white}Transparent Proxy activated, your system is under Tor${endc}\n"
+	printf "${blue}[ ok ]${endc} ${white}Transparent Proxy activated, your system is under Tor${endc}\n"
+	printf "${blue}[ info ]${endc} ${green}use --checkip argument for print public IP${endc}\n"
 }
 
 
 # stop program and return to clearnet 
 function stop {
-	banner
 	check_root
 
-	printf "\n${blue}::${endc} ${green}Stopping Transparent Proxy${endc}\n"
+	printf "${blue}::${endc} ${green}Stopping Transparent Proxy${endc}\n"
 	sleep 2
 
 	# flush iptables
@@ -255,13 +292,11 @@ function stop {
 # check current status of tor.service 
 function status {
 	check_root
-	local service='tor.service'
-
 	printf "${blue}::${endc} ${green}Check current status of tor.service${endc}\n"
-	if ps ax | grep -v grep | grep $service > /dev/null; then
-		printf "${blue}[+]${endc} ${white}tor.service is active${endc}\n"
+	if systemctl is-active tor.service > /dev/null 2>&1; then
+		printf "${blue}[ ok ]${endc} ${white}Tor service is active${endc}\n"
 	else
-		printf "${red}[!] tor.service is not running${endc}\n"
+		printf "${red}[ failed ] Tor service is not running!${endc}\n"
 	fi
 }
 
@@ -269,15 +304,23 @@ function status {
 # restart tor.service and change IP
 function restart {
 	check_root
-
-	printf "${blue}::${endc} ${green}Restart tor service and change IP${endc}\n"
-	systemctl restart tor.service
+	printf "${blue}::${endc} ${green}Restart Tor service and change IP${endc}\n"
+	systemctl stop tor.service
+	sleep 3
+	systemctl start tor.service
+	sleep 2
+	# check tor.service again
+	if systemctl is-active tor.service > /dev/null 2>&1; then
+		printf "${blue}[ ok ]${endc} ${white}Tor service is active${endc}\n"
+	else
+		printf "${red}[ failed ] Tor service is not running!${endc}\n"
+	fi
 	sleep 4
 	check_ip
 }
 
 
-# display program and tor version then exit
+# display version of: kalitorify.sh, tor daemon
 function print_version {
 	printf "${white}%s%s$program version $version${endc}\n"
 	printf "${white}$(tor --version)${endc}\n"
@@ -290,41 +333,41 @@ function help_menu {
 	banner	
 	printf "\n${white}Usage:${endc}\n\n"
 	printf "${white}┌─╼${endc} ${red}$USER${endc} $white╺─╸${endc} ${red}$(hostname)${endc}\n"
-	printf "${white}└───╼${endc} ${green}./%s$program <argument>${endc}\n"
+	printf "${white}└───╼${endc} ${green}./%s$program <--argument>${endc}\n"
 
 	printf "\n${white}Arguments:${endc}\n\n"
-	printf "${red}help${endc}        ${green}show this help message and exit${endc}\n"
-	printf "${red}start${endc}       ${green}start transparent proxy for tor${endc}\n"
-	printf "${red}stop${endc}        ${green}reset iptables and return to clear navigation${endc}\n"
-	printf "${red}status${endc}      ${green}check program status${endc}\n"
-	printf "${red}restart${endc}     ${green}restart tor service and change IP${endc}\n"
-	printf "${red}checkip${endc}     ${green}print current public IP${endc}\n"
-	printf "${red}version${endc}     ${green}display program and tor version then exit${endc}\n"  
+	printf "${red}--help${endc}        ${green}show this help message and exit${endc}\n"
+	printf "${red}--start${endc}       ${green}start transparent proxy for tor${endc}\n"
+	printf "${red}--stop${endc}        ${green}reset iptables and return to clear navigation${endc}\n"
+	printf "${red}--status${endc}      ${green}check program status${endc}\n"
+	printf "${red}--restart${endc}     ${green}restart tor service and change IP${endc}\n"
+	printf "${red}--checkip${endc}     ${green}print current public IP${endc}\n"
+	printf "${red}--version${endc}     ${green}display program and tor version then exit${endc}\n"  
 	exit 0
 }
 
 
 # cases user input
 case "$1" in
-	start)
+	--start)
 		start
 		;;
-	stop)
+	--stop)
 		stop
 		;;
-	restart)
+	--restart)
 		restart
 		;;
-	status)
+	--status)
 		status
 		;;
-	checkip)
+	--checkip)
 		check_ip
 		;;
-	version)
+	--version)
 		print_version
 		;;
-	help)
+	--help)
 		help_menu
 		;;
 	*)
