@@ -1,7 +1,7 @@
 ## Kalitorify v1.3.0
 
 ### Transparent proxy trough Tor, simply
-### Operative System: Kali Linux 
+### Operating System: Kali Linux 
 
  
 ### Instructions 
