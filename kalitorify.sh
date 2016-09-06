@@ -2,7 +2,7 @@
 
 # Program: kalitorify.sh
 # Version: 1.3.0 - 01/09/2016
-# Operative System: Kali Linux 
+# Operating System: Kali Linux 
 # Description: Transparent proxy trough Tor, simply.
 # Dev: Brainfuck
 # https://github.com/BrainfuckSec
