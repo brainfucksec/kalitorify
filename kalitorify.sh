@@ -332,7 +332,7 @@ function print_version {
 function help_menu {
 	banner	
 	printf "\n${white}Usage:${endc}\n\n"
-	printf "${white}┌─╼${endc} ${red}$USER${endc} $white╺─╸${endc} ${red}$(hostname)${endc}\n"
+	printf "${white}┌─╼${endc} ${red}$USER${endc} ${white}╺─╸${endc} ${red}$(hostname)${endc}\n"
 	printf "${white}└───╼${endc} ${green}./%s$program <--argument>${endc}\n"
 
 	printf "\n${white}Arguments:${endc}\n\n"
