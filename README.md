@@ -1,7 +1,6 @@
-## Kalitorify v1.3.0
+## Kalitorify v1.4.0
 
-### Transparent proxy trough Tor, simply
-### Operating System: Kali Linux 
+### Transparent proxy trough Tor for Kali Linux
 
  
 ### Instructions 
@@ -10,7 +9,7 @@
 ```bash
 sudo apt-get update && sudo apt-get upgrade -y
 sudo apt-get dist-upgrade -y
-sudo apt-get install tor
+sudo apt-get install -y tor
 ```
 
 #### 2 - Modify /etc/tor/torrc file, add the follows:
