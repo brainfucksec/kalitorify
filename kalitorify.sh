@@ -43,7 +43,7 @@ export endc=$'\e[0m'
 non_tor="192.168.1.0/24 192.168.0.0/24"
 
 # UID --> 'ps -e | grep tor'
-tor_uid="tor"
+tor_uid="debian-tor"
 
 # Tor TransPort
 trans_port="9040"
