@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # Program: kalitorify.sh
-# Version: 1.4.0 - 01/10/2016
+# Version: 1.4.1
 # Operating System: Kali Linux
-# Description: Transparent proxy trough Tor for Kali Linux
+# Description: Transparent proxy trough Tor
 # Author: Brainfuck
 # https://github.com/BrainfuckSec
 # Dependencies: tor, wget
@@ -29,7 +29,7 @@
 
 # program / version
 program="kalitorify"
-version="1.4.0"
+version="1.4.1"
 
 # define colors
 export red=$'\e[0;91m'
@@ -37,7 +37,7 @@ export green=$'\e[0;92m'
 export blue=$'\e[0;94m'
 export white=$'\e[0;97m'
 export endc=$'\e[0m'
-#export cyan=$'\e[0;36m'
+export cyan=$'\e[0;36m'
 
 # destinations you don't want routed through Tor
 non_tor="192.168.1.0/24 192.168.0.0/24"
@@ -52,11 +52,15 @@ trans_port="9040"
 # print banner
 function banner {
 printf "${white}
- _____     _ _ _           _ ___
-|  |  |___| |_| |_ ___ ___|_|  _|_ _
-|    -| .'| | |  _| . |  _| |  _| | |
-|__|__|__,|_|_|_| |___|_| |_|_| |_  |
-                                |___|
+*****************************************
+*                                       *
+*  _____     _ _ _           _ ___      *
+* |  |  |___| |_| |_ ___ ___|_|  _|_ _  *
+* |    -| .'| | |  _| . |  _| |  _| | | *
+* |__|__|__,|_|_|_| |___|_| |_|_| |_  | *
+*                                 |___| *
+*                                       *
+*****************************************
 
 Transparent proxy trough Tor for Kali Linux
 
@@ -186,7 +190,7 @@ function start {
     case $yn in
         [yY]|[y|Y] )
             rm -v /var/lib/tor/state
-            printf "${blue}%s${endc} ${white}%s${endc}\n" "[ ok ]" "New Tor entry guards obtained"
+            printf "${blue}%s${endc} ${white}%s${endc}\n" "[ ok ]" "When tor.service start, new Tor entry guards will obtained"
             ;;
         *)
             ;;
@@ -196,6 +200,10 @@ function start {
     printf "${blue}%s${endc} ${green}%s${endc}\n" "::" "Start Tor service"
     systemctl start tor.service
     sleep 6
+   	printf "${blue}%s${endc} ${white}%s${endc}\n" "[ ok ]" "Tor service is active"
+
+   	# iptables settings
+   	###################	
 
     # save iptables
     printf "${blue}%s${endc} ${green}%s${endc}\n" "::" "Backup iptables rules"
@@ -249,7 +257,7 @@ function start {
     sleep 4
 
     printf "${blue}%s${endc} ${white}%s${endc}\n" "[ ok ]" "Transparent Proxy activated, your system is under Tor"
-    printf "${blue}%s${endc} ${green}%s${endc}\n" "::" "use --status argument for check the program status"
+    printf "${blue}%s${endc} ${green}%s${endc}\n" "[ info ]" "Use --status argument for check the program status"
 }
 
 
@@ -305,18 +313,20 @@ function check_status {
     # check current public IP
     printf "\n${blue}%s${endc} ${green}%s${endc}\n" "::" "Checking your public IP, please wait..."
     local ext_ip
-    ext_ip=$(wget -qO- ipinfo.io/ip)
+    ext_ip=$(wget -qO- -t 1 --timeout=15 ipinfo.io/ip)
     local city
-    city=$(wget -qO- ipinfo.io/city)
+    city=$(wget -qO- -t 1 --timeout=15 ipinfo.io/city)
     
     printf "${blue}%s${endc} ${green}%s${endc}\n" "::" "Current public IP:"
     printf "${white}%s%s${endc}\n\n" "$ext_ip - $city"
+    sleep 1
 
     # exec command "netstat -tulpn", check if there are open doors
     printf "${blue}%s${endc} ${green}%s${endc}\n" "::" "Check if there are open doors"
     printf "${blue}%s${endc} ${green}%s${endc}\n" "::" "run command 'netstat -tulpn'"
     sleep 5 &
     netstat -tulpn
+    printf "\n${blue}%s${endc} ${green}%s${endc}\n" "[ info ]" "If your network security is ok, you have only 'tor' in listen"
     exit 0
 }
 
@@ -333,8 +343,8 @@ function restart {
     sleep 2
     # check tor.service after restart
     if systemctl is-active tor.service > /dev/null 2>&1; then
-        printf "${blue}%s${endc} ${white}%s${endc}\n" "[ ok ]" "Tor service is active and your IP is changed"
-        printf "${blue}%s${endc} ${green}%s${endc}\n" "::" "use --status argument for check public IP"
+        printf "${blue}%s${endc} ${white}%s${endc}\n\n" "[ ok ]" "Tor service is active and your IP is changed"
+        check_status
     else
         printf "${red}%s${endc}\n" "[-] Tor service is not running!" 
     fi
@@ -354,7 +364,8 @@ function print_version {
 function help_menu {
 	banner
 
-    printf "\n${white}%s${endc}\n\n" "Usage:"
+    printf "\n${white}%s${endc}\n" "Usage:"
+    printf "${white}%s${endc}\n\n"   "******"
     printf "${white}%s${endc} ${red}%s${endc} ${white}%s${endc} ${red}%s${endc}\n" "┌─╼" "$USER" "╺─╸" "$(hostname)"
     printf "${white}%s${endc} ${green}%s${endc}\n" "└───╼" "./$program --argument"
 
