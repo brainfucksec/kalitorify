@@ -1,4 +1,4 @@
-## Kalitorify v1.4.0
+## Kalitorify v1.4.1
 
 ### Transparent proxy trough Tor for Kali Linux
 
@@ -22,18 +22,22 @@ DNSPort 53
 RunAsDaemon 1
 ```
 
-#### 2 - Chmod and run the program as a root
+#### 3 - Use help argument or run the program without arguments for help menu'
+```bash
+./kalitorify.sh --help
+```
+![alt text](http://i.hizliresim.com/Y4LG2l.png)
+
+
+#### 4 - Chmod and run the program as a root
 ```bash
 chmod +x kalitorify.sh
 
 ./kalitorify.sh --start 
 ```
- 
-#### 3 - Use help argument or run the program without arguments for help menu'
-```bash
-./kalitorify.sh --help
-```
+![alt text](http://i.hizliresim.com/Xd1zW7.png)
 
+ 
 
 
 #### Note:
