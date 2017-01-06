@@ -72,7 +72,6 @@ https://forums.whonix.org/t/persistent-tor-entry-guard-relays-can-make-you-track
 
 For other informations please read official Tor project page: https://trac.torproject.org/projects/tor 
 
+**Requests:** https://github.com/BrainfuckSec/kalitorify/pulls
 
-#### Requests: https://github.com/BrainfuckSec/kalitorify/pulls
-
-#### Issues: https://github.com/BrainfuckSec/kalitorify/issues
+**Issues:** https://github.com/BrainfuckSec/kalitorify/issues
