@@ -1,52 +1,78 @@
-## Kalitorify v1.4.1
+## Kalitorify v1.5.0
 
-### Transparent proxy trough Tor for Kali Linux
+### Transparent proxy trough Tor for Kali Linux OS
 
  
-### Instructions 
+### Configuration
 
-#### 1 - Update system and install tor
+#### Update system and install tor:
 ```bash
-sudo apt-get update && sudo apt-get upgrade -y
-sudo apt-get dist-upgrade -y
-sudo apt-get install -y tor
+sudo apt update && sudo apt full-upgrade -y
+sudo apt install -y tor
 ```
 
-#### 2 - Modify /etc/tor/torrc file, add the follows:
+#### Modify /etc/tor/torrc file, add the follows:
 ```
 VirtualAddrNetworkIPv4 10.192.0.0/10
 AutomapHostsOnResolve 1
 TransPort 9040
 SocksPort 9050
-DNSPort 53
-RunAsDaemon 1
+DNSPort 5353
 ```
 
-#### 3 - Use help argument or run the program without arguments for help menu'
+
+
+### Start program
+
+#### Use help argument or run the program without arguments for help menu':
 ```bash
 ./kalitorify.sh --help
+...
+
+└───╼ ./kalitorify --argument
+
+Arguments:
+
+--help      show this help message and exit
+--start     start transparent proxy for tor
+--stop      reset iptables and return to clear navigation
+--status    check status of program and services
+--restart   restart tor service and change IP
+--version   display program and tor version then exit
+
 ```
-![alt text](http://i.hizliresim.com/Y4LG2l.png)
 
 
-#### 4 - Chmod and run the program as a root
+#### Start Transparent Proxy with --start argument
 ```bash
-chmod +x kalitorify.sh
+./kalitorify.sh --start
+...
 
-./kalitorify.sh --start 
+:: Starting Transparent Proxy
+
 ```
-![alt text](http://i.hizliresim.com/Xd1zW7.png)
+
 
  
 
-
 #### Note:
+
 Kalitorify is KISS version of Parrot AnonSurf Module, developed by "Pirates' Crew" of FrozenBox - https://github.com/parrotsec/anonsurf
 
-For informations about transparent proxy connections please read the official Tor Project documentation: https://trac.torproject.org/projects/tor/wiki/doc/TransparentProxy
+Tor project page about transparent proxy and DNS proxy: https://trac.torproject.org/projects/tor/wiki/doc/TransparentProxy
 
-Added the option for generate new Tor Entry Guards, this is usually something to avoid unless you know what you are doing, for more information please read here: 
+New Tor Entry Guards, this is usually something to avoid unless you know what you are doing, for more information please read here: 
 
 https://www.whonix.org/wiki/Tor#Non-Persistent_Entry_Guards 
 
 https://forums.whonix.org/t/persistent-tor-entry-guard-relays-can-make-you-trackable-across-different-physical-locations/2090
+
+
+
+
+For other informations please read official Tor project page: https://trac.torproject.org/projects/tor 
+
+
+#### Requests: https://github.com/BrainfuckSec/kalitorify/pulls
+
+#### Issues: https://github.com/BrainfuckSec/kalitorify/issues
