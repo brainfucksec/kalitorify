@@ -1,12 +1,12 @@
 #!/bin/bash
 
 # Program: kalitorify.sh
-# Version: 1.4.1
+# Version: 1.5.0
 # Operating System: Kali Linux
 # Description: Transparent proxy trough Tor
-# Author: Brainfuck
-# https://github.com/BrainfuckSec
 # Dependencies: tor, wget
+#
+# Copyright (C) 2015, 2016, 2017 Brainfuck
 #
 # Kalitorify is KISS version of Parrot AnonSurf Module, developed
 # by "Pirates' Crew" of FrozenBox - https://github.com/parrotsec/anonsurf
@@ -27,9 +27,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-# program / version
-program="kalitorify"
-version="1.4.1"
+# program name - version
+_program="kalitorify"
+_version="1.5.0"
 
 # define colors
 export red=$'\e[0;91m'
@@ -40,17 +40,17 @@ export endc=$'\e[0m'
 export cyan=$'\e[0;36m'
 
 # destinations you don't want routed through Tor
-non_tor="192.168.1.0/24 192.168.0.0/24"
+non_tor="127.0.0.0/8 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16"
 
 # UID --> 'ps -e | grep tor'
-tor_uid="debian-tor"
+tor_uid="109"
 
 # Tor TransPort
 trans_port="9040"
 
 
 # print banner
-function banner {
+banner () {
 printf "${white}
 *****************************************
 *                                       *
@@ -64,13 +64,13 @@ printf "${white}
 
 Transparent proxy trough Tor for Kali Linux
 
-Version: $version
+Version: $_version
 Author: Brainfuck${endc}\n"
 }
 
 
 # check if the program run as a root
-function check_root {
+check_root () {
     if [ "$(id -u)" -ne 0 ]; then
         printf "${red}%s${endc}\n"  "[ failed ] Please run this program as a root!" >&2
         exit 1
@@ -78,15 +78,23 @@ function check_root {
 }
 
 
+# display program and Tor version then exit
+print_version () {
+    printf "${white}%s${endc}\n" "$_program version $_version"
+    printf "${white}%s${endc}\n" "$(tor --version)"
+    
+	exit 0
+}
+
+
 # functions for firewall ufw
-# check if ufw is installed and active, if not
-# jump this function 
-function disable_ufw {
+# **************************
+# check if ufw is installed and active, if not, do nothing 
+disable_ufw () {
 	if hash ufw 2>/dev/null; then
     	if ufw status | grep -q active$; then
-        	printf "${blue}%s${endc} ${green}%s${endc}\n" "::" "Firewall ufw is active. disabling..."
-        	ufw disable > /dev/null 2>&1
-        	printf "${blue}%s${endc} ${green}%s${endc}\n" "::" "ufw disabled"
+        	printf "${blue}%s${endc} ${green}%s${endc}\n" "::" "Firewall ufw is active. disabling... "
+        	ufw disable
         	sleep 3
     	else 
     		ufw status | grep -q inactive$; 
@@ -97,13 +105,12 @@ function disable_ufw {
 
 
 # enable ufw 
-# if ufw isn't installed, jump this function
-function enable_ufw {
+# if ufw isn't installed, do nothing
+enable_ufw () {
 	if hash ufw 2>/dev/null; then
     	if ufw status | grep -q inactive$; then
-        	printf "${blue}%s${endc} ${green}%s${endc}\n" "::" "Enabling firewall ufw"
-        	ufw enable > /dev/null 2>&1
-        	printf "${blue}%s${endc} ${green}%s${endc}\n" "::" "ufw enabled"
+        	printf "${blue}%s${endc} ${green}%s${endc}\n" "::" "Enabling firewall ufw..."
+        	ufw enable
         	sleep 3
         fi
     fi
@@ -111,8 +118,9 @@ function enable_ufw {
 
 
 # check default configurations
+# ****************************
 # check if kalitorify is properly configured
-function check_default {
+check_default () {
     # check dependencies (tor, wget)
     command -v tor > /dev/null 2>&1 ||
     { printf >&2 "\n${red}%s${endc}\n" "[ failed ] tor isn't installed, exiting..."; exit 1; }
@@ -126,8 +134,7 @@ function check_default {
     # AutomapHostsOnResolve 1
     # TransPort 9040
     # SocksPort 9050
-    # DNSPort 53
-    # RunAsDaemon 1
+    # DNSPort 5353
     grep -q -x 'VirtualAddrNetworkIPv4 10.192.0.0/10' /etc/tor/torrc
     VAR1=$?
 
@@ -140,33 +147,28 @@ function check_default {
     grep -q -x 'SocksPort 9050' /etc/tor/torrc
     VAR4=$?
 
-    grep -q -x 'DNSPort 53' /etc/tor/torrc
+    grep -q -x 'DNSPort 5353' /etc/tor/torrc
     VAR5=$?
 
-    grep -q -x 'RunAsDaemon 1' /etc/tor/torrc
-    VAR6=$?
-
-    if [ $VAR1 -ne 0 ] ||
-        [ $VAR2 -ne 0 ] ||
-        [ $VAR3 -ne 0 ] ||
-        [ $VAR4 -ne 0 ] ||
-        [ $VAR5 -ne 0 ] ||
-        [ $VAR6 -ne 0 ]; then
+    if [[ $VAR1 -ne 0 ]] ||
+       [[ $VAR2 -ne 0 ]] ||
+       [[ $VAR3 -ne 0 ]] ||
+       [[ $VAR4 -ne 0 ]] ||
+       [[ $VAR5 -ne 0 ]]; then
         printf "\n${red}%s${endc}\n" "[ failed ] To enable the transparent proxy add the following of /etc/tor/torrc file:" >&2
         printf "${white}%s${endc}\n" "VirtualAddrNetworkIPv4 10.192.0.0/10"
         printf "${white}%s${endc}\n" "AutomapHostsOnResolve 1"
         printf "${white}%s${endc}\n" "TransPort 9040"
         printf "${white}%s${endc}\n" "SocksPort 9050"
-        printf "${white}%s${endc}\n" "DNSPort 53"
-        printf "${white}%s${endc}\n" "RunAsDaemon 1"
+        printf "${white}%s${endc}\n" "DNSPort 5353"
     exit 1
     fi
 }
 
 
 # start transparent proxy
-# start program
-function start {
+# ***********************
+start_program () {
     banner
     check_root
     check_default
@@ -190,30 +192,31 @@ function start {
     case $yn in
         [yY]|[y|Y] )
             rm -v /var/lib/tor/state
-            printf "${blue}%s${endc} ${white}%s${endc}\n" "[ ok ]" "When tor.service start, new Tor entry guards will obtained"
+            printf "${green}%s${endc} ${white}%s${endc}\n" "[ OK ]" "When tor.service start, new Tor entry guards will obtained"
             ;;
         *)
             ;;
     esac
 
     # start tor.service
-    printf "${blue}%s${endc} ${green}%s${endc}\n" "::" "Start Tor service"
+    printf "${blue}%s${endc} ${green}%s${endc}\n" "::" "Start Tor service... "
     systemctl start tor.service
     sleep 6
-   	printf "${blue}%s${endc} ${white}%s${endc}\n" "[ ok ]" "Tor service is active"
+   	printf "${green}%s${endc} ${white}%s${endc}\n" "[ OK ]" "Tor service is active"
 
    	# iptables settings
-   	###################	
-
+   	# *****************
     # save iptables
-    printf "${blue}%s${endc} ${green}%s${endc}\n" "::" "Backup iptables rules"
+    printf "${blue}%s${endc} ${green}%s${endc}" "::" "Backup iptables rules... " 
     iptables-save > /opt/iptables.backup
     sleep 2
+    printf "${green}%s${endc}\n" "Done"
 
     # flush iptables
-    printf "${blue}%s${endc} ${green}%s${endc}\n" "::" "Flush iptables rules"
+    printf "${blue}%s${endc} ${green}%s${endc}" "::" "Flush iptables rules... "    
     iptables -F
-    iptables -t nat -F
+    iptables -t nat -F    
+    printf "${green}%s${endc}\n" "Done"
 
     # configure system's DNS resolver to use Tor's DNSPort on the loopback interface
     printf "${blue}%s${endc} ${green}%s${endc}\n" "::" "Configure system's DNS resolver to use Tor's DNSPort"
@@ -222,13 +225,13 @@ function start {
     sleep 2
 
     # new iptables rules
-    printf "${blue}%s${endc} ${green}%s${endc}\n" "::" "Set new iptables rules"
+    printf "${blue}%s${endc} ${green}%s${endc}" "::" "Set new iptables rules... "
 
     # set iptables *nat
     iptables -t nat -A OUTPUT -m owner --uid-owner $tor_uid -j RETURN
-    iptables -t nat -A OUTPUT -p udp --dport 53 -j REDIRECT --to-ports 53
-    iptables -t nat -A OUTPUT -p tcp --dport 53 -j REDIRECT --to-ports 53
-    iptables -t nat -A OUTPUT -p udp -m owner --uid-owner $tor_uid -m udp --dport 53 -j REDIRECT --to-ports 53
+    iptables -t nat -A OUTPUT -p udp --dport 53 -j REDIRECT --to-ports 5353
+    iptables -t nat -A OUTPUT -p tcp --dport 53 -j REDIRECT --to-ports 5353
+    iptables -t nat -A OUTPUT -p udp -m owner --uid-owner $tor_uid -m udp --dport 53 -j REDIRECT --to-ports 5353
 
     iptables -t nat -A OUTPUT -p tcp -d 10.192.0.0/10 -j REDIRECT --to-ports $trans_port
     iptables -t nat -A OUTPUT -p udp -d 10.192.0.0/10 -j REDIRECT --to-ports $trans_port
@@ -255,34 +258,39 @@ function start {
     iptables -A OUTPUT -m owner --uid-owner $tor_uid -j ACCEPT
     iptables -A OUTPUT -j REJECT
     sleep 4
+    printf "${green}%s${endc}\n" "Done"
 
-    printf "${blue}%s${endc} ${white}%s${endc}\n" "[ ok ]" "Transparent Proxy activated, your system is under Tor"
-    printf "${blue}%s${endc} ${green}%s${endc}\n" "[ info ]" "Use --status argument for check the program status"
+    printf "${green}%s${endc} ${white}%s${endc}\n" "[ OK ]" "Transparent Proxy activated, your system is under Tor"
+    printf "${blue}%s${endc} ${green}%s${endc}\n" "[ info ]" "Use --status argument for check the program status whatever you need"
 }
 
 
-# stop function
-# stop transparent proxy and return to clearnet
-function stop {
+# stop transparent proxy
+# **********************
+stop () {
     check_root
 
     printf "${blue}%s${endc} ${green}%s${endc}\n" "::" "Stopping Transparent Proxy"
     sleep 2
 
     # flush iptables
-    printf "${blue}%s${endc} ${green}%s${endc}\n" "::" "Flush iptables rules"
+    printf "${blue}%s${endc} ${green}%s${endc}" "::" "Flush iptables rules... "    
     iptables -F
     iptables -t nat -F
+    printf "${green}%s${endc}\n" "Done"
 
     # restore iptables
-    printf "${blue}%s${endc} ${green}%s${endc}\n" "::" "Restore the default iptables rules"
+    printf "${blue}%s${endc} ${green}%s${endc}" "::" "Restore the default iptables rules... "
     iptables-restore < /opt/iptables.backup
+    printf "${green}%s${endc}\n" "Done"
+
     sleep 2
 
     # stop tor.service
-    printf "${blue}%s${endc} ${green}%s${endc}\n" "::" "Stop tor service"
+    printf "${blue}%s${endc} ${green}%s${endc}" "::" "Stop tor service... "
     systemctl stop tor.service
     sleep 4
+    printf "${green}%s${endc}\n" "Done"
 
     # restore /etc/resolv.conf --> default nameserver
     printf "${blue}%s${endc} ${green}%s${endc}\n" "::" "Restore /etc/resolv.conf file with default DNS"
@@ -291,20 +299,21 @@ function stop {
     sleep 2
 
     enable_ufw
-    printf "${blue}%s${endc} ${white}%s${endc}\n" "[-]" "Transparent Proxy stopped"
+    printf "${green}%s${endc} ${white}%s${endc}\n" "[-]" "Transparent Proxy stopped"
 }
 
 
 # check_status function
+# *********************
 # function for check status of program and services:
 # tor.service, check public IP, netstat for open door
-function check_status {
+check_status () {
     check_root
 
     # check status of tor.service
     printf "${blue}%s${endc} ${green}%s${endc}\n" "::" "Check current status of Tor service"
     if systemctl is-active tor.service > /dev/null 2>&1; then
-        printf "${blue}%s${endc} ${white}%s${endc}\n" "[ ok ]" "Tor service is active"
+        printf "${green}%s${endc} ${white}%s${endc}\n" "[ OK ]" "Tor service is active"
     else
         printf "${red}%s${endc}\n" "[-] Tor service is not running!"
         exit 1
@@ -316,9 +325,9 @@ function check_status {
     ext_ip=$(wget -qO- -t 1 --timeout=15 ipinfo.io/ip)
     local city
     city=$(wget -qO- -t 1 --timeout=15 ipinfo.io/city)
-    
+   
     printf "${blue}%s${endc} ${green}%s${endc}\n" "::" "Current public IP:"
-    printf "${white}%s%s${endc}\n\n" "$ext_ip - $city"
+    printf "${white}%s%s${endc}\n\n" "$ext_ip - $city"  
     sleep 1
 
     # exec command "netstat -tulpn", check if there are open doors
@@ -326,13 +335,14 @@ function check_status {
     printf "${blue}%s${endc} ${green}%s${endc}\n" "::" "run command 'netstat -tulpn'"
     sleep 5 &
     netstat -tulpn
-    printf "\n${blue}%s${endc} ${green}%s${endc}\n" "[ info ]" "If your network security is ok, you have only 'tor' in listen"
+    printf "\n${blue}%s${endc} ${green}%s${endc}\n" "[ info ]" "For better security, you must have only 'tor' in listen"
     exit 0
 }
 
 
 # restart tor.service and change IP
-function restart {
+# *********************************
+restart () {
     check_root
     printf "${blue}%s${endc} ${green}%s${endc}\n" "::" "Restart Tor service and change IP"
 
@@ -341,37 +351,32 @@ function restart {
     sleep 3
     systemctl start tor.service
     sleep 2
-    # check tor.service after restart
-    if systemctl is-active tor.service > /dev/null 2>&1; then
-        printf "${blue}%s${endc} ${white}%s${endc}\n\n" "[ ok ]" "Tor service is active and your IP is changed"
-        check_status
-    else
-        printf "${red}%s${endc}\n" "[-] Tor service is not running!" 
-    fi
-    sleep 4
+    
+    printf "${green}%s${endc} ${white}%s${endc}\n" "[ OK ]" "Tor Exit Node changed"
+    printf "${blue}%s${endc} ${green}%s${endc}\n" "::" "Checking your public IP, please wait..."
+    local ext_ip
+    ext_ip=$(wget -qO- -t 1 --timeout=15 ipinfo.io/ip)
+    local city
+    city=$(wget -qO- -t 1 --timeout=15 ipinfo.io/city)
+   
+    printf "${blue}%s${endc} ${green}%s${endc}\n" "::" "Current public IP:"
+    printf "${white}%s%s${endc}\n\n" "$ext_ip - $city"  
 }
 
 
-# display program and tor version then exit
-function print_version {
-    printf "${white}%s${endc}\n" "$program version $version"
-    printf "${white}%s${endc}\n" "$(tor --version)"
-    exit 0
-}
-
-
-# print nice help message and exit
-function help_menu {
+# print help menu'
+# ***************
+help_menu () {
 	banner
 
     printf "\n${white}%s${endc}\n" "Usage:"
     printf "${white}%s${endc}\n\n"   "******"
     printf "${white}%s${endc} ${red}%s${endc} ${white}%s${endc} ${red}%s${endc}\n" "┌─╼" "$USER" "╺─╸" "$(hostname)"
-    printf "${white}%s${endc} ${green}%s${endc}\n" "└───╼" "./$program --argument"
+    printf "${white}%s${endc} ${green}%s${endc}\n" "└───╼" "./$_program --argument"
 
     printf "\n${white}%s${endc}\n\n" "Arguments:"
     printf "${green}%s${endc}\n" "--help      show this help message and exit"
-    printf "${green}%s${endc}\n" "--start     start transparent proxy for tor"
+    printf "${green}%s${endc}\n" "--start     start transparent proxy through tor"
     printf "${green}%s${endc}\n" "--stop      reset iptables and return to clear navigation"
     printf "${green}%s${endc}\n" "--status    check status of program and services"
     printf "${green}%s${endc}\n" "--restart   restart tor service and change IP"
@@ -383,7 +388,7 @@ function help_menu {
 # cases user input
 case "$1" in
     --start)
-        start
+        start_program
         ;;
     --stop)
         stop
