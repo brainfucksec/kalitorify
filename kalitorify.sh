@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Program: kalitorify.sh
-# Version: 1.5.0
+# Version: 1.6.0
 # Operating System: Kali Linux
 # Description: Transparent proxy trough Tor
 # Dependencies: tor, wget
@@ -29,7 +29,7 @@
 
 # program name - version
 _program="kalitorify"
-_version="1.5.0"
+_version="1.6.0"
 
 # define colors
 export red=$'\e[0;91m'
@@ -39,14 +39,22 @@ export white=$'\e[0;97m'
 export endc=$'\e[0m'
 export cyan=$'\e[0;36m'
 
-# destinations you don't want routed through Tor
-non_tor="127.0.0.0/8 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16"
-
+# Network settings
+# ****************
 # UID --> 'ps -e | grep tor'
 tor_uid="109"
 
 # Tor TransPort
 trans_port="9040"
+
+# Tor DNSPort
+dns_port="5353"
+
+# Tor VirtualAddrNetworkIPv4
+virtual_addr_net="10.192.0.0/10"
+
+# destinations you don't want routed through Tor
+non_tor="127.0.0.0/8 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16"
 
 
 # print banner
@@ -229,12 +237,12 @@ start_program () {
 
     # set iptables *nat
     iptables -t nat -A OUTPUT -m owner --uid-owner $tor_uid -j RETURN
-    iptables -t nat -A OUTPUT -p udp --dport 53 -j REDIRECT --to-ports 5353
-    iptables -t nat -A OUTPUT -p tcp --dport 53 -j REDIRECT --to-ports 5353
-    iptables -t nat -A OUTPUT -p udp -m owner --uid-owner $tor_uid -m udp --dport 53 -j REDIRECT --to-ports 5353
+    iptables -t nat -A OUTPUT -p udp --dport 53 -j REDIRECT --to-ports $dns_port
+    iptables -t nat -A OUTPUT -p tcp --dport 53 -j REDIRECT --to-ports $dns_port
+    iptables -t nat -A OUTPUT -p udp -m owner --uid-owner $tor_uid -m udp --dport 53 -j REDIRECT --to-ports $dns_port
 
-    iptables -t nat -A OUTPUT -p tcp -d 10.192.0.0/10 -j REDIRECT --to-ports $trans_port
-    iptables -t nat -A OUTPUT -p udp -d 10.192.0.0/10 -j REDIRECT --to-ports $trans_port
+    iptables -t nat -A OUTPUT -p tcp -d $virtual_addr_net -j REDIRECT --to-ports $trans_port
+    iptables -t nat -A OUTPUT -p udp -d $virtual_addr_net -j REDIRECT --to-ports $trans_port
 
     # allow clearnet access for hosts in $non_tor
     for clearnet in $non_tor 127.0.0.0/9 127.128.0.0/10; do
@@ -246,8 +254,21 @@ start_program () {
     iptables -t nat -A OUTPUT -p udp -j REDIRECT --to-ports $trans_port
     iptables -t nat -A OUTPUT -p icmp -j REDIRECT --to-ports $trans_port
 
-    # set iptables *filter
-    iptables -A OUTPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+    ### set iptables *filter
+    # *filter INPUT
+    iptables -A INPUT -m state --state ESTABLISHED -j ACCEPT
+    iptables -A INPUT -i lo -j ACCEPT
+
+    iptables -A INPUT -j DROP
+
+    #*filter FORWARD
+    iptables -A FORWARD -j DROP
+
+    #*filter OUTPUT
+    #possible leak fix. See warning.
+    iptables -A OUTPUT -m state --state INVALID -j DROP
+
+    iptables -A OUTPUT -m state --state ESTABLISHED -j ACCEPT
 
     # allow clearnet access for hosts in $non_tor
     for clearnet in $non_tor 127.0.0.0/8; do
@@ -257,6 +278,16 @@ start_program () {
     # allow only Tor output
     iptables -A OUTPUT -m owner --uid-owner $tor_uid -j ACCEPT
     iptables -A OUTPUT -j REJECT
+
+    # log & drop everything else
+    iptables -A OUTPUT -j LOG --log-prefix "Dropped OUTPUT packet: " --log-level 7 --log-uid
+    iptables -A OUTPUT -j DROP
+
+    #Set default policies to DROP
+    iptables -P INPUT DROP
+    iptables -P FORWARD DROP
+    iptables -P OUTPUT DROP
+     
     sleep 4
     printf "${green}%s${endc}\n" "Done"
 
