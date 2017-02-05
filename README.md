@@ -1,4 +1,4 @@
-## Kalitorify v1.5.0
+## Kalitorify v1.6.0
 
 ### Transparent proxy trough Tor for Kali Linux OS
 
@@ -55,19 +55,19 @@ Arguments:
 
  
 
-#### Note:
+#### NOTES:
 
 Kalitorify is KISS version of Parrot AnonSurf Module, developed by "Pirates' Crew" of FrozenBox - https://github.com/parrotsec/anonsurf
 
-Tor project page about transparent proxy and DNS proxy: https://trac.torproject.org/projects/tor/wiki/doc/TransparentProxy
+Please note that this program isn't a final solution for a setup of anonimity at 100%, for more information about Tor configurations please read these docs:
 
-New Tor Entry Guards, this is usually something to avoid unless you know what you are doing, for more information please read here: 
+Tor Project wiki about Transparent Proxy: https://trac.torproject.org/projects/tor/wiki/doc/TransparentProxy
 
-https://www.whonix.org/wiki/Tor#Non-Persistent_Entry_Guards 
+Whonix wiki about Tor Entry Guards:
+
+https://www.whonix.org/wiki/<Tor id="Non-Persistent_Entry_Guards"></Tor>
 
 https://forums.whonix.org/t/persistent-tor-entry-guard-relays-can-make-you-trackable-across-different-physical-locations/2090
 
 
-
-
-For other informations please read official Tor project page: https://trac.torproject.org/projects/tor 
+Whonix Do Not recommendations: https://www.whonix.org/wiki/DoNot
