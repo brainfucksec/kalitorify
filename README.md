@@ -1,4 +1,4 @@
-## Kalitorify v1.6.0
+## Kalitorify v1.6.1
 
 ### Transparent proxy trough Tor for Kali Linux OS
 
@@ -31,7 +31,7 @@ DNSPort 5353
 
 └───╼ ./kalitorify --argument
 
-Arguments:
+Arguments available:
 
 --help      show this help message and exit
 --start     start transparent proxy for tor
