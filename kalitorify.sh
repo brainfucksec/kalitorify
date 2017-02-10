@@ -166,7 +166,7 @@ check_default () {
        [[ $VAR3 -ne 0 ]] ||
        [[ $VAR4 -ne 0 ]] ||
        [[ $VAR5 -ne 0 ]]; then
-        printf "\n${red}%s${endc}\n" "[ FAILED ] To enable the transparent proxy add the following of /etc/tor/torrc file:" >&2
+        printf "\n${red}%s${endc}\n" "[ failed ] To enable the transparent proxy add the following of /etc/tor/torrc file:" >&2
         printf "${white}%s${endc}\n" "VirtualAddrNetworkIPv4 10.192.0.0/10"
         printf "${white}%s${endc}\n" "AutomapHostsOnResolve 1"
         printf "${white}%s${endc}\n" "TransPort 9040"
