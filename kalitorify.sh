@@ -72,7 +72,7 @@ printf "${white}
 
 Transparent proxy trough Tor for Kali Linux
 
-Version: $_version
+Version: "$_VERSION"
 Author: Brainfuck${endc}\n"
 }
 
