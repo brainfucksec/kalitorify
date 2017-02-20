@@ -1,24 +1,21 @@
-## Kalitorify v1.6.1
+## Kalitorify v1.7.0
 
-### Transparent proxy trough Tor for Kali Linux OS
+### Transparent proxy through Tor for Kali Linux OS
 
  
+
+
 ### Configuration
 
-#### Update system and install tor:
+#### Update system and run install.sh:
 ```bash
-sudo apt update && sudo apt full-upgrade -y
-sudo apt install -y tor
+sudo apt-get update && sudo apt-get dist-upgrade -y
+cd kalitorify/
+chmod +x install.sh
+./install.sh
 ```
 
-#### Modify /etc/tor/torrc file, add the follows:
-```
-VirtualAddrNetworkIPv4 10.192.0.0/10
-AutomapHostsOnResolve 1
-TransPort 9040
-SocksPort 9050
-DNSPort 5353
-```
+
 
 
 
@@ -37,6 +34,7 @@ Arguments available:
 --start     start transparent proxy for tor
 --stop      reset iptables and return to clear navigation
 --status    check status of program and services
+--checkip   check only public IP
 --restart   restart tor service and change IP
 --version   display program and tor version then exit
 
@@ -55,19 +53,24 @@ Arguments available:
 
  
 
-#### NOTES:
+#### [ NOTES ]:
 
-Kalitorify is KISS version of Parrot AnonSurf Module, developed by "Pirates' Crew" of FrozenBox - https://github.com/parrotsec/anonsurf
+##### Kalitorify is KISS version of Parrot AnonSurf Module, developed by "Pirates' Crew" of FrozenBox - https://github.com/parrotsec/anonsurf
 
-Please note that this program isn't a final solution for a setup of anonimity at 100%, for more information about Tor configurations please read these docs:
+##### Please note that this program isn't a final solution for a setup of anonimity at 100%, for more information about Tor configurations please read these docs:
 
-Tor Project wiki about Transparent Proxy: https://trac.torproject.org/projects/tor/wiki/doc/TransparentProxy
+**Tor Project wiki about Transparent Proxy:** 
 
-Whonix wiki about Tor Entry Guards:
+https://trac.torproject.org/projects/tor/wiki/doc/TransparentProxy
+
+
+**Whonix Do Not recommendations:**
+
+https://www.whonix.org/wiki/DoNot
+
+
+**Whonix wiki about Tor Entry Guards:**
 
 https://www.whonix.org/wiki/<Tor id="Non-Persistent_Entry_Guards"></Tor>
 
 https://forums.whonix.org/t/persistent-tor-entry-guard-relays-can-make-you-trackable-across-different-physical-locations/2090
-
-
-Whonix Do Not recommendations: https://www.whonix.org/wiki/DoNot
