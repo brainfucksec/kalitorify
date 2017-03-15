@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # install.sh - kalitorify installer
-# Copyright (C) 2015 Brainfuck
+# Copyright (C) 2015, 2017 Brainfuck
 #
 # This file is part of Kalitorify
 #
@@ -20,7 +20,7 @@
 
 # program informations
 _PROGRAM="install.sh"
-_VERSION="0.1"
+_VERSION="0.2.1"
 _AUTHOR="Brainfuck"
 
 # define colors
@@ -55,49 +55,48 @@ check_root () {
 }
 
 
-# check dependencies (tor, curl)
+## Check dependencies
+# only tor is required, but use this function for future additions
 check_required () {
     printf "\n${blue}%s${endc} ${green}%s${endc}\n" "==>" "Check dependencies"
-    printf "${blue}%s${endc} ${green}%s${endc}\n" "==>" "Check tor"
-    if ! hash tor 2>/dev/null; then
-        printf "${blue}%s${endc} ${green}%s${endc}\n" "==>" "Installing tor..."
-        apt-get update && apt-get install -y tor
-        printf "${cyan}%s${endc} ${green}%s${endc}\n" "[ OK ]" "tor installed"
-    else
-        printf "${cyan}%s${endc} ${green}%s${endc}\n" "[ OK ]" "tor already installed"
-    fi
-
-    printf "${blue}%s${endc} ${green}%s${endc}\n" "==>" "Check curl"
-    if ! hash curl 2>/dev/null; then
-        printf "${blue}%s${endc} ${green}%s${endc}" "==>" "Installing curl..."
-        apt-get update && apt-get install -y curl
-        printf "${cyan}%s${endc} ${green}%s${endc}\n" "[ OK ]" "curl installed"
-    else
-        printf "${cyan}%s${endc} ${green}%s${endc}\n" "[ OK ]" "curl already installed"
-    fi
+    
+    declare -a dependencies=("tor");
+    
+    for package in "${dependencies[@]}"; do
+    	if ! hash "$package" 2>/dev/null; then
+        	printf "${blue}%s${endc} ${green}%s${endc}\n" "==>" "Installing "$package" ..."
+        	apt-get update && apt-get install -y "$package"
+        	printf "${cyan}%s${endc} ${green}%s${endc}\n" "[ OK ]" ""$package" installed"
+    	else
+        	printf "${cyan}%s${endc} ${green}%s${endc}\n" \
+                "[ OK ]" ""$package" already installed"
+    	fi
+    done
 }
 
 
-# Set file and folders
+## Install program files
+# with 'install' command create directories and copy files
 install_program () {
     printf "${blue}%s${endc} ${green}%s${endc}\n" "==>" "Install kalitorify..."
-    # copy program files on /usr/share/
-    install -d -m644 "/usr/share/kalitorify/cfg"
-    install -D -m644 "cfg/torrc" "/usr/share/kalitorify/cfg/torrc"
-    install -D -m644 "LICENSE" "/usr/share/kalitorify/LICENSE"
-    install -D -m644 "README.md" "/usr/share/kalitorify/README.md"
+    
+    # copy program files on /usr/share/*
+    install -Dm644 "LICENSE" "/usr/share/license/kalitorify/LICENSE"
+    install -Dm644 "README.md" "/usr/share/doc/kalitorify/README.md"
     
     # copy executable file on /usr/local/bin
-    install -D -m755 "kalitorify.sh" "/usr/local/bin/kalitorify"
+    install -Dm755 "kalitorify.sh" "/usr/local/bin/kalitorify"
 
     # check if program run correctly
     if hash kalitorify 2>/dev/null; then
-        printf "${cyan}%s${endc} ${green}%s${endc}\n" "[ OK ]" "kalitorify succesfully installed"
+        printf "${cyan}%s${endc} ${green}%s${endc}\n" \
+            "[ OK ]" "kalitorify succesfully installed"
         printf "${green}%s${endc}\n" "run command 'kalitorify --start for start program"
     else
         printf "${red}%s${endc}\n" "[ FAILED ] kalitorify cannot start :("
         printf "${green}%s${endc}\n" "If you are in trouble read NOTES on file README"
-        printf "${green}%s${endc}\n" "Report issues at: https://github.com/brainfucksec/kalitorify/issues"
+        printf "${green}%s${endc}\n" \ 
+            "Report issues at: https://github.com/brainfucksec/kalitorify/issues"
     fi
 }
 
