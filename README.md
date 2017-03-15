@@ -1,20 +1,22 @@
-## Kalitorify v1.7.0
+## Kalitorify v1.7.1
 
 ### Transparent proxy through Tor for Kali Linux OS
 
  
 
 
-### Configuration
+### Install
 
 #### Update system and run install.sh:
 ```bash
 sudo apt-get update && sudo apt-get dist-upgrade -y
+
+git clone https://github.com/BrainfuckSec/archtorify
+
 cd kalitorify/
 chmod +x install.sh
 ./install.sh
 ```
-
 
 
 
@@ -53,7 +55,7 @@ Arguments available:
 
  
 
-#### [ NOTES ]:
+#### [ NOTES ]
 
 ##### Kalitorify is KISS version of Parrot AnonSurf Module, developed by "Pirates' Crew" of FrozenBox - https://github.com/parrotsec/anonsurf
 
