@@ -291,8 +291,10 @@ start_program () {
     printf "${green}%s${endc}\n" "Done"
     sleep 4
 
-    printf "${cyan}%s${endc} ${green}%s${endc}\n" "[ OK ]" "Transparent Proxy activated, your system is under Tor"
-    printf "${cyan}%s${endc} ${green}%s${endc}\n" "[ INFO ]" "Use --status argument for check the program status whatever you need"
+    printf "${cyan}%s${endc} ${green}%s${endc}\n" \
+    	"[ OK ]" "Transparent Proxy activated, your system is under Tor"
+    printf "${cyan}%s${endc} ${green}%s${endc}\n" \
+    	"[ INFO ]" "Use --status argument for check the program status whatever you need"
 }
 
 
