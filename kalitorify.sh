@@ -1,12 +1,12 @@
 #!/bin/bash
 
 # Program: kalitorify.sh
-# Version: 1.7.0
+# Version: 1.7.1
 # Operating System: Kali Linux
 # Description: Transparent proxy through Tor
-# Dependencies: tor, curl
+# Dependencies: tor
 #
-# Copyright (C) 2015 Brainfuck
+# Copyright (C) 2015-2017 Brainfuck
 #
 # Kalitorify is KISS version of Parrot AnonSurf Module, developed
 # by "Pirates' Crew" of FrozenBox - https://github.com/parrotsec/anonsurf
@@ -29,7 +29,7 @@
 
 # program informations
 _PROGRAM="kalitorify"
-_VERSION="1.7.0"
+_VERSION="1.7.1"
 _AUTHOR="Brainfuck"
 
 # define colors
@@ -100,12 +100,14 @@ print_version () {
 disable_ufw () {
 	if hash ufw 2>/dev/null; then
     	if ufw status | grep -q active$; then
-        	printf "${blue}%s${endc} ${green}%s${endc}\n" "::" "Firewall ufw is active. disabling... "
+        	printf "${blue}%s${endc} ${green}%s${endc}\n" \
+                "::" "Firewall ufw is active. disabling... "
         	ufw disable
         	sleep 3
     	else 
     		ufw status | grep -q inactive$; 
-        	printf "${blue}%s${endc} ${green}%s${endc}\n" "::" "Firewall ufw is inactive, continue..."  
+        	printf "${blue}%s${endc} ${green}%s${endc}\n" \
+                "::" "Firewall ufw is inactive, continue..."  
     	fi
     fi
 }
@@ -117,7 +119,8 @@ disable_ufw () {
 enable_ufw () {
 	if hash ufw 2>/dev/null; then
     	if ufw status | grep -q inactive$; then
-        	printf "${blue}%s${endc} ${green}%s${endc}\n" "::" "Enabling firewall ufw..."
+        	printf "${blue}%s${endc} ${green}%s${endc}\n" \
+                "::" "Enabling firewall ufw..."
         	ufw enable
         	sleep 3
         fi
@@ -128,15 +131,13 @@ enable_ufw () {
 ## Check default configurations
 # check if kalitorify is properly configured, begin ...
 check_default () {
-    # check dependencies (tor, curl)
-    command -v tor > /dev/null 2>&1 ||
-    { printf >&2 "\n${red}%s${endc}\n" "[ FAILED ] tor isn't installed, exiting..."; exit 1; }
-
-    command -v curl > /dev/null 2>&1 ||
-    { printf >&2 "\n${red}%s${endc}\n" "[ FAILED ] curl isn't installed, exiting..."; exit 1; }
+    # check dependencies (tor)
+    if ! hash tor 2>/dev/null; then
+        printf "${red}%s${endc}\n" "[ FAILED ] tor isn't installed, exit";
+        exit 1
+    fi
 
     ## Check file "/etc/tor/torrc"
-    # ref: kalitorify/cfg/torrc
     grep -q -x 'VirtualAddrNetworkIPv4 10.192.0.0/10' /etc/tor/torrc
     VAR1=$?
 
@@ -212,14 +213,16 @@ start_program () {
 
     ## Tor Entry Guards
     # delete file: "/var/lib/tor/state"
-    # when tor.service starting, a new file "state" it's generated
+    #
+    # When tor.service starting, a new file "state" it's generated
     # when you connect to Tor network, a new Tor entry guards will be written on this file.
     printf "${blue}::${endc} ${green}Get fresh Tor entry guards? [y/n]${endc}"
 	read -p "${green}:${endc} " yn
     case $yn in
         [yY]|[y|Y] )
             rm -v /var/lib/tor/state
-            printf "${cyan}%s${endc} ${green}%s${endc}\n" "[ OK ]" "When tor.service start, new Tor entry guards will obtained"
+            printf "${cyan}%s${endc} ${green}%s${endc}\n" \
+                "[ OK ]" "When tor.service start, new Tor entry guards will obtained"
             ;;
         *)
             ;;
@@ -245,7 +248,8 @@ start_program () {
     printf "${green}%s${endc}\n" "Done"
 
     # configure system's DNS resolver to use Tor's DNSPort on the loopback interface
-    printf "${blue}%s${endc} ${green}%s${endc}\n" "::" "Configure system's DNS resolver to use Tor's DNSPort"
+    printf "${blue}%s${endc} ${green}%s${endc}\n" \
+        "::" "Configure system's DNS resolver to use Tor's DNSPort"
     cp -vf /etc/resolv.conf /opt/resolv.conf.backup
     echo -e 'nameserver 127.0.0.1' > /etc/resolv.conf
     sleep 2
@@ -318,7 +322,8 @@ stop () {
     sleep 4
 
     # restore /etc/resolv.conf --> default nameserver
-    printf "${blue}%s${endc} ${green}%s${endc}\n" "::" "Restore /etc/resolv.conf file with default DNS"
+    printf "${blue}%s${endc} ${green}%s${endc}\n" \
+        "::" "Restore /etc/resolv.conf file with default DNS"
     rm -v /etc/resolv.conf
     cp -vf /opt/resolv.conf.backup /etc/resolv.conf
     sleep 2
@@ -331,7 +336,8 @@ stop () {
 
 ## Function for check public IP
 check_ip () {
-    printf "\n${blue}%s${endc} ${green}%s${endc}\n" "::" "Checking your public IP, please wait..."
+    printf "\n${blue}%s${endc} ${green}%s${endc}\n" \
+        "::" "Checking your public IP, please wait..."
 
     # curl request: http://ipinfo.io/geo
     if ! external_ip="$(curl -s -m 10 ipinfo.io/geo)"; then
@@ -341,8 +347,7 @@ check_ip () {
 
     # print output
     printf "${blue}%s${endc} ${green}%s${endc}\n" "::" "IP Address Details:"
-    printf "${white}%s${endc}\n" "$external_ip" \
-        | tr -d '"' | tr -d '{}' | sed 's/  //g'
+    printf "${white}%s${endc}\n" "$external_ip" | tr -d '"' | tr -d '{}' | sed 's/ //g'
 }
 
 
@@ -350,7 +355,6 @@ check_ip () {
 # function for check status of program and services:
 # check --> tor.service
 # check --> public IP
-# check --> dangerous open doors, execute: netstat -tulpn
 check_status () {
     check_root
 
@@ -365,13 +369,6 @@ check_status () {
 
     # check current public IP
     check_ip
-
-    # exec command "netstat -tulpn", check if there are dangerous open doors
-    printf "${blue}%s${endc} ${green}%s${endc}\n" "::" "Check if there are open doors"
-    printf "${blue}%s${endc} ${green}%s${endc}\n" "::" "run command 'netstat -tulpn'"
-    sleep 5 &
-    netstat -tulpn | more
-    printf "\n${cyan}%s${endc} ${green}%s${endc}\n" "[ NOTE ]" "For better network security, you must have only 'tor' on state: LISTEN"
     exit 0
 }
 
@@ -401,7 +398,8 @@ help_menu () {
 
     printf "\n${white}%s${endc}\n" "Usage:"
     printf "${white}%s${endc}\n\n"   "******"
-    printf "${white}%s${endc} ${red}%s${endc} ${white}%s${endc} ${red}%s${endc}\n" "┌─╼" "$USER" "╺─╸" "$(hostname)"
+    printf "${white}%s${endc} ${red}%s${endc} ${white}%s${endc} ${red}%s${endc}\n" \
+        "┌─╼" "$USER" "╺─╸" "$(hostname)"
     printf "${white}%s${endc} ${green}%s${endc}\n" "└───╼" "./$_PROGRAM --argument"
 
     printf "\n${white}%s${endc}\n\n" "Arguments available:"
