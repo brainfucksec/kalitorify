@@ -38,7 +38,7 @@ export red=$'\e[0;91m'
 export green=$'\e[0;92m'
 export blue=$'\e[0;94m'
 export white=$'\e[0;97m'
-export cyan=$'\e[0;36m'
+export cyan=$'\e[0;96m'
 export endc=$'\e[0m'
 
 ## Network settings
