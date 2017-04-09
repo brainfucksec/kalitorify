@@ -1,4 +1,4 @@
-## Kalitorify v1.7.1
+## Kalitorify v1.8.0
 
 ### Transparent proxy through Tor for Kali Linux OS
 
