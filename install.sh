@@ -3,7 +3,7 @@
 # install.sh - kalitorify installer
 # Copyright (C) 2015, 2017 Brainfuck
 #
-# This file is part of Kalitorify
+# This file is part of kalitorify
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,9 +19,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # program informations
-_PROGRAM="install.sh"
-_VERSION="0.2.1"
-_AUTHOR="Brainfuck"
+PROGRAM="install.sh"
+VERSION="0.3.0"
+AUTHOR="Brainfuck"
 
 # define colors
 export red=$'\e[0;91m'
@@ -33,23 +33,23 @@ export endc=$'\e[0m'
 
 
 # banner
-banner () {
+banner() {
 printf "${red}
 ####################################
 #
-# :: "$_PROGRAM"
-# :: Version: "$_VERSION"
+# :: "$PROGRAM"
+# :: Version: "$VERSION"
 # :: Installer script for kalitorify
-# :: Author: "$_AUTHOR"
+# :: Author: "$AUTHOR"
 # 
 ####################################${endc}\n\n"
 }
 
 
 # check if the program run as a root
-check_root () {
-    if [ "$(id -u)" -ne 0 ]; then
-        printf "\n${red}%s${endc}\n" "[ FAILED ] Please run this program as a root!" >&2
+check_root() {
+    if [[ "$(id -u)" -ne 0 ]]; then
+        printf "\n${red}%s${endc}\n" "[ FAILED ] Please run this program as a root!" 2>&-
         exit 1
     fi
 }
@@ -57,7 +57,7 @@ check_root () {
 
 ## Check dependencies
 # only tor is required, but use this function for future additions
-check_required () {
+check_required() {
     printf "\n${blue}%s${endc} ${green}%s${endc}\n" "==>" "Check dependencies"
     
     declare -a dependencies=("tor");
@@ -77,7 +77,7 @@ check_required () {
 
 ## Install program files
 # with 'install' command create directories and copy files
-install_program () {
+install_program() {
     printf "${blue}%s${endc} ${green}%s${endc}\n" "==>" "Install kalitorify..."
     
     # copy program files on /usr/share/*
@@ -102,7 +102,7 @@ install_program () {
 
 
 # Main function
-main () {
+main() {
     banner
     check_root
     printf "${blue}%s${endc}" "==> " 
