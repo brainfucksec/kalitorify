@@ -378,7 +378,7 @@ restart() {
     check_root
     printf "${blue}%s${endc} ${green}%s${endc}\n" "::" "Restart Tor service and change IP"
     ## systemctl restart or stop/start not work any more 
-    # avoid errors with old "service reload" command
+    # avoid errors with old "service <servicename> reload" command
     service tor reload
     sleep 3   
     printf "${cyan}%s${endc} ${green}%s${endc}\n" "[ OK ]" "Tor Exit Node changed"
