@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Program: kalitorify.sh
-# Version: 1.8.0
+# Version: 1.8.1
 # Operating System: Kali Linux
 # Description: Transparent proxy through Tor
 # Dependencies: tor
@@ -29,7 +29,7 @@
 
 # Program's informations
 PROGRAM="kalitorify"
-VERSION="1.8.0"
+VERSION="1.8.1"
 AUTHOR="Brainfuck"
 GIT_URL="https://github.com/brainfucksec/kalitorify"
 
@@ -54,8 +54,9 @@ dns_port="5353"
 # Tor VirtualAddrNetworkIPv4
 virtual_addr_net="10.192.0.0/10"
 
-# destinations you don't want routed through Tor
+# LAN destinations that shouldn't be routed through Tor
 non_tor="127.0.0.0/8 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16"
+
 
 # print banner
 banner() {
@@ -154,7 +155,7 @@ check_default() {
     grep -q -x 'DNSPort 5353' /etc/tor/torrc
     VAR5=$?
 
-    # if it is not already set, set it now
+    # if this file is not already set, set it now
     if [[ $VAR1 -ne 0 ]] ||
        [[ $VAR2 -ne 0 ]] ||
        [[ $VAR3 -ne 0 ]] ||
@@ -203,7 +204,6 @@ main() {
     banner
     check_root
     check_default
-
     # check status of tor.service and stop it if is active
     if systemctl is-active tor.service > /dev/null 2>&1; then
         systemctl stop tor.service
@@ -212,7 +212,6 @@ main() {
     printf "\n${blue}%s${endc} ${green}%s${endc}\n" "::" "Starting Transparent Proxy"
     disable_ufw
     sleep 3
-
     ## Tor Entry Guards
     # delete file: "/var/lib/tor/state"
     #
@@ -237,7 +236,7 @@ main() {
    	printf "${cyan}%s${endc} ${green}%s${endc}\n" "[ OK ]" "Tor service is active"
 
    	
-    ## iptables settings
+    ## begin iptables settings
     # save current iptables rules
     printf "${blue}%s${endc} ${green}%s${endc}" "::" "Backup iptables rules... " 
     iptables-save > /opt/iptables.backup
@@ -378,7 +377,7 @@ restart() {
     check_root
     printf "${blue}%s${endc} ${green}%s${endc}\n" "::" "Restart Tor service and change IP"
     ## systemctl restart or stop/start not work any more 
-    # avoid errors with old "service <servicename> reload" command
+    # avoid errors with old "service reload" command
     service tor reload
     sleep 3   
     printf "${cyan}%s${endc} ${green}%s${endc}\n" "[ OK ]" "Tor Exit Node changed"
@@ -399,9 +398,9 @@ help_menu() {
     printf "\n${green}%s${endc}\n" "Arguments available:"
     printf "${white}%s${endc}\n" "--------------------"
     
-    printf "${white}%-12s${endc} ${green}%s${endc}\n" "--help"  "show this help message and exit"
-    printf "${white}%-12s${endc} ${green}%s${endc}\n" "--start" "start transparent proxy through tor"
-    printf "${white}%-12s${endc} ${green}%s${endc}\n" "--stop"  "reset iptables and return to clear navigation"
+    printf "${white}%-12s${endc} ${green}%s${endc}\n" "--help"  	"show this help message and exit"
+    printf "${white}%-12s${endc} ${green}%s${endc}\n" "--start" 	"start transparent proxy through tor"
+    printf "${white}%-12s${endc} ${green}%s${endc}\n" "--stop"  	"reset iptables and return to clear navigation"
     printf "${white}%-12s${endc} ${green}%s${endc}\n" "--status"    "check status of program and services"
     printf "${white}%-12s${endc} ${green}%s${endc}\n" "--checkip"   "check only public IP"
     printf "${white}%-12s${endc} ${green}%s${endc}\n" "--restart"   "restart tor service and change IP"
