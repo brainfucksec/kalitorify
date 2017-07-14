@@ -11,7 +11,7 @@
 ```bash
 sudo apt-get update && sudo apt-get dist-upgrade -y
 
-git clone https://github.com/brainfucksec/archtorify
+git clone https://github.com/brainfucksec/kalitorify
 
 cd kalitorify/
 chmod +x install.sh
