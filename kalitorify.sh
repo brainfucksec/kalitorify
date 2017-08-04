@@ -398,9 +398,9 @@ help_menu() {
     printf "\n${green}%s${endc}\n" "Arguments available:"
     printf "${white}%s${endc}\n" "--------------------"
     
-    printf "${white}%-12s${endc} ${green}%s${endc}\n" "--help"  	"show this help message and exit"
-    printf "${white}%-12s${endc} ${green}%s${endc}\n" "--start" 	"start transparent proxy through tor"
-    printf "${white}%-12s${endc} ${green}%s${endc}\n" "--stop"  	"reset iptables and return to clear navigation"
+    printf "${white}%-12s${endc} ${green}%s${endc}\n" "--help"      "show this help message and exit"
+    printf "${white}%-12s${endc} ${green}%s${endc}\n" "--start"     "start transparent proxy through tor"
+    printf "${white}%-12s${endc} ${green}%s${endc}\n" "--stop"      "reset iptables and return to clear navigation"
     printf "${white}%-12s${endc} ${green}%s${endc}\n" "--status"    "check status of program and services"
     printf "${white}%-12s${endc} ${green}%s${endc}\n" "--checkip"   "check only public IP"
     printf "${white}%-12s${endc} ${green}%s${endc}\n" "--restart"   "restart tor service and change IP"
