@@ -23,7 +23,7 @@ sudo make install
 
 #### Use help argument or run the program without arguments for help menu':
 ```bash
-./kalitorify.sh --help
+sudo kalitorify --help
 ...
 
 └───╼ ./kalitorify --argument
@@ -42,7 +42,7 @@ Arguments available:
 
 #### Start Transparent Proxy with --start argument:
 ```bash
-./kalitorify.sh --start
+sudo kalitorify --start
 ...
 
 :: Starting Transparent Proxy
