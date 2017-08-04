@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Program: kalitorify.sh
-# Version: 1.8.1
+# Version: 1.8.2
 # Operating System: Kali Linux
 # Description: Transparent proxy through Tor
 # Dependencies: tor
@@ -29,7 +29,7 @@
 
 # Program's informations
 PROGRAM="kalitorify"
-VERSION="1.8.1"
+VERSION="1.8.2"
 AUTHOR="Brainfuck"
 GIT_URL="https://github.com/brainfucksec/kalitorify"
 
@@ -89,16 +89,15 @@ check_root() {
 # display Program and Tor version then exit
 print_version() {
     printf "${white}%s${endc}\n" "$PROGRAM version $VERSION"
-    printf "${white}%s${endc}\n" "$(tor --version)"    
+    printf "${white}%s${endc}\n" "$(tor --version)"
 	exit 0
 }
 
 
 ## Functions for firewall ufw
-# check ufw status: 
-# if installed and/or active disable it
-# if aren't installed, do nothing, don't display
-# nothing to user, simply jump to next function
+# check ufw status:
+# if installed and/or active disable it, if isn't installed, do nothing,
+# don't display nothing to user and jump to next function
 disable_ufw() {
 	if hash ufw 2>/dev/null; then
     	if ufw status | grep -q active$; then
@@ -106,18 +105,17 @@ disable_ufw() {
                 "::" "Firewall ufw is active. disabling... "
         	ufw disable
         	sleep 3
-    	else 
-    		ufw status | grep -q inactive$; 
+    	else
+    		ufw status | grep -q inactive$;
         	printf "${blue}%s${endc} ${green}%s${endc}\n" \
-                "::" "Firewall ufw is inactive, continue..."  
+                "::" "Firewall ufw is inactive, continue..."
     	fi
     fi
 }
 
 
-## enable ufw 
-# if ufw isn't installed, do nothing and jump to
-# the next function
+## enable ufw:
+# if ufw isn't installed, do nothing and jump to the next function
 enable_ufw() {
 	if hash ufw 2>/dev/null; then
     	if ufw status | grep -q inactive$; then
@@ -161,7 +159,7 @@ check_default() {
        [[ $VAR3 -ne 0 ]] ||
        [[ $VAR4 -ne 0 ]] ||
        [[ $VAR5 -ne 0 ]]; then
-        printf "\n${blue}%s${endc} ${green}%s${endc}" 
+        printf "\n${blue}%s${endc} ${green}%s${endc}" \
             "::" "Setting file: /etc/tor/torrc... "
         # backup original file
         cp -vf /etc/tor/torrc /etc/tor/torrc.backup
@@ -194,7 +192,7 @@ TransPort 9040
 SocksPort 9050
 DNSPort 5353' > /etc/tor/torrc
 # EOF
-        printf "${green}%s${endc}\n" "Done"   
+        printf "${green}%s${endc}\n" "Done"
     fi
 }
 
@@ -204,6 +202,7 @@ main() {
     banner
     check_root
     check_default
+
     # check status of tor.service and stop it if is active
     if systemctl is-active tor.service > /dev/null 2>&1; then
         systemctl stop tor.service
@@ -235,18 +234,18 @@ main() {
     sleep 6
    	printf "${cyan}%s${endc} ${green}%s${endc}\n" "[ OK ]" "Tor service is active"
 
-   	
+
     ## begin iptables settings
     # save current iptables rules
-    printf "${blue}%s${endc} ${green}%s${endc}" "::" "Backup iptables rules... " 
+    printf "${blue}%s${endc} ${green}%s${endc}" "::" "Backup iptables rules... "
     iptables-save > /opt/iptables.backup
     printf "${green}%s${endc}\n" "Done"
     sleep 2
 
     # flush current iptables rules
-    printf "${blue}%s${endc} ${green}%s${endc}" "::" "Flush iptables rules... "    
+    printf "${blue}%s${endc} ${green}%s${endc}" "::" "Flush iptables rules... "
     iptables -F
-    iptables -t nat -F    
+    iptables -t nat -F
     printf "${green}%s${endc}\n" "Done"
 
     # configure system's DNS resolver to use Tor's DNSPort on the loopback interface
@@ -289,8 +288,8 @@ main() {
     # allow only Tor output
     iptables -A OUTPUT -m owner --uid-owner $tor_uid -j ACCEPT
     iptables -A OUTPUT -j REJECT
-    # end of iptables settings    
-    
+    # end of iptables settings
+
     printf "${green}%s${endc}\n" "Done"
     sleep 4
     printf "${cyan}%s${endc} ${green}%s${endc}\n" \
@@ -307,7 +306,7 @@ stop() {
     sleep 2
 
     # flush current iptables rules
-    printf "${blue}%s${endc} ${green}%s${endc}" "::" "Flush iptables rules... "    
+    printf "${blue}%s${endc} ${green}%s${endc}" "::" "Flush iptables rules... "
     iptables -F
     iptables -t nat -F
     printf "${green}%s${endc}\n" "Done"
@@ -320,7 +319,7 @@ stop() {
 
     # stop tor.service
     printf "${blue}%s${endc} ${green}%s${endc}" "::" "Stop tor service... "
-    systemctl stop tor.service    
+    systemctl stop tor.service
     printf "${green}%s${endc}\n" "Done"
     sleep 4
 
@@ -376,10 +375,10 @@ check_status() {
 restart() {
     check_root
     printf "${blue}%s${endc} ${green}%s${endc}\n" "::" "Restart Tor service and change IP"
-    ## systemctl restart or stop/start not work any more 
-    # avoid errors with old "service reload" command
+    ## why 'systemctl restart tor.service' not work any more?
+    # avoid errors with old "service tor reload" command
     service tor reload
-    sleep 3   
+    sleep 3
     printf "${cyan}%s${endc} ${green}%s${endc}\n" "[ OK ]" "Tor Exit Node changed"
     # check current public IP
     check_ip
@@ -396,8 +395,8 @@ help_menu() {
     printf "${white}%s${endc} ${green}%s${endc}\n" "└───╼" "./$PROGRAM --argument"
 
     printf "\n${green}%s${endc}\n" "Arguments available:"
-    printf "${white}%s${endc}\n" "--------------------"
-    
+    printf "${white}%s${endc}\n\n" "--------------------"
+
     printf "${white}%-12s${endc} ${green}%s${endc}\n" "--help"      "show this help message and exit"
     printf "${white}%-12s${endc} ${green}%s${endc}\n" "--start"     "start transparent proxy through tor"
     printf "${white}%-12s${endc} ${green}%s${endc}\n" "--stop"      "reset iptables and return to clear navigation"
