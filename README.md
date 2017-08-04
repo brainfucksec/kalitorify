@@ -1,21 +1,19 @@
-## Kalitorify v1.8.1
+## Kalitorify v1.8.2
 
 ### Transparent proxy through Tor for Kali Linux OS
 
- 
+
 
 
 ### Install
-
-#### Update system and run install.sh:
 ```bash
 sudo apt-get update && sudo apt-get dist-upgrade -y
 
 git clone https://github.com/brainfucksec/kalitorify
 
 cd kalitorify/
-chmod +x install.sh
-./install.sh
+
+sudo make install
 ```
 
 
@@ -39,21 +37,29 @@ Arguments available:
 --checkip   check only public IP
 --restart   restart tor service and change IP
 --version   display program and tor version then exit
-
 ```
 
 
-#### Start Transparent Proxy with --start argument
+#### Start Transparent Proxy with --start argument:
 ```bash
 ./kalitorify.sh --start
 ...
 
 :: Starting Transparent Proxy
-
 ```
 
 
- 
+
+
+### Uninstall
+```bash
+cd kalitorify/
+
+sudo make uninstall
+```
+
+
+
 
 #### [ NOTES ]
 
@@ -61,7 +67,7 @@ Arguments available:
 
 ##### Please note that this program isn't a final solution for a setup of anonimity at 100%, for more information about Tor configurations please read these docs:
 
-**Tor Project wiki about Transparent Proxy:** 
+**Tor Project wiki about Transparent Proxy:**
 
 https://trac.torproject.org/projects/tor/wiki/doc/TransparentProxy
 
