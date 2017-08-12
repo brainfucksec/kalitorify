@@ -1,14 +1,21 @@
-## Kalitorify v1.8.2
+## Kalitorify v1.9.0
 
 ### Transparent proxy through Tor for Kali Linux OS
 
 
 
 
-### Install
+### Installation
+
+#### Install dependencies:
 ```bash
 sudo apt-get update && sudo apt-get dist-upgrade -y
 
+sudo apt-get install tor
+
+
+#### Install kalitorify:
+```bash
 git clone https://github.com/brainfucksec/kalitorify
 
 cd kalitorify/
@@ -21,7 +28,7 @@ sudo make install
 
 ### Start program
 
-#### Use help argument or run the program without arguments for help menu':
+#### Use --help argument for help menu':
 ```bash
 sudo kalitorify --help
 ...
@@ -29,6 +36,7 @@ sudo kalitorify --help
 └───╼ ./kalitorify --argument
 
 Arguments available:
+--------------------
 
 --help      show this help message and exit
 --start     start transparent proxy for tor
@@ -43,9 +51,6 @@ Arguments available:
 #### Start Transparent Proxy with --start argument:
 ```bash
 sudo kalitorify --start
-...
-
-:: Starting Transparent Proxy
 ```
 
 
@@ -65,20 +70,18 @@ sudo make uninstall
 
 ##### Kalitorify is KISS version of Parrot AnonSurf Module, developed by "Pirates' Crew" of FrozenBox - https://github.com/parrotsec/anonsurf
 
-##### Please note that this program isn't a final solution for a setup of anonimity at 100%, for more information about Tor configurations please read these docs:
+##### Please note that this program is not a final solution for a setup of anonimity at 100%, for more information about Tor configurations please read these docs:
 
 **Tor Project wiki about Transparent Proxy:**
 
 https://trac.torproject.org/projects/tor/wiki/doc/TransparentProxy
 
 
+**Tor General FAQ**
+
+https://www.torproject.org/docs/faq.html.en
+
+
 **Whonix Do Not recommendations:**
 
 https://www.whonix.org/wiki/DoNot
-
-
-**Whonix wiki about Tor Entry Guards:**
-
-https://www.whonix.org/wiki/<Tor id="Non-Persistent_Entry_Guards"></Tor>
-
-https://forums.whonix.org/t/persistent-tor-entry-guard-relays-can-make-you-trackable-across-different-physical-locations/2090
