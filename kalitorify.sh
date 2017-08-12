@@ -75,8 +75,8 @@ printf "${white}
 *                                       *
 *****************************************
 
-version: "$version"
-author: "$author"
+Version: "$version"
+Author: "$author"
 $git_url${endc}\\n"
 }
 
