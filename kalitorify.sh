@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-# program: kalitorify.sh
-# version: 1.9.0
+# Program: kalitorify.sh
+# Version: 1.9.0
 # Operating System: Kali Linux
 # Description: Transparent proxy through Tor
 # Dependencies: tor
@@ -27,7 +27,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-# program's informations
+# Program's informations
 readonly program="kalitorify"
 readonly version="1.9.0"
 readonly author="Brainfuck"
