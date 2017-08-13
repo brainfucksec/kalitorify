@@ -1,5 +1,5 @@
 PROGRAM_NAME=kalitorify
-VERSION=1.8.2
+VERSION=1.9.0
 
 DOCS_DIR=/usr/share/doc
 PROGRAM_DIR=/usr/local/bin
