@@ -333,12 +333,6 @@ stop() {
     cp -vf "$backup_dir/resolv.conf.backup" /etc/resolv.conf
     sleep 2
 
-    # restore default /etc/tor/torrc file
-    printf "${blue}%s${endc} ${green}%s${endc}\\n" \
-        "::" "Restore default /etc/tor/torrc file"
-    cp -vf "$backup_dir/torrc.backup" /etc/tor/torrc
-    sleep 2
-
     # enable firewall ufw
     enable_ufw
 
