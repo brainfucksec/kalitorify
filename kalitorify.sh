@@ -197,14 +197,14 @@ check_defaults() {
         # backup original tor 'torrc' file to the backup directory
         if ! cp -vf /etc/tor/torrc "$backup_dir/torrc.backup"; then
             printf "${red}%s${endc}\\n" \
-                "[ failed ] can't copy original tor 'torrc' file to the backup directory."
+                "[ failed ] can't copy original tor 'torrc' file to the backup directory"
             exit 1
         fi
 
         # Copy new torrc file with settings for kalitorify
         if ! cp -vf "$config_dir/torrc" /etc/tor/torrc; then
             printf "${red}%s${endc}\\n" \
-                "[ failed ] can't set '/etc/tor/torrc'."
+                "[ failed ] can't set '/etc/tor/torrc'"
             exit 1
         fi
     fi
