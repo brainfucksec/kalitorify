@@ -154,7 +154,7 @@ check_defaults() {
     done
 
     ## Check if program's directories exist
-    # backups dir: /opt/kalitorify/backups
+    # backup dir: /opt/kalitorify/backups
     # config dir: /opt/kalitorify/cfg
     if [ ! -d "$backup_dir" ]; then
         printf "${red}%s${endc}\\n" \
@@ -196,17 +196,15 @@ check_defaults() {
 
         # backup original tor 'torrc' file to the backup directory
         if ! cp -vf /etc/tor/torrc "$backup_dir/torrc.backup"; then
-            printf "${red}%s\\n %s${endc}\\n" \
+            printf "${red}%s${endc}\\n" \
                 "[ failed ] can't copy original tor 'torrc' file to the backup directory."
-                "See the README file to install the program correctly."
             exit 1
         fi
 
         # Copy new torrc file with settings for kalitorify
         if ! cp -vf "$config_dir/torrc" /etc/tor/torrc; then
-            printf "${red}%s\\n %s${endc}\\n" \
+            printf "${red}%s${endc}\\n" \
                 "[ failed ] can't set '/etc/tor/torrc'."
-                "See the README file to install the program correctly."
             exit 1
         fi
     fi
@@ -244,9 +242,8 @@ main() {
     printf "${blue}%s${endc} ${green}%s${endc}" "::" "Backup iptables rules... "
 
     if ! iptables-save > "$backup_dir/iptables.backup"; then
-        printf "${red}%s\\n %s${endc}\\n" \
+        printf "${red}%s${endc}\\n" \
             "[ failed ] can't copy iptables rules to backup directory"
-            "See the README file to install the program correctly."
         exit 1
     fi
 
@@ -265,9 +262,8 @@ main() {
         "::" "Configure system's DNS resolver to use Tor's DNSPort"
 
     if ! cp -vf /etc/resolv.conf "$backup_dir/resolv.conf.backup"; then
-        printf "${red}%s\\n %s${endc}\\n" \
-            "[ failed ] can't copy resolv.conf to backup directory"
-            "See the README file to install the program correctly."
+        printf "${red}%s${endc}\\n" \
+            "[ failed ] can't copy resolv.conf to the backup directory"
         exit 1
     fi
 
