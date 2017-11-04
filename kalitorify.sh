@@ -1,10 +1,9 @@
-#!/usr/bin/env bash
+ #!/usr/bin/env bash
 
 # Program: kalitorify.sh
-# Version: 1.10.0
+# Version: 1.10.1
 # Operating System: Kali Linux
 # Description: Transparent proxy through Tor
-# Dependencies: tor
 #
 # Copyright (C) 2015-2017 Brainfuck
 #
@@ -32,7 +31,7 @@ set -eo pipefail
 
 # Program's informations
 readonly program="kalitorify"
-readonly version="1.10.0"
+readonly version="1.10.1"
 readonly author="Brainfuck"
 readonly git_url="https://github.com/brainfucksec/kalitorify"
 
@@ -169,7 +168,7 @@ check_defaults() {
     fi
 
 
-    ## Check file if "/etc/tor/torrc" is configured for Transparent Proxy
+    ## Check if file '/etc/tor/torrc' is configured for Transparent Proxy
     grep -q -x 'VirtualAddrNetworkIPv4 10.192.0.0/10' /etc/tor/torrc
     VAR1=$?
 
@@ -218,23 +217,25 @@ main() {
     check_defaults
 
     # check status of tor.service and stop it if is active
-    if systemctl is-active tor.service > /dev/null 2>&1; then
+    if systemctl is-active tor.service >/dev/null 2>&1; then
         systemctl stop tor.service
     fi
 
-    printf "\\n${cyan}%s${endc} ${green}%s${endc}\\n" "=>" "Starting Transparent Proxy"
+    printf "\\n${cyan}%s${endc} ${green}%s${endc}\\n" \
+        "==>" "Starting Transparent Proxy"
     disable_ufw
     sleep 3
 
     # start tor.service
     printf "${blue}%s${endc} ${green}%s${endc}\\n" "::" "Start Tor service... "
     if ! systemctl start tor.service 2>/dev/null; then
-        printf "\\n${red}%s${endc}\\n" \
-            "[ failed ] systemd error, exit!"
+        printf "\\n${red}%s${endc}\\n" "[ failed ] systemd error, exit!"
         exit 1
     fi
     sleep 6
-   	printf "${cyan}%s${endc} ${green}%s${endc}\\n" "[ ok ]" "Tor service is active"
+
+    printf "${cyan}%s${endc} ${green}%s${endc}\\n" \
+        "[ ok ]" "Tor service is active"
 
 
     ## Begin iptables settings
@@ -320,7 +321,8 @@ main() {
 ## Stop transparent proxy
 stop() {
     check_root
-    printf "${cyan}%s${endc} ${green}%s${endc}\\n" "=>" "Stopping Transparent Proxy"
+    printf "${cyan}%s${endc} ${green}%s${endc}\\n" \
+        "==>" "Stopping Transparent Proxy"
     sleep 2
 
     ## Resets default settings
@@ -333,6 +335,7 @@ stop() {
     # restore iptables
     printf "${blue}%s${endc} ${green}%s${endc}" \
         "::" "Restore the default iptables rules... "
+
     iptables-restore < "$backup_dir/iptables.backup"
     printf "${white}%s${endc}\\n" "Done"
     sleep 2
@@ -361,8 +364,8 @@ stop() {
 
 ## Function for check public IP
 check_ip() {
-    printf "\\n${cyan}%s${endc} ${green}%s${endc}\\n" \
-        "=>" "Checking your public IP, please wait..."
+    printf "${cyan}%s${endc} ${green}%s${endc}\\n" \
+        "==>" "Checking your public IP, please wait..."
 
     # curl request: http://ipinfo.io/geo
     if ! external_ip="$(curl -s -m 10 ipinfo.io/geo)"; then
@@ -385,9 +388,10 @@ check_status() {
 
     # check status of tor.service
     printf "${cyan}%s${endc} ${green}%s${endc}\\n" \
-        "=>" "Check current status of Tor service"
+        "==>" "Check current status of Tor service"
+
     if systemctl is-active tor.service > /dev/null 2>&1; then
-        printf "${cyan}%s${endc} ${green}%s${endc}\\n" \
+        printf "${cyan}%s${endc} ${green}%s${endc}\\n\\n" \
             "[ ok ]" "Tor service is active"
     else
         printf "${red}%s${endc}\\n" "[-] Tor service is not running!"
@@ -405,13 +409,14 @@ restart() {
     check_root
 
     printf "${cyan}%s${endc} ${green}%s${endc}\\n" \
-        "=>" "Restart Tor service and change IP"
+        "==>" "Restart Tor service and change IP"
     ## why 'systemctl restart tor.service' not work any more?
     # avoid errors with old "service tor reload" command
     service tor reload
     sleep 3
 
-    printf "${cyan}%s${endc} ${green}%s${endc}\\n" "[ ok ]" "Tor Exit Node changed"
+    printf "${cyan}%s${endc} ${green}%s${endc}\\n\\n" \
+        "[ ok ]" "Tor Exit Node changed"
 
     # check current public IP
     check_ip
@@ -475,13 +480,16 @@ case "$1" in
         ;;
     --)
         printf "${red}%s${endc}\\n" "[ failed ] '$1' it requires an argument!" >&2
+        printf "${white}%s${endc}\\n" "use '$program --help' for more informations"
         exit 1
         ;;
     --*)
-        printf "${red}%s${endc}\\n" "[ failed ] Invalid option '$1' !" >&2
+        printf "${red}%s${endc}\\n" "[ failed ] Invalid option '$1'!" >&2
+        printf "${white}%s${endc}\\n" "use '$program --help' for more informations"
         exit 1
         ;;
     *)
-        printf "${red}%s${endc}\\n" "[ failed ] Invalid option '$1' !" >&2
+        printf "${red}%s${endc}\\n" "[ failed ] Invalid option $1!" >&2
+        printf "${white}%s${endc}\\n" "use '$program --help' for more informations"
         exit 1
 esac
