@@ -1,4 +1,4 @@
-# Kalitorify v1.10.0
+# Kalitorify v1.10.1
 
 ## Transparent proxy through Tor for Kali Linux OS
 
@@ -42,7 +42,7 @@ sudo kalitorify --start
 https://trac.torproject.org/projects/tor/wiki/doc/TransparentProxy
 
 
-#### Tor General FAQ**
+#### Tor General FAQ:
 
 https://www.torproject.org/docs/faq.html.en
 
