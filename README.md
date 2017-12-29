@@ -1,9 +1,22 @@
-# Kalitorify v1.10.1
+# Kalitorify v1.11.0
 
 ## Transparent proxy through Tor for Kali Linux OS
 
 
-### Installation
+## Installation
+
+Note: From this version the program directories are changed, if previous version is installed, remove it first:
+```bash
+sudo rm -Rf /usr/share/doc/kalitorify
+sudo rm -Rf /usr/local/bin/kalitorify
+sudo rm -Rf /opt/kalitorify
+```
+
+Or, inside the folder of the older version:
+```bash
+sudo make uninstall
+```
+
 
 #### Install dependencies:
 ```bash
@@ -23,7 +36,7 @@ sudo make install
 ```
 
 
-### Run program
+## Run program
 
 #### Simply start Transparent Proxy with --start option:
 ```bash
@@ -41,11 +54,9 @@ sudo kalitorify --start
 
 https://trac.torproject.org/projects/tor/wiki/doc/TransparentProxy
 
-
 #### Tor General FAQ:
 
 https://www.torproject.org/docs/faq.html.en
-
 
 #### Whonix Do Not recommendations:
 
