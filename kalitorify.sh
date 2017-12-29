@@ -1,7 +1,7 @@
- #!/usr/bin/env bash
+#!/usr/bin/env bash
 
 # Program: kalitorify.sh
-# Version: 1.10.1
+# Version: 1.11.0
 # Operating System: Kali Linux
 # Description: Transparent proxy through Tor
 #
@@ -26,12 +26,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-# set command for errors handling (https://ss64.com/bash/set.html)
-set -eo pipefail
-
 # Program's informations
 readonly program="kalitorify"
-readonly version="1.10.1"
+readonly version="1.11.0"
 readonly author="Brainfuck"
 readonly git_url="https://github.com/brainfucksec/kalitorify"
 
@@ -60,12 +57,11 @@ readonly virtual_addr_net="10.192.0.0/10"
 readonly non_tor="127.0.0.0/8 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16"
 ## End of Network settings
 
-## Directories
-# Set program's directories and files
+## Set program's directories and files
+# configuration files: /usr/share/kalitorify/data
 # backup files: /opt/kalitorify/backups
-# configuration files: /opt/kalitorify/cfg
+readonly config_dir="/usr/share/kalitorify/data"
 readonly backup_dir="/opt/kalitorify/backups"
-readonly config_dir="/opt/kalitorify/cfg"
 
 
 # Show program banner
@@ -106,14 +102,14 @@ print_version() {
 
 
 ## Functions for firewall ufw (launched only if ufw exists)
-# check ufw status:
-# if installed and/or active disable it, if isn't installed, do nothing,
-# don't display nothing to user and jump to next function
+# Disable ufw:
+# If ufw is installed and/or active disable it, if isn't installed, ù
+# do nothing, don't display nothing to user, just jump to the next function
 disable_ufw() {
 	if hash ufw 2>/dev/null; then
     	if ufw status | grep -q active$; then
         	printf "${blue}%s${endc} ${green}%s${endc}\\n" \
-                "::" "Firewall ufw is active. disabling... "
+                "::" "Firewall ufw is active. disabling..."
         	ufw disable
         	sleep 3
     	else
@@ -125,8 +121,8 @@ disable_ufw() {
 }
 
 
-## enable ufw:
-# often, if ufw isn't installed, do nothing and jump to the next function
+## Enable ufw:
+# Often, if ufw isn't installed, again do nothing and jump to the next function
 enable_ufw() {
 	if hash ufw 2>/dev/null; then
     	if ufw status | grep -q inactive$; then
@@ -140,9 +136,9 @@ enable_ufw() {
 
 
 ## Check default configurations
-# check if kalitorify is properly configured, begin ...
+# Check if kalitorify is properly configured, begin ...
 check_defaults() {
-    # check dependencies (tor)
+    # Check dependencies (tor)
     declare -a dependencies=("tor");
     for package in "${dependencies[@]}"; do
         if ! hash "$package" 2> /dev/null; then
@@ -153,70 +149,82 @@ check_defaults() {
     done
 
     ## Check if program's directories exist
-    # backup dir: /opt/kalitorify/backups
-    # config dir: /opt/kalitorify/cfg
+    # bash "-d": test if the given directory exists or not.
     if [ ! -d "$backup_dir" ]; then
-        printf "${red}%s${endc}\\n" \
-            "[ failed ] '$backup_dir' not exist, run makefile first!";
+        printf "\\n${red}%s${endc}\\n" \
+            "[ failed ] directory '$backup_dir' not exist, run makefile first!";
         exit 1
     fi
 
     if [ ! -d "$config_dir" ]; then
-        printf "${red}%s${endc}\\n" \
-            "[ failed ] '$config_dir' not exist, run makefile first!";
+        printf "\\n${red}%s${endc}\\n" \
+            "[ failed ] directory '$config_dir' not exist, run makefile first!";
         exit 1
     fi
 
-
-    ## Check if file '/etc/tor/torrc' is configured for Transparent Proxy
-    grep -q -x 'VirtualAddrNetworkIPv4 10.192.0.0/10' /etc/tor/torrc
-    VAR1=$?
-
-    grep -q -x 'AutomapHostsOnResolve 1' /etc/tor/torrc
-    VAR2=$?
-
-    grep -q -x 'TransPort 9040' /etc/tor/torrc
-    VAR3=$?
-
-    grep -q -x 'SocksPort 9050' /etc/tor/torrc
-    VAR4=$?
-
-    grep -q -x 'DNSPort 5353' /etc/tor/torrc
-    VAR5=$?
-
-    # if this file is not configured, configure it now
-    if [[ $VAR1 -ne 0 ]] ||
-       [[ $VAR2 -ne 0 ]] ||
-       [[ $VAR3 -ne 0 ]] ||
-       [[ $VAR4 -ne 0 ]] ||
-       [[ $VAR5 -ne 0 ]]; then
+    ## Check file: "/etc/tor/torrc"
+    # reference file: "/usr/share/kalitorify/data/torrc"
+    # tor on Debian does not install this file anymore, then check if this file
+    # already exist, if not, copy new file, if exist, check if it is
+    # configured correctly.
+    if [[ ! -f /etc/tor/torrc ]]; then
         printf "\\n${blue}%s${endc} ${green}%s${endc}\\n" \
             "::" "Setting file: /etc/tor/torrc..."
 
-        # backup original tor 'torrc' file to the backup directory
-        if ! cp -vf /etc/tor/torrc "$backup_dir/torrc.backup"; then
+        # Copy new "torrc" file with settings for kalitorify
+        if ! cp -vf "$config_dir/torrc" /etc/tor/torrc; then
+            printf "\\n${red}%s${endc}\\n" \
+                "[ failed ] can't set '/etc/tor/torrc'"
             printf "${red}%s${endc}\\n" \
-                "[ failed ] can't copy original tor 'torrc' file to the backup directory"
+                "Please report bugs at: https://github.com/brainfucksec/kalitorify/issues"
             exit 1
         fi
+    else
+        # grep required strings from existing file
+        grep -q -x 'VirtualAddrNetworkIPv4 10.192.0.0/10' /etc/tor/torrc;
+        VAR1=$?
 
-        # Copy new torrc file with settings for kalitorify
-        if ! cp -vf "$config_dir/torrc" /etc/tor/torrc; then
-            printf "${red}%s${endc}\\n" \
-                "[ failed ] can't set '/etc/tor/torrc'"
-            exit 1
+        grep -q -x 'AutomapHostsOnResolve 1' /etc/tor/torrc
+        VAR2=$?
+
+        grep -q -x 'TransPort 9040' /etc/tor/torrc
+        VAR3=$?
+
+        grep -q -x 'SocksPort 9050' /etc/tor/torrc
+        VAR4=$?
+
+        grep -q -x 'DNSPort 5353' /etc/tor/torrc
+        VAR5=$?
+
+        # If this file is not configured, configure it now
+        if [[ $VAR1 -ne 0 ]] ||
+           [[ $VAR2 -ne 0 ]] ||
+           [[ $VAR3 -ne 0 ]] ||
+           [[ $VAR4 -ne 0 ]] ||
+           [[ $VAR5 -ne 0 ]]; then
+            printf "\\n${blue}%s${endc} ${green}%s${endc}\\n" \
+                "::" "Setting file: /etc/tor/torrc..."
+
+            # Copy new "torrc" file with settings for kalitorify
+            if ! cp -vf "$config_dir/torrc" /etc/tor/torrc; then
+                printf "\\n${red}%s${endc}\\n" \
+                    "[ failed ] can't set '/etc/tor/torrc'"
+                printf "${red}%s${endc}\\n" \
+                    "Please report bugs at: https://github.com/brainfucksec/kalitorify/issues"
+                exit 1
+            fi
         fi
     fi
 }
 
 
-## Start transparent proxy
+# Start transparent proxy
 main() {
     banner
     check_root
     check_defaults
 
-    # check status of tor.service and stop it if is active
+    # Check status of tor.service and stop it if is active
     if systemctl is-active tor.service >/dev/null 2>&1; then
         systemctl stop tor.service
     fi
@@ -226,7 +234,7 @@ main() {
     disable_ufw
     sleep 3
 
-    # start tor.service
+    # Start tor.service
     printf "${blue}%s${endc} ${green}%s${endc}\\n" "::" "Start Tor service... "
     if ! systemctl start tor.service 2>/dev/null; then
         printf "\\n${red}%s${endc}\\n" "[ failed ] systemd error, exit!"
@@ -238,27 +246,27 @@ main() {
         "[ ok ]" "Tor service is active"
 
 
-    ## Begin iptables settings
-    # save current iptables rules
+    ## Begin iptables settings:
+    # Save current iptables rules
     printf "${blue}%s${endc} ${green}%s${endc}" "::" "Backup iptables rules... "
 
     if ! iptables-save > "$backup_dir/iptables.backup"; then
-        printf "${red}%s${endc}\\n" \
-            "[ failed ] can't copy iptables rules to backup directory"
+        printf "\\n${red}%s${endc}\\n" \
+            "[ failed ] can't copy iptables rules to the backup directory"
         exit 1
     fi
 
     printf "${white}%s${endc}\\n" "Done"
     sleep 2
 
-    # flush current iptables rules
+    # Flush current iptables rules
     printf "${blue}%s${endc} ${green}%s${endc}" "::" "Flush iptables rules... "
     iptables -F
     iptables -t nat -F
     printf "${white}%s${endc}\\n" "Done"
 
-    # configure system's DNS resolver to use Tor's DNSPort on the loopback interface
-    # i.e. write nameserver 127.0.0.1 to 'etc/resolv.conf' file
+    # Configure system's DNS resolver to use Tor's DNSPort on the loopback interface
+    # i.e. write nameserver 127.0.0.1 to "etc/resolv.conf" file
     printf "${blue}%s${endc} ${green}%s${endc}\\n" \
         "::" "Configure system's DNS resolver to use Tor's DNSPort"
 
@@ -271,7 +279,7 @@ main() {
     printf "%s\\n" "nameserver 127.0.0.1" > /etc/resolv.conf
     sleep 2
 
-    # write new iptables rules
+    # Write new iptables rules
     printf "${blue}%s${endc} ${green}%s${endc}" "::" "Set new iptables rules... "
 
     #-------------------------------------------------------------------------
@@ -314,11 +322,11 @@ main() {
     printf "${cyan}%s${endc} ${green}%s${endc}\\n" \
     	"[ ok ]" "Transparent Proxy activated, your system is under Tor"
     printf "${cyan}%s${endc} ${green}%s${endc}\\n" \
-    	"[ info ]" "Use --status argument for check the program status"
+    	"[ info ]" "Try '$program --status' for check the program status"
 }
 
 
-## Stop transparent proxy
+# Stop transparent proxy
 stop() {
     check_root
     printf "${cyan}%s${endc} ${green}%s${endc}\\n" \
@@ -326,13 +334,13 @@ stop() {
     sleep 2
 
     ## Resets default settings
-    # flush current iptables rules
+    # Flush current iptables rules
     printf "${blue}%s${endc} ${green}%s${endc}" "::" "Flush iptables rules... "
     iptables -F
     iptables -t nat -F
     printf "${white}%s${endc}\\n" "Done"
 
-    # restore iptables
+    # Restore iptables
     printf "${blue}%s${endc} ${green}%s${endc}" \
         "::" "Restore the default iptables rules... "
 
@@ -340,20 +348,20 @@ stop() {
     printf "${white}%s${endc}\\n" "Done"
     sleep 2
 
-    # stop tor.service
+    # Stop tor.service
     printf "${blue}%s${endc} ${green}%s${endc}" "::" "Stop tor service... "
     systemctl stop tor.service
     printf "${white}%s${endc}\\n" "Done"
     sleep 4
 
-    # restore /etc/resolv.conf --> default nameserver
+    # Restore /etc/resolv.conf --> default nameserver
     printf "${blue}%s${endc} ${green}%s${endc}\\n" \
         "::" "Restore /etc/resolv.conf file with default DNS"
     rm -v /etc/resolv.conf
     cp -vf "$backup_dir/resolv.conf.backup" /etc/resolv.conf
     sleep 2
 
-    # enable firewall ufw
+    # Enable firewall ufw
     enable_ufw
 
     ## End
@@ -370,10 +378,11 @@ check_ip() {
     # curl request: http://ipinfo.io/geo
     if ! external_ip="$(curl -s -m 10 ipinfo.io/geo)"; then
         printf "${red}%s${endc}\\n" "[ failed ] curl: HTTP request error!"
+        printf "${red}%s${endc}\\n" "Please check your network settings."
         exit 1
     fi
 
-    # print output
+    # Print output
     printf "${blue}%s${endc} ${green}%s${endc}\\n" "::" "IP Address Details:"
     printf "${white}%s${endc}\\n" "$external_ip" | tr -d '"{}' | sed 's/ //g'
 }
@@ -386,7 +395,7 @@ check_ip() {
 check_status() {
     check_root
 
-    # check status of tor.service
+    # Check status of tor.service
     printf "${cyan}%s${endc} ${green}%s${endc}\\n" \
         "==>" "Check current status of Tor service"
 
@@ -394,11 +403,33 @@ check_status() {
         printf "${cyan}%s${endc} ${green}%s${endc}\\n\\n" \
             "[ ok ]" "Tor service is active"
     else
-        printf "${red}%s${endc}\\n" "[-] Tor service is not running!"
+        printf "${red}%s${endc}\\n" "[-] Tor service is not running! exiting..."
         exit 1
     fi
 
-    # check current public IP
+    # Check tor network settings
+    # make http request with curl at "https://check.torproject.org/"
+    # and grep the necessary strings from the html page to test connection
+    # with tor
+    printf "${cyan}%s${endc} ${green}%s${endc}\\n" \
+        "==>" "Check Tor network settings"
+
+    local host_port="localhost:9050"
+    local url="https://check.torproject.org/"
+
+    # curl: '-L' and 'tac' for avoid error: (23) Failed writing body
+    # https://github.com/kubernetes/helm/issues/2802
+    # https://stackoverflow.com/questions/16703647/why-curl-return-and-error-23-failed-writing-body
+    if curl --socks5 "$host_port" --socks5-hostname "$host_port" -sL "$url" \
+        | cat | tac | grep -q 'Congratulations'; then
+        printf "${cyan}%s${endc} ${green}%s${endc}\\n\\n" \
+            "[ ok ]" "Your system is configured to use Tor"
+    else
+        printf "${red}%s${endc}\\n\\n" "Your system is not using Tor"
+        exit 1
+    fi
+
+    # Check current public IP
     check_ip
     exit 0
 }
@@ -410,15 +441,13 @@ restart() {
 
     printf "${cyan}%s${endc} ${green}%s${endc}\\n" \
         "==>" "Restart Tor service and change IP"
-    ## why 'systemctl restart tor.service' not work any more?
-    # avoid errors with old "service tor reload" command
     service tor reload
     sleep 3
 
     printf "${cyan}%s${endc} ${green}%s${endc}\\n\\n" \
         "[ ok ]" "Tor Exit Node changed"
 
-    # check current public IP
+    # Check current public IP
     check_ip
 }
 
@@ -454,7 +483,7 @@ usage() {
 }
 
 
-## Cases user input
+# Cases user input
 case "$1" in
     --start)
         main
@@ -479,17 +508,17 @@ case "$1" in
         exit 0
         ;;
     --)
-        printf "${red}%s${endc}\\n" "[ failed ] '$1' it requires an argument!" >&2
-        printf "${white}%s${endc}\\n" "use '$program --help' for more informations"
+        printf "${white}%s${endc}\\n" "$program: '$1' it requires an argument!" >&2
+        printf "${white}%s${endc}\\n" "Try '$program --help' for more information."
         exit 1
         ;;
     --*)
-        printf "${red}%s${endc}\\n" "[ failed ] Invalid option '$1'!" >&2
-        printf "${white}%s${endc}\\n" "use '$program --help' for more informations"
+        printf "${white}%s${endc}\\n" "$program: Invalid option '$1'!" >&2
+        printf "${white}%s${endc}\\n" "Try '$program --help' for more information."
         exit 1
         ;;
     *)
-        printf "${red}%s${endc}\\n" "[ failed ] Invalid option $1!" >&2
-        printf "${white}%s${endc}\\n" "use '$program --help' for more informations"
+        printf "${white}%s${endc}\\n" "$program: Invalid option $1!" >&2
+        printf "${white}%s${endc}\\n" "try '$program --help' for more information."
         exit 1
 esac
