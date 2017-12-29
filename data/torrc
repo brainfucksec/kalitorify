@@ -1,0 +1,28 @@
+## Configuration file for Tor
+##
+## See "man tor", or https://www.torproject.org/docs/tor-manual.html,
+## for more options you can use in this file.
+##
+## Tor will look for this file in various places based on your platform:
+## https://www.torproject.org/docs/faq#torrc
+##
+## This file is modified by kalitorify: https://github.com/brainfucksec/kalitorify
+
+## Logs to /tmp to prevent digital evidence to be stored on disk
+Log notice file /tmp/kalitorify.log
+
+## Uncomment this to start the process in the background... or use
+## --runasdaemon 1 on the command line. This is ignored on Windows;
+## see the FAQ entry if you want Tor to run as an NT service.
+#RunAsDaemon 1
+
+## The directory for keeping all the keys/etc. By default, we store
+## things in $HOME/.tor on Unix, and in Application Data\tor on Windows.
+#DataDirectory /var/lib/tor
+
+## Transparent Proxy settings
+VirtualAddrNetworkIPv4 10.192.0.0/10
+AutomapHostsOnResolve 1
+TransPort 9040
+SocksPort 9050
+DNSPort 5353
