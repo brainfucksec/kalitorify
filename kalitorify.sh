@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Program: kalitorify.sh
-# Version: 1.11.0
+# Version: 1.11.1
 # Operating System: Kali Linux
 # Description: Transparent proxy through Tor
 #
@@ -28,7 +28,7 @@
 
 # Program's informations
 readonly program="kalitorify"
-readonly version="1.11.0"
+readonly version="1.11.1"
 readonly author="Brainfuck"
 readonly git_url="https://github.com/brainfucksec/kalitorify"
 
@@ -138,8 +138,8 @@ enable_ufw() {
 ## Check default configurations
 # Check if kalitorify is properly configured, begin ...
 check_defaults() {
-    # Check dependencies (tor)
-    declare -a dependencies=("tor");
+    # Check dependencies (tor, curl)
+    declare -a dependencies=('tor' 'curl');
     for package in "${dependencies[@]}"; do
         if ! hash "$package" 2> /dev/null; then
             printf "${red}%s${endc}\\n" \
@@ -164,9 +164,8 @@ check_defaults() {
 
     ## Check file: "/etc/tor/torrc"
     # reference file: "/usr/share/kalitorify/data/torrc"
-    # tor on Debian does not install this file anymore, then check if this file
-    # already exist, if not, copy new file, if exist, check if it is
-    # configured correctly.
+    # check if this file already exist, if not, copy new file,
+    # if exist, check if it is configured correctly.
     if [[ ! -f /etc/tor/torrc ]]; then
         printf "\\n${blue}%s${endc} ${green}%s${endc}\\n" \
             "::" "Setting file: /etc/tor/torrc..."
@@ -204,6 +203,15 @@ check_defaults() {
            [[ $VAR5 -ne 0 ]]; then
             printf "\\n${blue}%s${endc} ${green}%s${endc}\\n" \
                 "::" "Setting file: /etc/tor/torrc..."
+
+            # Backup original tor "torrc" file to the backup directory
+            if ! cp -vf /etc/tor/torrc "$backup_dir/torrc.backup"; then
+                printf "\\n${red}%s${endc}\\n" \
+                    "[ failed ] can't copy original tor 'torrc' file to the backup directory"
+                printf "${red}%s${endc}\\n" \
+                    "Please report bugs at: https://github.com/brainfucksec/kalitorify/issues"
+                exit 1
+            fi
 
             # Copy new "torrc" file with settings for kalitorify
             if ! cp -vf "$config_dir/torrc" /etc/tor/torrc; then
@@ -360,6 +368,12 @@ stop() {
     rm -v /etc/resolv.conf
     cp -vf "$backup_dir/resolv.conf.backup" /etc/resolv.conf
     sleep 2
+
+    # Restore default "torrc" file
+    printf "${blue}%s${endc} ${green}%s${endc}\\n" \
+        "::" "Restore '/etc/tor/torrc' file with default tor settings"
+    cp -vf "$backup_dir/torrc.backup" /etc/tor/torrc
+    sleep 1
 
     # Enable firewall ufw
     enable_ufw
