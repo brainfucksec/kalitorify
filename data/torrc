@@ -1,28 +1,83 @@
-## Configuration file for Tor
+## Configuration file for a typical Tor user
+## Last updated 22 December 2017 for Tor 0.3.2.8-rc.
+## (may or may not work for much older or much newer versions of Tor.)
 ##
-## See "man tor", or https://www.torproject.org/docs/tor-manual.html,
+## Lines that begin with "## " try to explain what's going on. Lines
+## that begin with just "#" are disabled commands: you can enable them
+## by removing the "#" symbol.
+##
+## See 'man tor', or https://www.torproject.org/docs/tor-manual.html,
 ## for more options you can use in this file.
 ##
 ## Tor will look for this file in various places based on your platform:
 ## https://www.torproject.org/docs/faq#torrc
-##
-## This file is modified by kalitorify: https://github.com/brainfucksec/kalitorify
 
+## Note: this is the modified version of '/etc/tor/torrc' with settings
+## for 'kalitorify' program.
+## See https://github.com/brainfucksec/kalitorify/blob/master/README.md
+##
+## The original file is copied in the program backup directory
+## '/opt/kalitorify/backups/torrc.backup'. The original file is restored
+## when the program is closed.
+
+## Logs go to stdout at level "notice" unless redirected by something
+## else, like one of the below lines. You can have as many Log lines as
+## you want.
+##
+## We advise using "notice" in most cases, since anything more verbose
+## may provide sensitive information to an attacker who obtains the logs.
+##
+## Send all messages of level 'notice' or higher to /var/log/tor/
 ## Logs to /tmp to prevent digital evidence to be stored on disk
 Log notice file /tmp/kalitorify.log
 
-## Uncomment this to start the process in the background... or use
-## --runasdaemon 1 on the command line. This is ignored on Windows;
-## see the FAQ entry if you want Tor to run as an NT service.
-#RunAsDaemon 1
+############### This section is for Transparent Proxy Settings #########
+#
+## See https://trac.torproject.org/projects/tor/wiki/doc/TransparentProxy
+## for details.
 
-## The directory for keeping all the keys/etc. By default, we store
-## things in $HOME/.tor on Unix, and in Application Data\tor on Windows.
-#DataDirectory /var/lib/tor
-
-## Transparent Proxy settings
+## IPv4Address/bits
 VirtualAddrNetworkIPv4 10.192.0.0/10
+
+## AutomapHostsOnResolve 0|1
+##
+## When this option is enabled, and we get a request to resolve an address
+## that ends with one of the suffixes in AutomapHostsSuffixes, we map an
+## unused virtual address to that address, and return the new virtual address.
+## This is handy for making ".onion" addresses work with applications
+## that resolve an ## address and then connect to it. (Default: 0)
 AutomapHostsOnResolve 1
+
+## TransPort [address:]port|auto [isolation flags]
+##
+## Open this port to listen for transparent proxy connections.
+## Set this to 0 if you don’t want to allow transparent proxy connections.
+## Set the port to "auto"to have Tor pick a port for you.
+## This directive can be specified multiple times to bind to multiple
+## addresses/ports. See SOCKSPort for an explanation of ## isolation flags.
+##
+## TransPort requires OS support for transparent proxies, such as
+## BSDs' pf or Linux’s IPTables. If you’re planning to use Tor as a
+## transparent proxy for a network, you’ll want to examine and change
+## VirtualAddrNetwork from the default setting. (Default: 0)
 TransPort 9040
+
+## SocksPort [address:]port|unix:path|auto [flags] [isolation flags]
+##
+## Open this port to listen for connections from SOCKS-speaking applications.
+## Set this to 0 if you don’t want to allow application connections via SOCKS.
+## Set it to "auto" to have Tor pick a port for you. This directive can
+## be specified multiple times to bind to multiple addresses/ports.
+## If a unix domain socket ## is used, you may quote the path using
+## standard C escape sequences. (Default: 9050)
 SocksPort 9050
+
+##  DNSPort [address:]port|auto [isolation flags]
+##
+## If non-zero, open this port to listen for UDP DNS requests, and
+## resolve them anonymously. This port only handles A, AAAA, and PTR
+## requests---it doesn’t handle arbitrary DNS request types. Set the port
+## to "auto" to have Tor pick a port for you. This directive can be
+## specified multiple times to bind to multiple addresses/ports.
+## See SocksPort for an explanation of isolation flags. (Default: 0)
 DNSPort 5353
