@@ -49,7 +49,7 @@ sudo kalitorify --start
 
 #### Like any other unix like program use '--help' option for help menù:
 ```bash
-sudo archtorify --help
+sudo kalitorify --help
 ```
 
 ## Thanks
