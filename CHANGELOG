@@ -1,0 +1,7 @@
+/** 1.12.0 / 27 March 2018 **/
+
+Added exception for resolvconf package
+Deleted unnecessary sleep statements
+Added the check status at the end of the start function
+Improve output messages
+Modified file data/torrc
