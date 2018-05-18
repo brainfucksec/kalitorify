@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Program: kalitorify.sh
-# Version: 1.12.0
+# Version: 1.12.1
 # Operating System: Kali Linux
 # Description: Transparent proxy through Tor
 #
@@ -28,7 +28,7 @@
 
 # Program's informations
 readonly program="kalitorify"
-readonly version="1.12.0"
+readonly version="1.12.1"
 readonly author="Brainfuck"
 readonly git_url="https://github.com/brainfucksec/kalitorify"
 
@@ -41,6 +41,7 @@ export cyan=$'\e[0;96m'
 export endc=$'\e[0m'
 
 ## Network settings
+#
 # The UID that Tor runs as (varies from system to system)
 #_tor_uid=`id -u debian-tor` #Debian/Ubuntu
 readonly tor_uid="109"
@@ -58,7 +59,7 @@ readonly virtual_addr_net="10.192.0.0/10"
 readonly non_tor="127.0.0.0/8 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16"
 ## End of Network settings
 
-## Set program's directories and files
+# Set program's directories and files
 # configuration files: /usr/share/kalitorify/data
 # backup files: /opt/kalitorify/backups
 readonly config_dir="/usr/share/kalitorify/data"
@@ -66,6 +67,7 @@ readonly backup_dir="/opt/kalitorify/backups"
 
 
 # Show program banner
+#####################
 banner() {
 printf "${white}
 *****************************************
@@ -85,97 +87,106 @@ $git_url${endc}\\n"
 
 
 # Check if the program run as a root
+####################################
 check_root() {
     if [[ "$(id -u)" -ne 0 ]]; then
         printf "\\n${red}%s${endc}\\n" \
-            "[ failed ] Please run this program as a root!" 2>&-
+               "[ failed ] Please run this program as a root!" 2>&-
         exit 1
     fi
 }
 
 
-# Display program and Tor version then exit
+# Display program and Tor version
+#################################
 print_version() {
-    printf "${white}%s${endc}\\n" "$program version $version"
-    printf "${white}%s${endc}\\n" "$(tor --version)"
+    printf "%s\\n" "$program version $version"
+    printf "%s\\n" "$(tor --version)"
 	exit 0
 }
 
 
-## Functions for firewall ufw (launched only if ufw exists)
+# ufw firewall functions (running only if ufw exists)
+#
 # Disable ufw:
+##############
 # If ufw is installed and/or active disable it, if isn't installed,
 # do nothing, don't display nothing to user, just jump to the next function
 disable_ufw() {
 	if hash ufw 2>/dev/null; then
     	if ufw status | grep -q active$; then
         	printf "${blue}%s${endc} ${green}%s${endc}\\n" \
-                "::" "Firewall ufw is active. disabling..."
+                   "::" "Firewall ufw is active. disabling..."
         	ufw disable
     	else
     		ufw status | grep -q inactive$;
         	printf "${blue}%s${endc} ${green}%s${endc}\\n" \
-                "::" "Firewall ufw is inactive, continue..."
+                   "::" "Firewall ufw is inactive, continue..."
     	fi
     fi
 }
 
 
-## Enable ufw:
+# Enable ufw:
+#############
 # Often, if ufw isn't installed, again, do nothing
 # and jump to the next function
 enable_ufw() {
 	if hash ufw 2>/dev/null; then
     	if ufw status | grep -q inactive$; then
         	printf "\\n${blue}%s${endc} ${green}%s${endc}\\n" \
-                "::" "Enabling firewall ufw..."
+                   "::" "Enabling firewall ufw..."
         	ufw enable
         fi
     fi
 }
 
 
-## Check default configurations
-# Check if kalitorify is properly configured, begin ...
+# Check default settings:
+#########################
 check_defaults() {
+    # project page for report bugs
     local report_url="https://github.com/brainfucksec/kalitorify/issues"
 
     # Check dependencies (tor, curl)
     declare -a dependencies=('tor' 'curl');
+
     for package in "${dependencies[@]}"; do
         if ! hash "$package" 2> /dev/null; then
             printf "\\n${red}%s${endc}\\n" \
-                "[ failed ] '$package' isn't installed, exit";
+                   "[ failed ] '$package' isn't installed, exit";
             exit 1
         fi
     done
 
-    ## Check if program's directories exist
+    # Check if program's directories exist
     # bash `-d`: test if the given directory exists or not.
     if [ ! -d "$backup_dir" ]; then
         printf "\\n${red}%s${endc}\\n" \
-            "[ failed ] directory '$backup_dir' not exist, run makefile first!";
+               "[ failed ] directory '$backup_dir' not exist, run makefile first!";
         exit 1
     fi
 
     if [ ! -d "$config_dir" ]; then
         printf "\\n${red}%s${endc}\\n" \
-            "[ failed ] directory '$config_dir' not exist, run makefile first!";
+               "[ failed ] directory '$config_dir' not exist, run makefile first!";
         exit 1
     fi
 
-    ## Check file: `/etc/tor/torrc`
+    # Check file: `/etc/tor/torrc`
     # reference file: `/usr/share/kalitorify/data/torrc`
+    #
     # check if this file already exist, if not, copy new file,
     # if exist, check if it is configured correctly.
     if [[ ! -f /etc/tor/torrc ]]; then
         printf "\\n${blue}%s${endc} ${green}%s${endc}\\n" \
-            "::" "Setting file: /etc/tor/torrc..."
+               "::" "Setting file: /etc/tor/torrc..."
 
         # Copy new `torrc` file with settings for kalitorify
         if ! cp -vf "$config_dir/torrc" /etc/tor/torrc; then
             printf "\\n${red}%s${endc}\\n" \
-                "[ failed ] can't set '/etc/tor/torrc'"
+                   "[ failed ] can't set '/etc/tor/torrc'"
+
             printf "${red}%s${endc}\\n" "Please report bugs at: $report_url"
             exit 1
         fi
@@ -203,13 +214,14 @@ check_defaults() {
            [[ $VAR4 -ne 0 ]] ||
            [[ $VAR5 -ne 0 ]]; then
             printf "\\n${blue}%s${endc} ${green}%s${endc}\\n" \
-                "::" "Setting file: /etc/tor/torrc..."
+                   "::" "Setting file: /etc/tor/torrc..."
 
             # Backup original tor `/etc/tor/torrc` file
             # in the backup directory
             if ! cp -vf /etc/tor/torrc "$backup_dir/torrc.backup"; then
                 printf "\\n${red}%s${endc}\\n" \
-                    "[ failed ] can't copy original tor 'torrc' file in the backup directory"
+                       "[ failed ] can't copy original tor 'torrc' file in the backup directory"
+
                 printf "${red}%s${endc}\\n" "Please report bugs at: $report_url"
                 exit 1
             fi
@@ -217,7 +229,8 @@ check_defaults() {
             # Copy new `torrc` file with settings for kalitorify
             if ! cp -vf "$config_dir/torrc" /etc/tor/torrc; then
                 printf "\\n${red}%s${endc}\\n" \
-                    "[ failed ] can't set '/etc/tor/torrc'"
+                       "[ failed ] can't set '/etc/tor/torrc'"
+
                 printf "${red}%s${endc}\\n" "Please report bugs at: $report_url"
                 exit 1
             fi
@@ -227,6 +240,7 @@ check_defaults() {
 
 
 # Start transparent proxy
+#########################
 main() {
     banner
     sleep 1
@@ -239,7 +253,7 @@ main() {
     fi
 
     printf "\\n${cyan}%s${endc} ${green}%s${endc}\\n" \
-        "==>" "Starting Transparent Proxy"
+           "==>" "Starting Transparent Proxy"
     sleep 2
     disable_ufw
 
@@ -251,37 +265,36 @@ main() {
     fi
     sleep 6
 
-    printf "${cyan}%s${endc} ${green}%s${endc}\\n" \
-        "[ ok ]" "Tor service is active"
+    #printf "${cyan}%s${endc} ${green}%s${endc}\\n" \
+    #       "[ ok ]" "Tor service is active"
 
 
-    ## Begin iptables settings:
+    # Begin iptables settings:
+    #
     # Save current iptables rules
     printf "\\n${blue}%s${endc} ${green}%s${endc}" "::" "Backup iptables rules... "
-
     if ! iptables-save > "$backup_dir/iptables.backup"; then
         printf "\\n${red}%s${endc}\\n" \
-            "[ failed ] can't copy iptables rules to the backup directory"
+               "[ failed ] can't copy iptables rules to the backup directory"
         exit 1
     fi
-
-    printf "${white}%s${endc}\\n" "Done"
+    printf "%s\\n" "Done"
 
     # Flush current iptables rules
     printf "${blue}%s${endc} ${green}%s${endc}" "::" "Flush iptables rules... "
     iptables -F
     iptables -t nat -F
-    printf "${white}%s${endc}\\n" "Done"
+    printf "%s\\n" "Done"
 
     # Configure system's DNS resolver to use Tor's DNSPort
     # on the loopback interface, i.e. write nameserver 127.0.0.1
     # to `/etc/resolv.conf` file
     printf "\\n${blue}%s${endc} ${green}%s${endc}\\n" \
-        "::" "Configure system's DNS resolver to use Tor's DNSPort"
+           "::" "Configure system's DNS resolver to use Tor's DNSPort"
 
     if ! cp -vf /etc/resolv.conf "$backup_dir/resolv.conf.backup"; then
         printf "${red}%s${endc}\\n" \
-            "[ failed ] can't copy resolv.conf to the backup directory"
+               "[ failed ] can't copy resolv.conf to the backup directory"
         exit 1
     fi
 
@@ -289,9 +302,9 @@ main() {
     sleep 1
 
     # Write new iptables rules
+    #-------------------------------------------------------------------
     printf "\\n${blue}%s${endc} ${green}%s${endc}" "::" "Set new iptables rules... "
 
-    #-------------------------------------------------------------------
     # set iptables *nat
     iptables -t nat -A OUTPUT -m owner --uid-owner $tor_uid -j RETURN
     iptables -t nat -A OUTPUT -p udp --dport 53 -j REDIRECT --to-ports $dns_port
@@ -322,48 +335,51 @@ main() {
     # allow only Tor output
     iptables -A OUTPUT -m owner --uid-owner $tor_uid -j ACCEPT
     iptables -A OUTPUT -j REJECT
-    #-------------------------------------------------------------------
-    ## End of iptables settings
 
-    printf "${white}%s${endc}\\n\\n" "Done"
+    # End of iptables settings
+    #-------------------------------------------------------------------
+
+    printf "%s\\n\\n" "Done"
 
     # check program status
     check_status
 
     printf "${cyan}%s${endc} ${green}%s${endc}\\n" \
-    	"[ ok ]" "Transparent Proxy activated, your system is under Tor"
+    	   "[ ok ]" "Transparent Proxy activated, your system is under Tor"
 }
 
 
 # Stop transparent proxy
+########################
 stop() {
     check_root
     printf "${cyan}%s${endc} ${green}%s${endc}\\n" \
-        "==>" "Stopping Transparent Proxy"
+           "==>" "Stopping Transparent Proxy"
     sleep 2
 
-    ## Resets default settings
+    # Resets default settings
+    #
     # Flush current iptables rules
     printf "${blue}%s${endc} ${green}%s${endc}" "::" "Flush iptables rules... "
     iptables -F
     iptables -t nat -F
-    printf "${white}%s${endc}\\n" "Done"
+    printf "%s\\n" "Done"
 
     # Restore iptables
     printf "${blue}%s${endc} ${green}%s${endc}" \
-        "::" "Restore the default iptables rules... "
+           "::" "Restore the default iptables rules... "
 
     iptables-restore < "$backup_dir/iptables.backup"
-    printf "${white}%s${endc}\\n" "Done"
+    printf "%s\\n" "Done"
 
     # Stop tor.service
     printf "${blue}%s${endc} ${green}%s${endc}" "::" "Stop tor service... "
     systemctl stop tor.service
-    printf "${white}%s${endc}\\n" "Done"
+    printf "%s\\n" "Done"
 
     # Restore `/etc/resolv.conf` --> default nameserver
     printf "\\n${blue}%s${endc} ${green}%s${endc}\\n" \
-        "::" "Restore /etc/resolv.conf file with default DNS"
+           "::" "Restore /etc/resolv.conf file with default DNS"
 
     # delete current `/etc/resolv.conf` file
     rm -v /etc/resolv.conf
@@ -379,7 +395,7 @@ stop() {
 
     # Restore default `/etc/tor/torrc` file
     printf "\\n${blue}%s${endc} ${green}%s${endc}\\n" \
-        "::" "Restore '/etc/tor/torrc' file with default tor settings"
+           "::" "Restore '/etc/tor/torrc' file with default tor settings"
     cp -vf "$backup_dir/torrc.backup" /etc/tor/torrc
     sleep 1
 
@@ -388,14 +404,15 @@ stop() {
 
     ## End
     printf "\\n${cyan}%s${endc} ${green}%s${endc}\\n" \
-        "[-]" "Transparent Proxy stopped"
+           "[-]" "Transparent Proxy stopped"
 }
 
 
-## Function for check public IP
+# Check public IP
+#################
 check_ip() {
     printf "${cyan}%s${endc} ${green}%s${endc}\\n" \
-        "==>" "Checking your public IP, please wait..."
+           "==>" "Checking your public IP, please wait..."
 
     # curl request: http://ipinfo.io/geo
     if ! external_ip="$(curl -s -m 10 ipinfo.io/geo)"; then
@@ -410,19 +427,20 @@ check_ip() {
 }
 
 
-## Check_status function
-# function for check status of program and services:
+# Check status of program and services:
+#######################################
+#
 # check --> tor.service
 # check --> tor settings
 # check --> public IP
 check_status() {
     # Check status of tor.service
     printf "${cyan}%s${endc} ${green}%s${endc}\\n" \
-        "==>" "Check current status of Tor service"
+           "==>" "Check current status of Tor service"
 
     if systemctl is-active tor.service > /dev/null 2>&1; then
         printf "${cyan}%s${endc} ${green}%s${endc}\\n\\n" \
-            "[ ok ]" "Tor service is active"
+               "[ ok ]" "Tor service is active"
     else
         printf "${red}%s${endc}\\n" "[-] Tor service is not running! exiting..."
         exit 1
@@ -433,7 +451,7 @@ check_status() {
     # and grep the necessary strings from the html page to test connection
     # with tor
     printf "${cyan}%s${endc} ${green}%s${endc}\\n" \
-        "==>" "Check Tor network settings"
+           "==>" "Check Tor network settings"
 
     local host_port="localhost:9050"
     local url="https://check.torproject.org/"
@@ -443,8 +461,9 @@ check_status() {
     # https://stackoverflow.com/questions/16703647/why-curl-return-and-error-23-failed-writing-body
     if curl -m 15 --socks5 "$host_port" --socks5-hostname "$host_port" -sL "$url" \
         | cat | tac | grep -q 'Congratulations'; then
+
         printf "${cyan}%s${endc} ${green}%s${endc}\\n\\n" \
-            "[ ok ]" "Your system is configured to use Tor"
+               "[ ok ]" "Your system is configured to use Tor"
     else
         printf "${red}%s${endc}\\n\\n" "Your system is not using Tor"
         exit 1
@@ -456,25 +475,30 @@ check_status() {
 }
 
 
-## Restart tor.service and change IP
+# Restart tor.service and change IP
+###################################
 restart() {
     check_root
 
     printf "${cyan}%s${endc} ${green}%s${endc}\\n" \
-        "==>" "Restart Tor service and change IP"
+           "==>" "Restart Tor service and change IP"
+
     service tor reload
 
     printf "${cyan}%s${endc} ${green}%s${endc}\\n\\n" \
-        "[ ok ]" "Tor Exit Node changed"
+           "[ ok ]" "Tor Exit Node changed"
 
     # Check current public IP
     check_ip
+    exit 0
 }
 
 
-# Print nice "nerd style" help menù
+# Print "nerd style" help menù
+##############################
 usage() {
     printf "${green}%s${endc}\\n" "$program $version"
+
     printf "${green}%s${endc}\\n\\n" "Transparent proxy through Tor for Kali Linux OS"
 
     printf "${green}%s${endc}\\n\\n" "Usage:"
@@ -486,24 +510,32 @@ usage() {
     printf "${green}%s${endc}\\n\\n" "Options:"
 
     printf "${white}%-12s${endc} ${green}%s${endc}\\n" \
-        "--help"      "show this help message and exit"
+           "--help"      "show this help message and exit"
+
     printf "${white}%-12s${endc} ${green}%s${endc}\\n" \
-        "--start"     "start transparent proxy through tor"
+           "--start"     "start transparent proxy through tor"
+
     printf "${white}%-12s${endc} ${green}%s${endc}\\n" \
-        "--stop"      "reset iptables and return to clear navigation"
+           "--stop"      "reset iptables and return to clear navigation"
+
     printf "${white}%-12s${endc} ${green}%s${endc}\\n" \
-        "--status"    "check status of program and services"
+           "--status"    "check status of program and services"
+
     printf "${white}%-12s${endc} ${green}%s${endc}\\n" \
-        "--checkip"   "check only public IP"
+           "--checkip"   "check only public IP"
+
     printf "${white}%-12s${endc} ${green}%s${endc}\\n" \
-        "--restart"   "restart tor service and change IP"
+           "--restart"   "restart tor service and change IP"
+
     printf "${white}%-12s${endc} ${green}%s${endc}\\n" \
-        "--version"   "display program and tor version then exit"
+           "--version"   "display program and tor version then exit"
+
     exit 0
 }
 
 
-# Cases user input
+# Handle user input
+###################
 case "$1" in
     --start)
         main
@@ -528,17 +560,17 @@ case "$1" in
         exit 0
         ;;
     --)
-        printf "${white}%s${endc}\\n" "$program: '$1' it requires an argument!" >&2
-        printf "${white}%s${endc}\\n" "Try '$program --help' for more information."
+        printf "%s\\n" "$program: '$1' it requires an argument!" >&2
+        printf "%s\\n" "Try '$program --help' for more information."
         exit 1
         ;;
     --*)
-        printf "${white}%s${endc}\\n" "$program: Invalid option '$1'!" >&2
-        printf "${white}%s${endc}\\n" "Try '$program --help' for more information."
+        printf "%s\\n" "$program: Invalid option '$1'!" >&2
+        printf "%s\\n" "Try '$program --help' for more information."
         exit 1
         ;;
     *)
-        printf "${white}%s${endc}\\n" "$program: Invalid option $1!" >&2
-        printf "${white}%s${endc}\\n" "try '$program --help' for more information."
+        printf "%s\\n" "$program: Invalid option $1!" >&2
+        printf "%s\\n" "try '$program --help' for more information."
         exit 1
 esac
