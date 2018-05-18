@@ -5,3 +5,10 @@ Deleted unnecessary sleep statements
 Added the check status at the end of the start function
 Improve output messages
 Modified file data/torrc
+
+
+/** 1.12.1 / 19 May 2018 **/
+
+Modified file data/torrc
+Little fixes in printf functions
+
