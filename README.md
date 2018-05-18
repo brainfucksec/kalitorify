@@ -42,12 +42,12 @@ sudo reboot
 
 ## Usage
 
-#### Simply start Transparent Proxy with --start option:
+#### Simply start Transparent Proxy with `--start` option:
 ```bash
 sudo kalitorify --start
 ```
 
-#### Like any other unix like program use '--help' option for help menù:
+#### Like any other unix like program use `--help` option for help menù:
 ```bash
 sudo kalitorify --help
 ```
