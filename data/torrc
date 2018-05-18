@@ -2,6 +2,13 @@
 ## Last updated 22 December 2017 for Tor 0.3.2.8-rc.
 ## (may or may not work for much older or much newer versions of Tor.)
 ##
+## This is a modified version of '/etc/tor/torrc' for 'kalitorify' program.
+## See https://github.com/brainfucksec/kalitorify/blob/master/README.md
+##
+## The original file is copied in the program backup directory
+## '/opt/archtorify/backups/torrc.backup'. The file is restored when the
+## program is closed.
+##
 ## Lines that begin with "## " try to explain what's going on. Lines
 ## that begin with just "#" are disabled commands: you can enable them
 ## by removing the "#" symbol.
@@ -12,14 +19,6 @@
 ## Tor will look for this file in various places based on your platform:
 ## https://www.torproject.org/docs/faq#torrc
 
-## Note: this is the modified version of '/etc/tor/torrc' with settings
-## for 'kalitorify' program.
-## See https://github.com/brainfucksec/kalitorify/blob/master/README.md
-##
-## The original file is copied in the program backup directory
-## '/opt/kalitorify/backups/torrc.backup'. The original file is restored
-## when the program is closed.
-
 ## Logs go to stdout at level "notice" unless redirected by something
 ## else, like one of the below lines. You can have as many Log lines as
 ## you want.
@@ -27,7 +26,6 @@
 ## We advise using "notice" in most cases, since anything more verbose
 ## may provide sensitive information to an attacker who obtains the logs.
 ##
-## Send all messages of level 'notice' or higher to /var/log/tor/
 ## Logs to /tmp to prevent digital evidence to be stored on disk
 Log notice file /tmp/kalitorify.log
 
