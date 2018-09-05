@@ -12,3 +12,15 @@ Modified file data/torrc
 Modified file data/torrc
 Little fixes in printf functions
 
+
+/** 1.13.0 / 05 Sep 2018 **/
+
+Fix value of global variable 'tor_uid'
+Change iptables rules on 'main()' function
+Changed names of command line arguments and added "shortopts"
+Change entries on 'usage()' function (help menù)
+Changes in 'check_defaults()' function (added [isolation flags] on TransPort option)
+Other some little changes in functions: main(), check_root(), check_status(), check_ip()
+Modified file 'data/torrc'
+Modified Makefile
+Update README

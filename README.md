@@ -12,23 +12,22 @@ In the [Tor project wiki](https://trac.torproject.org/projects/tor/wiki/doc/Tran
 
 ## Recommendations
 
-kalitorify is produced independently from the Tor anonimity software and carries no guarantee from the Tor Project about quality, suitability or anything else, if you need more information about tor security plese read these docs:
+kalitorify is produced independently from the Tor anonimity software and carries no guarantee from the Tor Project about quality, suitability or anything else, **please read these documents to know how to use the Tor network safely:**
 
 [Tor General FAQ](https://www.torproject.org/docs/faq.html.en)
 
 [Whonix Do Not recommendations](https://www.whonix.org/wiki/DoNot)
 
-
 ## Install
 
-#### Install dependencies:
+### Install dependencies:
 ```bash
 sudo apt update && sudo apt full-upgrade -y
 
 sudo apt install tor -y
 ```
 
-#### Install kalitorify and reboot:
+### Install kalitorify and reboot:
 ```bash
 git clone https://github.com/brainfucksec/kalitorify
 
@@ -39,21 +38,37 @@ sudo make install
 sudo reboot
 ```
 
-
 ## Usage
 
-#### Simply start Transparent Proxy with `--start` option:
-```bash
-sudo kalitorify --start
-```
+**kalitorify [option]**
 
-#### Like any other unix like program use `--help` option for help menù:
-```bash
-sudo kalitorify --help
-```
+### Options
+
+**-t, --tor**
+
+    start transparent proxy through tor
+
+**-c, --clearnet**
+
+    reset iptables and return to clearnet navigation
+
+**-s, --status**
+
+    check status of program and services
+
+**-i, --ipinfo**
+
+    show public IP
+
+**-r, --restart**
+
+    restart tor service and change IP
 
 ## Thanks
 
-* kalitorify is KISS version of [Parrot AnonSurf Module](https://github.com/parrotsec/anonsurf), developed by "Pirates' Crew" of FrozenBox
+* kalitorify is KISS version of [Parrot AnonSurf Module](https://github.com/parrotsec/anonsurf), developed by [Parrot Project Team](https://docs.parrotsec.org/developers). Thank you guys for give me the way in developing this program.
+
+* This program could not exist without the guides of the [Tor Project official website](https://www.torproject.org/)
 
 * A special thanks goes also to the [Whonix](https://www.whonix.org/) Team and their [documentation](https://www.whonix.org/wiki/Documentation)
+
