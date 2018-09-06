@@ -7,13 +7,6 @@
 ## Last updated 22 December 2017 for Tor 0.3.2.8-rc.
 ## (may or may not work for much older or much newer versions of Tor.)
 ##
-## This is a modified version of '/etc/tor/torrc' for 'kalitorify' program.
-## See https://github.com/brainfucksec/kalitorify/blob/master/README.md
-##
-## The original file is copied in the program backup directory
-## '/opt/archtorify/backups/torrc.backup'. The file is restored when the
-## program is closed.
-##
 ## Lines that begin with "## " try to explain what's going on. Lines
 ## that begin with just "#" are disabled commands: you can enable them
 ## by removing the "#" symbol.
