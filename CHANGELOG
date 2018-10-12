@@ -24,3 +24,9 @@ Other some little changes in functions: main(), check_root(), check_status(), ch
 Modified file 'data/torrc'
 Modified Makefile
 Update README
+
+
+/** 1.13.1 / 12 Oct 2018 **/
+
+Little fixes "around the program"
+Fix comparison operator for parsing command line options

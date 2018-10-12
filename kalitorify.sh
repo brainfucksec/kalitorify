@@ -27,9 +27,12 @@
 
 # Program information
 readonly prog_name="kalitorify"
-readonly version="1.13.0"
+readonly version="1.13.1"
 readonly author="Brainfuck"
 readonly git_url="https://github.com/brainfucksec/kalitorify"
+
+# URL for BUG reports :)
+readonly report_url="https://github.com/brainfucksec/kalitorify/issues"
 
 # Define colors for terminal output
 export red=$'\e[0;91m'
@@ -66,9 +69,6 @@ readonly non_tor="127.0.0.0/8 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16"
 readonly config_dir="/usr/share/kalitorify/data"
 readonly backup_dir="/opt/kalitorify/backups"
 
-# URL for BUG reports :)
-report_url="https://github.com/brainfucksec/kalitorify/issues"
-
 
 # Show program banner
 #####################
@@ -95,7 +95,7 @@ $git_url${endc}\\n"
 check_root() {
     if [[ "$(id -u)" -ne 0 ]]; then
         printf "\\n${red}%s${endc}\\n" \
-               "[ failed ] Please run this program as a root!" 2>&-
+               "[ failed ] Please run this program as a root!" 2>&1
         exit 1
     fi
 }
@@ -153,7 +153,7 @@ check_defaults() {
     declare -a dependencies=('tor' 'curl');
 
     for package in "${dependencies[@]}"; do
-        if ! hash "$package" 2> /dev/null; then
+        if ! hash "$package" 2>/dev/null; then
             printf "\\n${red}%s${endc}\\n" \
                    "[ failed ] '$package' isn't installed, exit";
             exit 1
@@ -208,7 +208,7 @@ check_defaults() {
         grep -q -x 'DNSPort 5353' /etc/tor/torrc
         VAR5=$?
 
-        # and configure it if needed
+        # and replace original `/etc/tor/torrc` file if needed
         if [[ $VAR1 -ne 0 ]] ||
            [[ $VAR2 -ne 0 ]] ||
            [[ $VAR3 -ne 0 ]] ||
@@ -395,6 +395,7 @@ stop() {
     # Restore default `/etc/tor/torrc` file
     printf "\\n${blue}%s${endc} ${green}%s${endc}\\n" \
            "::" "Restore '/etc/tor/torrc' file with default tor settings"
+
     cp -vf "$backup_dir/torrc.backup" /etc/tor/torrc
 
     # Enable firewall ufw
@@ -537,8 +538,8 @@ usage() {
 
 # Parse command line options
 ############################
-if [ "$#" == "0" ]; then
-    printf "%s\\n" "$prog_name: Argument required" >&2
+if [ "$#" -eq 0 ]; then
+    printf "%s\\n" "$prog_name: Argument required"
     printf "%s\\n" "Try '$prog_name --help' for more information."
     exit 1
 fi
@@ -569,7 +570,7 @@ while [ "$#" -gt 0 ]; do
             exit 0
             ;;
         -- | -* | *)
-            printf "%s\\n" "$prog_name: Invalid option '$1'" >&2
+            printf "%s\\n" "$prog_name: Invalid option '$1'"
             printf "%s\\n" "Try '$prog_name --help' for more information."
             exit 1
             ;;
