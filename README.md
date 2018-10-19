@@ -72,3 +72,8 @@ sudo reboot
 
 * A special thanks goes also to the [Whonix](https://www.whonix.org/) Team and their [documentation](https://www.whonix.org/wiki/Documentation)
 
+## Donation
+
+If you like my work you can give me a cup of coffee :)
+
+Bitcoin Address: 1B39SnAXcR2bkxNpNy3AuckgaTshqNc2ce
