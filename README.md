@@ -8,6 +8,8 @@ kalitorify is a shell script for [Kali Linux](https://www.kali.org/) which use [
 
 Also known as an intercepting proxy, inline proxy, or forced proxy, a transparent proxy intercepts normal communication at the network layer without requiring any special client configuration. Clients need not be aware of the existence of the proxy. A transparent proxy is normally located between the client and the Internet, with the proxy performing some of the functions of a gateway or router.
 
+Strictly speaking, with kalitorify you can redirect all traffic of your Kali Linux operating system through Tor.
+
 In the [Tor project wiki](https://trac.torproject.org/projects/tor/wiki/doc/TransparentProxy) you find an explanation of what is the "transparent proxy through tor" and related settings.
 
 ## Recommendations
