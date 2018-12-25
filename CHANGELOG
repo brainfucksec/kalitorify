@@ -30,3 +30,11 @@ Update README
 
 Little fixes "around the program"
 Fix comparison operator for parsing command line options
+
+
+/** 1.14.0 / 25 Dic 2018 **/
+
+Modified many comments for a better reading (I hope)
+Changes on 'main()' function, change order of dns/iptables instructions
+Little changes on 'banner()' function
+Added information on 'check_status()' function when network error occurred
