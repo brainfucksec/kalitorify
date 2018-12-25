@@ -20,9 +20,16 @@ kalitorify is produced independently from the Tor anonimity software and carries
 
 [Whonix Do Not recommendations](https://www.whonix.org/wiki/DoNot)
 
-kalitorify provides transparent proxy management on tor but does not provide 100% anonymity.
+kalitorify provides transparent proxy management on Tor but does not provide 100% anonymity.
 
-From [Arch Linux Wiki](https://wiki.archlinux.org/index.php/Tor): Applications can still learn your computer's hostname, MAC address, serial number, timezone, etc. and those with root privileges can disable the firewall entirely. In other words, transparent torification with iptables protects against accidental connections and DNS leaks by misconfigured software, it is not sufficient to protect against malware or software with serious security vulnerabilities.
+From [Arch Linux Wiki](https://wiki.archlinux.org/index.php/Tor) about Transparent Torification: Using iptables to transparently torify a system affords comparatively strong leak protection, but it is not a substitute for virtualized torification applications such as Whonix, or TorVM.
+Applications can still learn your computer's hostname, MAC address, serial number, timezone, etc. and those with root privileges can disable the firewall entirely. In other words, transparent torification with iptables protects against accidental connections and DNS leaks by misconfigured software, it is not sufficient to protect against malware or software with serious security vulnerabilities.
+
+For this, you should change at least the hostname and the MAC address:
+
+[Setting the Hostname on Debian](https://debian-handbook.info/browse/stable/sect.hostname-name-service.html)
+
+[Changing MAC Address on Linux](https://en.wikibooks.org/wiki/Changing_Your_MAC_Address/Linux)
 
 
 ## Install
