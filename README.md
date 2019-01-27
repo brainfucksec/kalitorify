@@ -2,7 +2,7 @@
 
 # About kalitorify
 
-kalitorify is a shell script for [Kali Linux](https://www.kali.org/) which use [iptables](https://www.netfilter.org/projects/iptables/index.html) settings for create a transparent proxy through Tor Network, the program also allows you to perform various checks like checking the Tor Exit Node (i.e. your public IP when you are under Tor proxy), or if Tor has been configured correctly.
+kalitorify is a shell script for [Kali Linux](https://www.kali.org/) which use [iptables](https://www.netfilter.org/projects/iptables/index.html) settings to create a transparent proxy through Tor Network, the program also allows you to perform various checks like checking the Tor Exit Node (i.e. your public IP when you are under Tor proxy), or if Tor has been configured correctly.
 
 ## What is Transparent Proxy through Tor?
 
@@ -11,7 +11,7 @@ Transparent proxy is an intermediary system that sit between a user and a conten
 ![alt text](https://imgur.com/c9canu4.png)
 
 Transparent proxy via Tor means that every network application will make its TCP connections through Tor; no application will be able to reveal your IP address by connecting directly.
-In simple terms, with archtorify you can redirect all traffic of your Arch Linux operating system through the Tor Network.
+In simple terms, with kalitorify you can redirect all traffic of your Kali Linux operating system through the Tor Network.
 
 In the [Tor project wiki](https://trac.torproject.org/projects/tor/wiki/doc/TransparentProxy) you find an explanation of what is the **"Transparent Proxy through Tor"** and related settings.
 you should read it.
