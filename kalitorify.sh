@@ -272,10 +272,10 @@ check_ip() {
            "==>" "Checking your public IP, please wait..."
 
     if external_ip="$(curl -s -m 10 http://ipinfo.io)" ||
-        external_ip="$(curl -s -m 10 http://ip-api.com)"; then
+       external_ip="$(curl -s -m 10 http://ip-api.com)"; then
 
-    printf "${blue}%s${endc} ${green}%s${endc}\\n" "::" "IP Address Details:"
-    printf "${white}%s${endc}\\n" "$external_ip" | tr -d '"{}' | sed 's/ //g'
+        printf "${blue}%s${endc} ${green}%s${endc}\\n" "::" "IP Address Details:"
+        printf "${white}%s${endc}\\n" "$external_ip" | tr -d '"{}' | sed 's/ //g'
     else
         printf "${red}%s${endc}\\n\\n" "[ failed ] curl: HTTP request error"
 
