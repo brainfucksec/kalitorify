@@ -1,3 +1,8 @@
+[![Build Status](https://img.shields.io/github/forks/brainfucksec/kalitorify.svg)](https://github.com/brainfucksec/kalitorify)
+[![Build Status](https://img.shields.io/github/stars/brainfucksec/kalitorify.svg)](https://github.com/brainfucksec/kalitorify)
+[![License](https://img.shields.io/github/license/brainfucksec/kalitorify.svg)](https://github.com/brainfucksec/kalitorify)
+[![Rawsec's CyberSecurity Inventory](https://inventory.rawsec.ml/img/badges/Rawsec-inventoried-FF5050_flat.svg)](https://inventory.rawsec.ml/tools.html#kalitorify)
+
 # kalitorify
 
 # About kalitorify
