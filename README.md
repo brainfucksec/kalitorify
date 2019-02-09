@@ -90,8 +90,10 @@ sudo reboot
 
 * A special thanks goes also to the [Whonix](https://www.whonix.org/) Team and their [documentation](https://www.whonix.org/wiki/Documentation)
 
-## Donations
+## How can I help ?
 
-This is a project made with a lot of motivation to collaborate in the computer security community, if you liked the features. I invite you to make a donation.
+All kinds of contributions are welcome!<br />
+The most basic way to show your support is to star :star: the project, or to raise issues :speech_balloon:<br />
+But this project also needs donations :moneybag: to stay alive!
 
 **BITCOIN:** 1B39SnAXcR2bkxNpNy3AuckgaTshqNc2ce
