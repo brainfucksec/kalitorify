@@ -90,10 +90,8 @@ sudo reboot
 
 * A special thanks goes also to the [Whonix](https://www.whonix.org/) Team and their [documentation](https://www.whonix.org/wiki/Documentation)
 
-## How can I help ?
+## Support kalitorify
 
-All kinds of contributions are welcome!<br />
-The most basic way to show your support is to star :star: the project, or to raise issues :speech_balloon:<br />
-But this project also needs donations :moneybag: to stay alive!
+Please consider donating to sustain this project
 
 **BITCOIN:** 1B39SnAXcR2bkxNpNy3AuckgaTshqNc2ce
