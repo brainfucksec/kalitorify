@@ -46,3 +46,10 @@ Added instructions for disable/enable IPv6
 Changes on 'check_ip()' and 'restart()' functions
 Changed order of functions: 'check_ip()' and 'check_status()' before 'main()'
 Improved README
+
+
+/** 1.16.0 / 1 May 2019 **/
+
+Modified logic of program:
+Changed the name of old 'main()' function, now is called 'start()'
+Integrated the code to start the program in a new 'main()' function

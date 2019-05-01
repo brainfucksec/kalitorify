@@ -31,7 +31,7 @@
 
 # Program information
 readonly prog_name="kalitorify"
-readonly version="1.15.0"
+readonly version="1.16.0"
 readonly signature="Copyright (C) 2015-2019 Brainfuck"
 readonly bug_report="Please report bug to <https://github.com/brainfucksec/kalitorify/issues>."
 
@@ -347,7 +347,7 @@ check_status() {
 # ===================================================================
 # Start transparent proxy
 # ===================================================================
-main() {
+start() {
     banner
     check_root
     sleep 1
@@ -595,44 +595,51 @@ usage() {
 
 
 # ===================================================================
-# Parse command line options
+# Main function
 # ===================================================================
-if [ "$#" -eq 0 ]; then
-    printf "%s\\n" "$prog_name: Argument required"
-    printf "%s\\n" "Try '$prog_name --help' for more information."
-    exit 1
-fi
 
-while [ "$#" -gt 0 ]; do
-    case "$1" in
-        -t | --tor)
-            main
-            shift
-            ;;
-        -c | --clearnet)
-            stop
-            ;;
-        -r | --restart)
-            restart
-            ;;
-        -s | --status)
-            check_status
-            ;;
-        -i | --ipinfo)
-            check_ip
-            ;;
-        -v | --version)
-            print_version
-            ;;
-        -h | --help)
-            usage
-            exit 0
-            ;;
-        -- | -* | *)
-            printf "%s\\n" "$prog_name: Invalid option '$1'"
-            printf "%s\\n" "Try '$prog_name --help' for more information."
-            exit 1
-            ;;
-    esac
-    shift
-done
+# Parse command line arguments and start program
+main() {
+    if [[ "$#" -eq 0 ]]; then
+        printf "%s\\n" "$prog_name: Argument required"
+        printf "%s\\n" "Try '$prog_name --help' for more information."
+        exit 1
+    fi
+
+    while [[ "$#" -gt 0 ]]; do
+        case "$1" in
+            -t | --tor)
+                start
+                shift
+                ;;
+            -c | --clearnet)
+                stop
+                ;;
+            -r | --restart)
+                restart
+                ;;
+            -s | --status)
+                check_status
+                ;;
+            -i | --ipinfo)
+                check_ip
+                ;;
+            -v | --version)
+                print_version
+                ;;
+            -h | --help)
+                usage
+                exit 0
+                ;;
+            -- | -* | *)
+                printf "%s\\n" "$prog_name: Invalid option '$1'"
+                printf "%s\\n" "Try '$prog_name --help' for more information."
+                exit 1
+                ;;
+        esac
+        shift
+    done
+}
+
+
+main "$@"
