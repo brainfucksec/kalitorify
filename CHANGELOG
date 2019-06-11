@@ -50,6 +50,15 @@ Improved README
 
 /** 1.16.0 / 1 May 2019 **/
 
-Modified logic of program:
+Modified program logic:
 Changed the name of old 'main()' function, now is called 'start()'
 Integrated the code to start the program in a new 'main()' function
+
+
+/** 1.17.0 / 10 Jun 2019 **/
+
+Bold colors for terminal output messages
+Changed banner
+Update function 'check_ip()''
+Update README
+Added issue template
