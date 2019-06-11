@@ -55,10 +55,10 @@ Changed the name of old 'main()' function, now is called 'start()'
 Integrated the code to start the program in a new 'main()' function
 
 
-/** 1.17.0 / 10 Jun 2019 **/
+/** 1.17.0 / 11 Jun 2019 **/
 
 Bold colors for terminal output messages
 Changed banner
-Update function 'check_ip()''
+Update function 'check_ip()'
 Update README
 Added issue template
