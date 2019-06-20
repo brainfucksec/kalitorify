@@ -15,6 +15,16 @@ Transparent Proxy through Tor for Kali Linux
 
 In simple terms, with kalitorify you can redirect all traffic of your Kali Linux operating system through the Tor Network.
 
+
+## What is Tor?
+
+if you don't know the Tor Network and the Tor Project (but even if you know them), I suggest you read the information from here:
+
+Tor Anonimity Network on [Wikipedia](https://en.wikipedia.org/wiki/Tor_%28anonymity_network%29)
+
+Tor Project [Website](https://www.torproject.org/)
+
+
 ## What is Transparent Proxy through Tor?
 
 Transparent proxy is an intermediary system that sit between a user and a content provider. When a user makes a request to a web server, the transparent proxy intercepts the request to perform various actions including caching, redirection and authentication.
@@ -50,13 +60,20 @@ sudo reboot
 
 ---
 
+Please, before starting kalitorify make sure you have read the section about [Security](https://github.com/brainfucksec/kalitorify#security).
+The use of program is very simple, the syntax follows the order `archtorify <option>`, you can show the help menu at any time with the `--help` option:
+
 ## Usage
 
 **kalitorify [option]**
 
 ### Options
 
-**-t, --tor**
+**-h, --help**
+
+    show this help message and exit
+**
+-t, --tor**
 
     start transparent proxy through tor
 
@@ -118,7 +135,7 @@ Next you need to identify the Tor guard IP, you can use `ss`, `netstat` or `GETI
 
 Example with `ss`:
 ```bash
-ss -ntp | grep $(cat /var/run/tor/tor.pid)
+ss -ntp | grep "$(cat /var/run/tor/tor.pid)"
 ```
 
 With the interface and guard IP at hand, we can now use `tcpdump` to check for possible non-tor leaks. Replace IP.TO.TOR.GUARD with the IP you got from the `ss` output.
@@ -127,6 +144,8 @@ tcpdump -n -f -p -i eth0 not arp and not host IP.TO.TOR.GUARD
 ```
 
 You are not supposed to see any output other than the first two header lines. You can remove `and not host IP` to see how it would look like otherwise.
+
+Source: https://trac.torproject.org/projects/tor/wiki/doc/TransparentProxy#Checkingforleaks
 
 ---
 
