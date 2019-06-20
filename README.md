@@ -60,41 +60,6 @@ sudo reboot
 
 ---
 
-Please, before starting kalitorify make sure you have read the section about [Security](https://github.com/brainfucksec/kalitorify#security).
-The use of program is very simple, the syntax follows the order `archtorify <option>`, you can show the help menu at any time with the `--help` option:
-
-## Usage
-
-**kalitorify [option]**
-
-### Options
-
-**-h, --help**
-
-    show this help message and exit
-**
--t, --tor**
-
-    start transparent proxy through tor
-
-**-c, --clearnet**
-
-    reset iptables and return to clearnet navigation
-
-**-s, --status**
-
-    check status of program and services
-
-**-i, --ipinfo**
-
-    show public IP
-
-**-r, --restart**
-
-    restart tor service and change IP
-
----
-
 ## Security
 
 **kalitorify is produced independently from the Tor anonimity software and carries no guarantee from the Tor Project about quality, suitability or anything else,** please read these documents to know how to use the Tor network safely:
@@ -146,6 +111,37 @@ tcpdump -n -f -p -i eth0 not arp and not host IP.TO.TOR.GUARD
 You are not supposed to see any output other than the first two header lines. You can remove `and not host IP` to see how it would look like otherwise.
 
 Source: https://trac.torproject.org/projects/tor/wiki/doc/TransparentProxy#Checkingforleaks
+
+---
+
+## Usage
+
+Please, before starting kalitorify make sure you have read the section about [Security](https://github.com/brainfucksec/kalitorify#security).
+The use of program is very simple, the syntax follow the order `<program name> <option>`, you can show the help menu at any time with the `--help` option:
+
+**kalitorify [option]**
+
+### Options
+
+**-t, --tor**
+
+    start transparent proxy through tor
+
+**-c, --clearnet**
+
+    reset iptables and return to clearnet navigation
+
+**-s, --status**
+
+    check status of program and services
+
+**-i, --ipinfo**
+
+    show public IP
+
+**-r, --restart**
+
+    restart tor service and change IP
 
 ---
 
