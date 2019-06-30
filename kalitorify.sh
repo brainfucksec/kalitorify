@@ -31,7 +31,7 @@
 
 # Program information
 readonly prog_name="kalitorify"
-readonly version="1.17.0"
+readonly version="1.17.1"
 readonly signature="Copyright (C) 2015-2019 Brainfuck"
 readonly git_url="https://github.com/brainfucksec/kalitorify"
 readonly bug_report_url="Please report bugs to <https://github.com/brainfucksec/kalitorify/issues>."
@@ -223,7 +223,7 @@ check_defaults() {
         local string1=$?
 
         grep -q -x 'AutomapHostsOnResolve 1' /etc/tor/torrc
-        local string2=$b?
+        local string2=$?
 
         grep -q -x 'TransPort 9040 IsolateClientAddr IsolateClientProtocol IsolateDestAddr IsolateDestPort' /etc/tor/torrc
         local string3=$?
