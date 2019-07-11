@@ -150,7 +150,7 @@ disable_ufw() {
 # Enable ufw
 # ===================================================================
 
-# Often, if ufw isn't installed, again, do nothing
+# If ufw isn't installed, again, do nothing
 # and jump to the next function
 enable_ufw() {
 	if hash ufw 2>/dev/null; then
