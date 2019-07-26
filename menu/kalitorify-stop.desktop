@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=kalitorify stop
+Encoding=UTF-8
+Exec=sh -c "kalitorify -c;${SHELL:-bash}"
+Icon=/usr/share/icons/kalitorify-stop.png
+StartupNotify=true
+Terminal=true
+Type=Application
+Categories=14-14-kalitorify-service;14-services;
+X-Kali-Package=kalitorify
