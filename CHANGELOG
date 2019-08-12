@@ -80,6 +80,6 @@ Delete readonly variable: 'bug_report_url'
 Changes on functions 'start(), stop()': delete excessive output
 Update README: new project logo
 
-/** 1.18.0-1 / 12 Aug 2019 **/
+/** 1.18.1 / 12 Aug 2019 **/
 
 Update README

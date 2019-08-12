@@ -31,7 +31,7 @@
 
 # Program information
 readonly prog_name="kalitorify"
-readonly version="1.18.0"
+readonly version="1.18.1"
 readonly signature="Copyright (C) 2015-2019 Brainfuck"
 readonly git_url="https://github.com/brainfucksec/kalitorify"
 
