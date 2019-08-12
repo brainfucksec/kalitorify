@@ -39,8 +39,7 @@ Transparent proxy is an intermediary system that sit between a user and a conten
 
 Transparent proxy via Tor means that every network application will make its TCP connections through Tor; no application will be able to reveal your IP address by connecting directly.
 
-In the [Tor project wiki](https://trac.torproject.org/projects/tor/wiki/doc/TransparentProxy) you find an explanation of what is the **"Transparent Proxy through Tor"** and related settings.
-**Please read it if you want to use kalitorify safely.**
+For more information about the Transparent Proxy through Tor please read the [Tor project wiki](https://trac.torproject.org/projects/tor/wiki/doc/TransparentProxy)
 
 ---
 
@@ -68,22 +67,16 @@ sudo reboot
 
 ## Security
 
-**kalitorify is produced independently from the Tor anonimity software and carries no guarantee from the Tor Project about quality, suitability or anything else,** please read these documents to know how to use the Tor network safely:
+**Please read this section carefully before starting kalitorify**
 
-[Tor General FAQ](https://www.torproject.org/docs/faq.html.en)
+kalitorify is a bash script to start a transparent proxy through Tor to be used for a safe navigation during communications, searches or other activities with Kali Linux, but does not guarantee 100% anonymity.
+From [Tor Project wiki](https://trac.torproject.org/projects/tor/wiki/doc/TransparentProxy#BriefNotes) about Transparent Proxy:
 
-[Whonix Do Not recommendations](https://www.whonix.org/wiki/DoNot)
+Please read [Transparent Proxy Leaks](https://trac.torproject.org/projects/tor/wiki/doc/TransparentProxyLeaks) (mostly Microsoft Windows related) and/or consider an [Isolating Proxy](https://trac.torproject.org/projects/tor/wiki/doc/TorifyHOWTO/IsolatingProxy) as alternative.
+See [Whonix](https://www.whonix.org/) for a complete, ready-made VM based solution (alternatively using multiple physical computers) built around the Isolating Proxy and Transparent Proxy [Anonymizing Middlebox design](https://trac.torproject.org/projects/tor/wiki/doc/TransparentProxy#AnonymizingMiddlebox).
+Once you start kalitorify you can [check for leaks](#checking-for-leaks).
 
-**kalitorify provides transparent proxy management on Tor but does not provide 100% anonymity.**
-
-From [Arch Linux Wiki](https://wiki.archlinux.org/index.php/Tor) about Transparent Torification: Using iptables to transparently torify a system affords comparatively strong leak protection, but it is not a substitute for virtualized torification applications such as Whonix, or TorVM.
-Applications can still learn your computer's hostname, MAC address, serial number, timezone, etc. and those with root privileges can disable the firewall entirely. In other words, transparent torification with iptables protects against accidental connections and DNS leaks by misconfigured software, it is not sufficient to protect against malware or software with serious security vulnerabilities.
-
-For this, you should change at least the hostname and the MAC address:
-
-[Setting the Hostname on Debian](https://debian-handbook.info/browse/stable/sect.hostname-name-service.html)
-
-[Changing MAC Address on Linux](https://en.wikibooks.org/wiki/Changing_Your_MAC_Address/Linux)
+Don't start Tor Browser when transparent browsing (kalitorify) is active, this to [avoid Tor over Tor Scenarios](https://www.whonix.org/wiki/DoNot#Allow_Tor_over_Tor_Scenarios).
 
 ### Checking for leaks:
 
@@ -122,8 +115,13 @@ Source: https://trac.torproject.org/projects/tor/wiki/doc/TransparentProxy#Check
 
 ## Usage
 
-Please, before starting kalitorify make sure you have read the section about [Security](https://github.com/brainfucksec/kalitorify#security).
-The use of program is very simple, the syntax follow the order `<program name> <option>`, you can show the help menu at any time with the `--help` option:
+Please, before starting kalitorify make sure you have read the section about [Security](#security).
+
+Using the program is simple, the command-line options follow the [GNU Coding Standards](https://www.gnu.org/prep/standards/html_node/Command_002dLine-Interfaces.html), you can use the short and long options, the commands syntax is:
+
+`<program name> --<option>`
+
+For example, to display the help menù, run command `kalitorify` with the `--help` or `-h` option, these are all the commands available:
 
 **kalitorify [option]**
 
@@ -161,6 +159,6 @@ The use of program is very simple, the syntax follow the order `<program name> <
 
 ## Support kalitorify
 
-Please consider donating to sustain this project
+Please consider donating to sustain this project:
 
 **BITCOIN:** 1B39SnAXcR2bkxNpNy3AuckgaTshqNc2ce
