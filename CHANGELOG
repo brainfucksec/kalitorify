@@ -72,3 +72,10 @@ Update README
 /** 1.17.1 / 30 Jun 2019 **/
 
 Fix little error on code syntax on function 'check_defaults'
+
+
+/** 1.18.0 / 12 Aug 2019 **/
+
+Delete readonly variable: 'bug_report_url'
+Changes on functions 'start(), stop()': delete excessive output
+Update README: new project logo

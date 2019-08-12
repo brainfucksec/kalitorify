@@ -31,10 +31,9 @@
 
 # Program information
 readonly prog_name="kalitorify"
-readonly version="1.17.1"
+readonly version="1.18.0"
 readonly signature="Copyright (C) 2015-2019 Brainfuck"
 readonly git_url="https://github.com/brainfucksec/kalitorify"
-readonly bug_report_url="Please report bugs to <https://github.com/brainfucksec/kalitorify/issues>."
 
 # Colors for terminal output (b = bold)
 export red=$'\e[0;91m'
@@ -210,11 +209,11 @@ check_defaults() {
     if [[ ! -f /etc/tor/torrc ]]; then
 
         printf "${bblue}%s${endc} ${bgreen}%s${endc}\\n" \
-               "::" "Setting file: /etc/tor/torrc..."
+               "::" "Setting file: /etc/tor/torrc"
 
         if ! cp -vf "$config_dir/torrc" /etc/tor/torrc; then
-            printf "\\n${red}%s${endc}\\n" "[ failed ] can't set '/etc/tor/torrc'"
-            printf "%s\\n" "$bug_report_url"
+            printf "\\n${red}%s${endc}\\n" "[ failed ] can't setup '/etc/tor/torrc'"
+            printf "%s\\n" "Please report bugs to <$git_url/issues>."
             exit 1
         fi
     else
@@ -251,14 +250,14 @@ check_defaults() {
                 printf "\\n${red}%s${endc}\\n" \
                        "[ failed ] can't copy original tor 'torrc' file in the backup directory"
 
-                printf "%s\\n" "$bug_report_url"
+                printf "%s\\n" "Please report bugs to <$git_url/issues>."
                 exit 1
             fi
 
             # copy new `torrc` file with settings for kalitorify
             if ! cp -vf "$config_dir/torrc" /etc/tor/torrc; then
-                printf "\\n${red}%s${endc}\\n" "[ failed ] can't set '/etc/tor/torrc'"
-                printf "%s\\n" "$bug_report_url"
+                printf "\\n${red}%s${endc}\\n" "[ failed ] can't setup '/etc/tor/torrc'"
+                printf "%s\\n" "Please report bugs to <$git_url/issues>."
                 exit 1
             fi
         fi
@@ -282,7 +281,7 @@ check_ip() {
         printf "${red}%s${endc}\\n\\n" "[ failed ] curl: HTTP request error"
 
         printf "%s\\n" "try another Tor circuit with '$prog_name --restart'"
-        printf "%s\\n" "$bug_report_url"
+        printf "%s\\n" "Please report bugs to <$git_url/issues>."
         exit 1
     fi
 }
@@ -337,7 +336,7 @@ check_status() {
         printf "${red}%s${endc}\\n\\n" "Your system is not using Tor!"
 
         printf "%s\\n" "try another Tor circuit with '$prog_name --restart'"
-        printf "%s\\n" "$bug_report_url"
+        printf "%s\\n" "Please report bugs to <$git_url/issues>."
         exit 1
     fi
 
@@ -381,7 +380,7 @@ start() {
         printf "${red}%s${endc}\\n" \
                "[ failed ] can't copy resolv.conf to the backup directory"
 
-        printf "%s\\n" "$bug_report_url"
+        printf "%s\\n" "Please report bugs to <$git_url/issues>."
         exit 1
     fi
 
@@ -411,19 +410,15 @@ start() {
     # iptables settings
     # =================
     #
-    # Save current iptables rules
-    printf "\\n${bblue}%s${endc} ${bgreen}%s${endc}" "::" "Backup iptables... "
+    # Setup iptables rules
+    printf "\\n${bblue}%s${endc} ${bgreen}%s${endc}\\n" "::" "Setup new iptables rules"
+
+    # Backup current iptables rules
     iptables-save > "$backup_dir/iptables.backup"
-    printf "%s\\n" "Done"
 
     # Flush current iptables rules
-    printf "${bblue}%s${endc} ${bgreen}%s${endc}" "::" "Flush current iptables... "
     iptables -F
     iptables -t nat -F
-    printf "%s\\n" "Done"
-
-    # Set new iptables rules
-    printf "${bblue}%s${endc} ${bgreen}%s${endc}" "::" "Set new iptables rules... "
 
     # set iptables *nat
     iptables -t nat -A OUTPUT -m owner --uid-owner $tor_uid -j RETURN
@@ -452,12 +447,14 @@ start() {
     iptables -A OUTPUT -m owner --uid-owner $tor_uid -j ACCEPT
     iptables -A OUTPUT -j REJECT
 
-    printf "%s\\n\\n" "Done"
+    printf "${bcyan}%s${endc} ${bgreen}%s${endc}\\n\\n" \
+        "[ ok ]" "iptables rules set"
+
 
     # check program status
     check_status
 
-    printf "${bcyan}%s${endc} ${bgreen}%s${endc}\\n" \
+    printf "\\n${bcyan}%s${endc} ${bgreen}%s${endc}\\n" \
     	    "[ ok ]" "Transparent Proxy activated, your system is under Tor"
 }
 
@@ -474,26 +471,27 @@ stop() {
            "==>" "Stopping Transparent Proxy"
     sleep 2
 
-    # Resets default iptables:
-    # ========================
+    # Restore default iptables rules:
+    # ===============================
     #
-    # Flush current iptables rules
-    printf "${bblue}%s${endc} ${bgreen}%s${endc}" "::" "Flush iptables rules... "
+    printf "${bblue}%s${endc} ${bgreen}%s${endc}\\n" "::" "Restore default iptables rules"
+
+    # Flush iptables rules
     iptables -F
     iptables -t nat -F
-    printf "%s\\n" "Done"
 
-    # Restore iptables
-    printf "${bblue}%s${endc} ${bgreen}%s${endc}" \
-           "::" "Restore the default iptables rules... "
-
+    # Restore iptables from backup
     iptables-restore < "$backup_dir/iptables.backup"
-    printf "%s\\n" "Done"
+
+    printf "${bcyan}%s${endc} ${bgreen}%s${endc}\\n" \
+        "[ ok ]" "iptables rules restored"
 
     # Stop tor.service
-    printf "${bblue}%s${endc} ${bgreen}%s${endc}" "::" "Stop tor service... "
+    printf "\\n${bblue}%s${endc} ${bgreen}%s${endc}\\n" "::" "Stop tor service"
     systemctl stop tor.service
-    printf "%s\\n" "Done"
+
+    printf "${bcyan}%s${endc} ${bgreen}%s${endc}\\n" \
+        "[ ok ]" "Tor service stopped"
 
     # Restore `/etc/resolv.conf`
     # ==========================
@@ -595,7 +593,7 @@ usage() {
 
     printf "${green}
 Project URL: $git_url
-Report bugs: https://github.com/brainfucksec/kalitorify/issues${endc}\\n"
+Report bugs: $git_url/issues${endc}\\n"
     exit 0
 }
 
