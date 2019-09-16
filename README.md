@@ -7,7 +7,7 @@ Transparent Proxy through Tor for Kali Linux
 </p>
 
 <p align="center">
-<a href="https://github.com/brainfucksec/kalitorify/releases"><img src="https://img.shields.io/badge/version-1.18.1-blue"></a>
+<a href="https://github.com/brainfucksec/kalitorify/releases"><img src="https://img.shields.io/badge/version-1.19.0-blue"></a>
 <a href="https://github.com/brainfucksec/kalitorify/commits/master"><img src="https://img.shields.io/badge/build-passing-brightgreen.svg"></a>
 <a href="https://github.com/brainfucksec/kalitorify/blob/master/README.md"><img src="https://img.shields.io/badge/docs-passing-brightgreen.svg"></a>
 <a href="https://github.com/brainfucksec/kalitorify/blob/master/LICENSE"><img src="https://img.shields.io/github/license/brainfucksec/kalitorify.svg"></a>
@@ -82,15 +82,15 @@ Source: [Tor Project wiki](https://trac.torproject.org/projects/tor/wiki/doc/Tra
 
 [Whonix Do Not recommendations](https://www.whonix.org/wiki/DoNot)
 
+Applications can still learn your computer's hostname, MAC address, serial number, timezone, etc. and those with root privileges can disable the firewall entirely. In other words, transparent torification with iptables protects against accidental connections and DNS leaks by misconfigured software, it is not sufficient to protect against malware or software with serious security vulnerabilities.
+
+Source: [Arch Linux Wiki](https://wiki.archlinux.org/index.php/Tor)
+
 **Before run kalitorify you should change at least the hostname and the MAC address:**
 
 [Setting the Hostname on Debian](https://debian-handbook.info/browse/stable/sect.hostname-name-service.html)
 
 [Changing MAC Address on Linux](https://en.wikibooks.org/wiki/Changing_Your_MAC_Address/Linux)
-
-Applications can still learn your computer's hostname, MAC address, serial number, timezone, etc. and those with root privileges can disable the firewall entirely. In other words, transparent torification with iptables protects against accidental connections and DNS leaks by misconfigured software, it is not sufficient to protect against malware or software with serious security vulnerabilities.
-
-Source: [Arch Linux Wiki](https://wiki.archlinux.org/index.php/Tor)
 
 **Don't start Tor Browser when transparent browsing (kalitorify) is active, this to** [avoid Tor over Tor Scenarios](https://www.whonix.org/wiki/DoNot#Allow_Tor_over_Tor_Scenarios).
 
@@ -137,7 +137,12 @@ Using the program is simple, the command-line options follow the [GNU Coding Sta
 
 `<program name> --<option>`
 
-For example, to display the help menù, run command `kalitorify` with the `--help` or `-h` option, the available commands are listed below:
+For example, to display the help menù, run command `kalitorify` with the `--help` or `-h` option:
+```bash
+kalitorify -h
+```
+
+The available commands are listed below:
 
 **kalitorify [option]**
 
@@ -173,8 +178,10 @@ For example, to display the help menù, run command `kalitorify` with the `--hel
 
 * A special thanks goes also to the [Whonix](https://www.whonix.org/) Team and their [documentation](https://www.whonix.org/wiki/Documentation)
 
-## Support kalitorify
+## Donate
 
-Please consider donating to sustain this project:
+I accept Bitcoin donations. This will help me to pay various costs. My Bitcoin address is:
 
-**BITCOIN:** 1B39SnAXcR2bkxNpNy3AuckgaTshqNc2ce
+```
+1B39SnAXcR2bkxNpNy3AuckgaTshqNc2ce
+```

@@ -80,6 +80,23 @@ Delete readonly variable: 'bug_report_url'
 Changes on functions 'start(), stop()': delete excessive output
 Update README: new project logo
 
+
 /** 1.18.1 / 12 Aug 2019 **/
 
 Update README
+
+
+/** 1.19.0 / 16 Sep 2019 **/
+
+Change default directory 'backup_dir'
+Add function 'die()' for exception handling (exit on error)
+Improve function 'check_ip()'
+Changes on function 'check_status()'
+Change Makefile
+
+
+
+
+
+
+

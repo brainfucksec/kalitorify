@@ -31,7 +31,7 @@
 
 # Program information
 readonly prog_name="kalitorify"
-readonly version="1.18.1"
+readonly version="1.19.0"
 readonly signature="Copyright (C) 2015-2019 Brainfuck"
 readonly git_url="https://github.com/brainfucksec/kalitorify"
 
@@ -55,9 +55,9 @@ export byellow=$'\e[1;96m'
 # ===================================================================
 
 # Configuration files: /usr/share/kalitorify/data
-# Backup files: /opt/kalitorify/backups
+# Backup files: /usr/share/kalitorify/backups
 readonly config_dir="/usr/share/kalitorify/data"
-readonly backup_dir="/opt/kalitorify/backups"
+readonly backup_dir="/usr/share/kalitorify/backups"
 
 
 # ===================================================================
@@ -102,13 +102,20 @@ ${endc}\\n\\n"
 
 
 # ===================================================================
+# Print a message and exit with (1) when an error occurs
+# ===================================================================
+die() {
+    printf "${red}%s${endc}\\n" "$@" >&2
+    exit 1
+}
+
+
+# ===================================================================
 # Check if the program run as a root
 # ===================================================================
 check_root() {
     if [[ "$(id -u)" -ne 0 ]]; then
-        printf "\\n${red}%s${endc}\\n" \
-               "[ failed ] Please run this program as a root!" 2>&1
-        exit 1
+        die "[ failed ] Please run this program as a root!"
     fi
 }
 
@@ -124,6 +131,7 @@ print_version() {
 
 # ===================================================================
 # Disable firewall ufw
+
 # ===================================================================
 
 # See: https://wiki.ubuntu.com/UncomplicatedFirewall
@@ -176,28 +184,22 @@ check_defaults() {
 
     # Check: dependencies
     # ===================
-    declare -a dependencies=('tor' 'curl');
+    declare -a dependencies=('tor' 'curl')
 
     for package in "${dependencies[@]}"; do
-        if ! hash "$package" 2>/dev/null; then
-            printf "\\n${red}%s${endc}\\n" \
-                   "[ failed ] '$package' isn't installed, exit";
-            exit 1
+        if ! hash "${package}" 2>/dev/null; then
+            die "[ failed ] '${package}' isn't installed, exit"
         fi
     done
 
     # Check: default directories
     # ==========================
     if [ ! -d "$backup_dir" ]; then
-        printf "\\n${red}%s${endc}\\n" \
-               "[ failed ] directory '$backup_dir' not exist, run makefile first!";
-        exit 1
+        die "[ failed ] directory '$backup_dir' not exist, run makefile first!"
     fi
 
     if [ ! -d "$config_dir" ]; then
-        printf "\\n${red}%s${endc}\\n" \
-               "[ failed ] directory '$config_dir' not exist, run makefile first!";
-        exit 1
+        die "[ failed ] directory '$config_dir' not exist, run makefile first!"
     fi
 
     # Check: file `/etc/tor/torrc`
@@ -212,9 +214,7 @@ check_defaults() {
                "::" "Setting file: /etc/tor/torrc"
 
         if ! cp -vf "$config_dir/torrc" /etc/tor/torrc; then
-            printf "\\n${red}%s${endc}\\n" "[ failed ] can't setup '/etc/tor/torrc'"
-            printf "%s\\n" "Please report bugs to <$git_url/issues>."
-            exit 1
+            die "[ failed ] can't setup '/etc/tor/torrc'"
         fi
     else
         # grep required strings from existing file
@@ -247,18 +247,12 @@ check_defaults() {
             # backup original tor `/etc/tor/torrc` file
             # in the backup directory
             if ! cp -vf /etc/tor/torrc "$backup_dir/torrc.backup"; then
-                printf "\\n${red}%s${endc}\\n" \
-                       "[ failed ] can't copy original tor 'torrc' file in the backup directory"
-
-                printf "%s\\n" "Please report bugs to <$git_url/issues>."
-                exit 1
+                die "[ failed ] can't copy original tor 'torrc' file in the backup directory"
             fi
 
             # copy new `torrc` file with settings for kalitorify
             if ! cp -vf "$config_dir/torrc" /etc/tor/torrc; then
-                printf "\\n${red}%s${endc}\\n" "[ failed ] can't setup '/etc/tor/torrc'"
-                printf "%s\\n" "Please report bugs to <$git_url/issues>."
-                exit 1
+                die "[ failed ] can't setup '/etc/tor/torrc'"
             fi
         fi
     fi
@@ -272,18 +266,26 @@ check_ip() {
     printf "${bcyan}%s${endc} ${bgreen}%s${endc}\\n" \
            "==>" "Checking your public IP, please wait..."
 
-    if external_ip="$(curl -s -m 10 http://ipinfo.io)" ||
-       external_ip="$(curl -s -m 10 https://ipapi.co/json)"; then
+    # url list for curl requests
+    url_list=(
+        'http://ip-api.com/'
+        'https://ipinfo.io/'
+        'https://api.myip.com'
+    )
+
+    # if the first request fails try with the next
+    for url in "${url_list[@]}"; do
+        request="$(curl -s "$url")"
+        response="$?"
+
+        if [[ "$response" -ne 0 ]]; then
+            continue
+        fi
 
         printf "${bblue}%s${endc} ${bgreen}%s${endc}\\n" "::" "IP Address Details:"
-        printf "${white}%s${endc}\\n" "$external_ip" | tr -d '"{}' | sed 's/ //g'
-    else
-        printf "${red}%s${endc}\\n\\n" "[ failed ] curl: HTTP request error"
-
-        printf "%s\\n" "try another Tor circuit with '$prog_name --restart'"
-        printf "%s\\n" "Please report bugs to <$git_url/issues>."
-        exit 1
-    fi
+        printf "${white}%s${endc}\\n" "$request"
+        break
+    done
 }
 
 
@@ -307,8 +309,7 @@ check_status() {
         printf "${bcyan}%s${endc} ${bgreen}%s${endc}\\n\\n" \
                "[ ok ]" "Tor service is active"
     else
-        printf "${red}%s${endc}\\n" "[-] Tor service is not running! exit"
-        exit 1
+        die "[-] Tor service is not running! exit"
     fi
 
     # Check tor network settings
@@ -320,9 +321,10 @@ check_status() {
     printf "${bcyan}%s${endc} ${bgreen}%s${endc}\\n" \
            "==>" "Check Tor network settings"
 
-    # curl option: --socks5 <host[:port]> SOCKS5 proxy on given host + port
+    # hostport = curl socks5 settings:
+    #   --socks5 <host[:port]> SOCKS5 proxy on given host + port
+    #   --socks5-hostname <host[:port]> SOCKS5 proxy, pass host name to proxy
     local hostport="localhost:9050"
-    # destination url
     local url="https://check.torproject.org/"
 
     # curl: `-L` and `tac` for avoid error: (23) Failed writing body
@@ -333,10 +335,8 @@ check_status() {
         printf "${bcyan}%s${endc} ${bgreen}%s${endc}\\n\\n" \
                "[ ok ]" "Your system is configured to use Tor"
     else
-        printf "${red}%s${endc}\\n\\n" "Your system is not using Tor!"
-
+        printf "${red}%s${endc}\\n\\n" "[!] Your system is not using Tor!"
         printf "%s\\n" "try another Tor circuit with '$prog_name --restart'"
-        printf "%s\\n" "Please report bugs to <$git_url/issues>."
         exit 1
     fi
 
@@ -377,11 +377,7 @@ start() {
 
     # backup current resolv.conf
     if ! cp -vf /etc/resolv.conf "$backup_dir/resolv.conf.backup"; then
-        printf "${red}%s${endc}\\n" \
-               "[ failed ] can't copy resolv.conf to the backup directory"
-
-        printf "%s\\n" "Please report bugs to <$git_url/issues>."
-        exit 1
+        die "[ failed ] can't copy resolv.conf to the backup directory"
     fi
 
     # write new nameserver
@@ -403,8 +399,7 @@ start() {
         printf "${bcyan}%s${endc} ${bgreen}%s${endc}\\n" \
                "[ ok ]" "Tor service started"
     else
-        printf "${red}%s${endc}\\n" "[ failed ] systemd error, exit!"
-        exit 1
+        die "[ failed ] systemd error, exit!"
     fi
 
     # iptables settings
@@ -594,6 +589,7 @@ usage() {
     printf "${green}
 Project URL: $git_url
 Report bugs: $git_url/issues${endc}\\n"
+
     exit 0
 }
 
