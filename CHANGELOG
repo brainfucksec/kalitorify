@@ -95,8 +95,7 @@ Changes on function 'check_status()'
 Change Makefile
 
 
+/** 1.19.1 / 26 Sep 2019 **/
 
-
-
-
-
+Fix the check of service status in ufw functions (issue #28) see commits
+Fix bug with resolvconf (symlink /etc/resolv.conf)

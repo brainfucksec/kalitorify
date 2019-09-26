@@ -31,7 +31,7 @@
 
 # Program information
 readonly prog_name="kalitorify"
-readonly version="1.19.0"
+readonly version="1.19.1"
 readonly signature="Copyright (C) 2015-2019 Brainfuck"
 readonly git_url="https://github.com/brainfucksec/kalitorify"
 
@@ -131,7 +131,6 @@ print_version() {
 
 # ===================================================================
 # Disable firewall ufw
-
 # ===================================================================
 
 # See: https://wiki.ubuntu.com/UncomplicatedFirewall
@@ -140,12 +139,12 @@ print_version() {
 # do nothing, don't display nothing to user, just jump to the next function
 disable_ufw() {
 	if hash ufw 2>/dev/null; then
-    	if ufw status | grep -q active$; then
+    	if ufw status | grep -wq "active" 2>/dev/null; then
         	printf "${bblue}%s${endc} ${bgreen}%s${endc}\\n" \
                    "::" "Disabling firewall ufw, please wait..."
         	ufw disable
     	else
-    		ufw status | grep -q inactive$;
+    		ufw status | grep -wq "inactive" 2>/dev/null;
         	printf "${bblue}%s${endc} ${bgreen}%s${endc}\\n" \
                    "::" "Firewall ufw is inactive, continue..."
     	fi
@@ -161,7 +160,7 @@ disable_ufw() {
 # and jump to the next function
 enable_ufw() {
 	if hash ufw 2>/dev/null; then
-    	if ufw status | grep -q inactive$; then
+    	if ufw status | grep -wq "inactive" 2>/dev/null; then
         	printf "\\n${bblue}%s${endc} ${bgreen}%s${endc}\\n" \
                    "::" "Enabling firewall ufw, please wait..."
         	ufw enable
@@ -305,7 +304,7 @@ check_status() {
     printf "${bcyan}%s${endc} ${bgreen}%s${endc}\\n" \
            "==>" "Check current status of Tor service"
 
-    if systemctl is-active tor.service > /dev/null 2>&1; then
+    if systemctl is-active tor.service >/dev/null 2>&1; then
         printf "${bcyan}%s${endc} ${bgreen}%s${endc}\\n\\n" \
                "[ ok ]" "Tor service is active"
     else
@@ -493,13 +492,12 @@ stop() {
     printf "\\n${bblue}%s${endc} ${bgreen}%s${endc}\\n" \
            "::" "Restore /etc/resolv.conf file with default DNS"
 
-    # delete current `/etc/resolv.conf` file
-    rm -v /etc/resolv.conf
-
     # restore file with `resolvconf` program if exists
     # otherwise copy the original file from backup directory
     if hash resolvconf 2>/dev/null; then
         resolvconf -u
+        printf "${bcyan}%s${endc} ${bgreen}%s${endc}\\n " \
+               "[ ok ]" "update '/etc/resolv.conf'"
     else
         cp -vf "$backup_dir/resolv.conf.backup" /etc/resolv.conf
     fi

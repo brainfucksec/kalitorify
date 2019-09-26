@@ -1,12 +1,13 @@
 PROGRAM_NAME=kalitorify
-VERSION=1.19.0
+VERSION=1.19.1
 
 DATA_DIR=/usr/share
 DOCS_DIR=$(DATA_DIR)/doc
 PROGRAM_DIR=/usr/local/bin
 
+
 install:
-	# from v1.18.1, remove directory: `opt/kalitorify`
+
 	rm -Rf /opt/$(PROGRAM_NAME)
 
 	install -Dm644 README.md $(DOCS_DIR)/$(PROGRAM_NAME)/README.md
@@ -16,6 +17,7 @@ install:
 	install -Dm644 data/* $(DATA_DIR)/$(PROGRAM_NAME)/data
 
 uninstall:
+
 	rm -Rf $(PROGRAM_DIR)/$(PROGRAM_NAME)
 	rm -Rf $(DATA_DIR)/$(PROGRAM_NAME)
 	rm -Rf $(DOCS_DIR)/$(PROGRAM_NAME)
