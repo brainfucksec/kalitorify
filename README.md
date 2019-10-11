@@ -7,7 +7,7 @@ Transparent Proxy through Tor for Kali Linux
 </p>
 
 <p align="center">
-<a href="https://github.com/brainfucksec/kalitorify/releases"><img src="https://img.shields.io/badge/version-1.19.1-blue"></a>
+<a href="https://github.com/brainfucksec/kalitorify/releases"><img src="https://img.shields.io/badge/version-1.19.2-blue"></a>
 <a href="https://github.com/brainfucksec/kalitorify/commits/master"><img src="https://img.shields.io/badge/build-passing-brightgreen.svg"></a>
 <a href="https://github.com/brainfucksec/kalitorify/blob/master/README.md"><img src="https://img.shields.io/badge/docs-passing-brightgreen.svg"></a>
 <a href="https://github.com/brainfucksec/kalitorify/blob/master/LICENSE"><img src="https://img.shields.io/github/license/brainfucksec/kalitorify.svg"></a>
@@ -69,12 +69,14 @@ sudo reboot
 
 ### Please read this section carefully before starting kalitorify
 
+#### Kalitorify and anonymity
+
 **kalitorify is a bash script to start a transparent proxy through Tor to be used for a safe navigation during communications, searches or other activities with Kali Linux, but does not guarantee 100% anonymity.**
 
 About Transparent Torification, please read [Transparent Proxy Leaks](https://trac.torproject.org/projects/tor/wiki/doc/TransparentProxyLeaks) (mostly Microsoft Windows related) and/or consider an [Isolating Proxy](https://trac.torproject.org/projects/tor/wiki/doc/TorifyHOWTO/IsolatingProxy) as alternative.
 See [Whonix](https://www.whonix.org/) for a complete, ready-made VM based solution (alternatively using multiple physical computers) built around the Isolating Proxy and Transparent Proxy [Anonymizing Middlebox design](https://trac.torproject.org/projects/tor/wiki/doc/TransparentProxy#AnonymizingMiddlebox).
 
-Source: [Tor Project wiki](https://trac.torproject.org/projects/tor/wiki/doc/TransparentProxy#BriefNotes)
+Source: https://trac.torproject.org/projects/tor/wiki/doc/TransparentProxy#BriefNotes
 
 **kalitorify is produced independently from the Tor anonimity software and carries no guarantee from the Tor Project about quality, suitability or anything else, please read these documents to know how to use the Tor network safely:**
 
@@ -82,9 +84,13 @@ Source: [Tor Project wiki](https://trac.torproject.org/projects/tor/wiki/doc/Tra
 
 [Whonix Do Not recommendations](https://www.whonix.org/wiki/DoNot)
 
+---
+
+####  Hostname and MAC Address security risks
+
 Applications can still learn your computer's hostname, MAC address, serial number, timezone, etc. and those with root privileges can disable the firewall entirely. In other words, transparent torification with iptables protects against accidental connections and DNS leaks by misconfigured software, it is not sufficient to protect against malware or software with serious security vulnerabilities.
 
-Source: [Arch Linux Wiki](https://wiki.archlinux.org/index.php/Tor)
+Source: https://wiki.archlinux.org/index.php/Tor
 
 **Before run kalitorify you should change at least the hostname and the MAC address:**
 
@@ -92,9 +98,15 @@ Source: [Arch Linux Wiki](https://wiki.archlinux.org/index.php/Tor)
 
 [Changing MAC Address on Linux](https://en.wikibooks.org/wiki/Changing_Your_MAC_Address/Linux)
 
+---
+
+#### Transparent Proxy with kalitorify and Tor Browser
+
 **Don't start Tor Browser when transparent browsing (kalitorify) is active, this to** [avoid Tor over Tor Scenarios](https://www.whonix.org/wiki/DoNot#Allow_Tor_over_Tor_Scenarios).
 
-### Checking for leaks:
+---
+
+#### Checking for leaks
 
 After starting kalitorify you can use [tcpdump](https://www.tcpdump.org/) to check if there are any internet activity other the Tor:
 
@@ -131,6 +143,8 @@ Source: https://trac.torproject.org/projects/tor/wiki/doc/TransparentProxy#Check
 
 ## Usage
 
+**This program was created for the Kali Linux operating system, don't run on other Linux distributions if you're not sure what you're doing.**
+
 Please, before starting kalitorify make sure you have read the section about [Security](#security).
 
 Using the program is simple, the command-line options follow the [GNU Coding Standards](https://www.gnu.org/prep/standards/html_node/Command_002dLine-Interfaces.html), you can use the short and long options, the commands syntax is:
@@ -146,7 +160,11 @@ The available commands are listed below:
 
 **kalitorify [option]**
 
-### Options
+### Options:
+
+**-h, --help**
+
+    show this help message and exit
 
 **-t, --tor**
 

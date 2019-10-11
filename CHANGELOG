@@ -99,3 +99,11 @@ Change Makefile
 
 Fix the check of service status in ufw functions (issue #28) see commits
 Fix bug with resolvconf (symlink /etc/resolv.conf)
+
+
+/** 1.19.2 / 10 Oct 2019 **/
+
+Changes on "printf()" functions (also help_menu())
+small improvements (NO BUGFIX)
+Update README: improve section "Security"
+

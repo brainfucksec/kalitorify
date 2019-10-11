@@ -1,5 +1,5 @@
 PROGRAM_NAME=kalitorify
-VERSION=1.19.1
+VERSION=1.19.2
 
 DATA_DIR=/usr/share
 DOCS_DIR=$(DATA_DIR)/doc
@@ -7,8 +7,6 @@ PROGRAM_DIR=/usr/local/bin
 
 
 install:
-
-	rm -Rf /opt/$(PROGRAM_NAME)
 
 	install -Dm644 README.md $(DOCS_DIR)/$(PROGRAM_NAME)/README.md
 	install -Dm755 kalitorify.sh $(PROGRAM_DIR)/$(PROGRAM_NAME)
