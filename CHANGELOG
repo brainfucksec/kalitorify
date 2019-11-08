@@ -107,3 +107,8 @@ Changes on "printf()" functions (also help_menu())
 small improvements (NO BUGFIX)
 Update README: improve section "Security"
 
+
+/** 1.20.0 / 08 Nov 2019 **/
+
+Moved the iptables instructions to a separate function "setup_iptables()"
+Remove functions for manage 'ufw' (debloat)

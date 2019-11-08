@@ -147,6 +147,8 @@ Source: https://trac.torproject.org/projects/tor/wiki/doc/TransparentProxy#Check
 
 Please, before starting kalitorify make sure you have read the section about [Security](#security).
 
+**Before starting the program make sure to disable the firewall if you have one.**
+
 Using the program is simple, the command-line options follow the [GNU Coding Standards](https://www.gnu.org/prep/standards/html_node/Command_002dLine-Interfaces.html), you can use the short and long options, the commands syntax is:
 
 `<program name> --<option>`

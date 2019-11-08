@@ -35,11 +35,11 @@
 
 # Program information
 readonly prog_name="kalitorify"
-readonly version="1.19.2"
+readonly version="1.20.0"
 readonly signature="Copyright (C) 2015-2019 Brainfuck"
 readonly git_url="https://github.com/brainfucksec/kalitorify"
 
-# Colors for terminal output (b = bold)
+# Colors for terminal output
 export red=$'\e[0;91m'
 export green=$'\e[0;92m'
 export blue=$'\e[0;94m'
@@ -47,6 +47,7 @@ export white=$'\e[0;97m'
 export cyan=$'\e[0;96m'
 export endc=$'\e[0m'
 
+# b = bold
 export bgreen=$'\e[1;92m'
 export bblue=$'\e[1;94m'
 export bwhite=$'\e[1;97m'
@@ -130,46 +131,6 @@ check_root() {
 print_version() {
     printf "%s\\n" "$prog_name $version"
 	exit 0
-}
-
-
-# ===================================================================
-# Disable firewall ufw
-# ===================================================================
-
-# See: https://wiki.ubuntu.com/UncomplicatedFirewall
-#
-# If ufw is installed and/or active, disable it, if isn't installed,
-# do nothing, don't display nothing to user, just jump to the next function
-disable_ufw() {
-	if hash ufw 2>/dev/null; then
-    	if ufw status | grep -wq "active" 2>/dev/null; then
-        	printf "${bblue}%s${endc} ${bgreen}%s${endc}\\n" \
-                   "==>" "Disabling firewall ufw, please wait..."
-        	ufw disable
-    	else
-    		ufw status | grep -wq "inactive" 2>/dev/null;
-        	printf "${bblue}%s${endc} ${bgreen}%s${endc}\\n" \
-                   "==>" "Firewall ufw is inactive, continue..."
-    	fi
-    fi
-}
-
-
-# ===================================================================
-# Enable ufw
-# ===================================================================
-
-# If ufw isn't installed, again, do nothing
-# and jump to the next function
-enable_ufw() {
-	if hash ufw 2>/dev/null; then
-    	if ufw status | grep -wq "inactive" 2>/dev/null; then
-        	printf "\\n${bblue}%s${endc} ${bgreen}%s${endc}\\n" \
-                   "==>" "Enabling firewall ufw, please wait..."
-        	ufw enable
-        fi
-    fi
 }
 
 
@@ -349,66 +310,11 @@ check_status() {
 
 
 # ===================================================================
-# Start transparent proxy
+# iptables settings
 # ===================================================================
-start() {
-    banner
-    check_root
-    sleep 2
-    check_defaults
 
-    # stop tor.service before changing tor settings
-    if systemctl is-active tor.service >/dev/null 2>&1; then
-        systemctl stop tor.service
-    fi
-
-    printf "\\n${bcyan}%s${endc} ${bgreen}%s${endc}\\n" \
-           "::" "Starting Transparent Proxy"
-
-    # Disable firewall ufw
-    sleep 2
-    disable_ufw
-
-    # DNS settings: `/etc/resolv.conf`:
-    # =================================
-    #
-    # Configure system's DNS resolver to use Tor's DNSPort
-    # on the loopback interface, i.e. write nameserver 127.0.0.1
-    # to `/etc/resolv.conf` file
-    printf "\\n${bblue}%s${endc} ${bgreen}%s${endc}\\n" \
-           "==>" "Configure system's DNS resolver to use Tor's DNSPort"
-
-    # backup current resolv.conf
-    if ! cp -vf /etc/resolv.conf "$backup_dir/resolv.conf.backup"; then
-        die "[ failed ] can't copy resolv.conf to the backup directory"
-    fi
-
-    # write new nameserver
-    printf "%s\\n" "nameserver 127.0.0.1" > /etc/resolv.conf
-    sleep 1
-
-    # Disable IPv6 with sysctl
-    # ========================
-    printf "\\n${bblue}%s${endc} ${bgreen}%s${endc}\\n" "==>" "Disable IPv6 with sysctl"
-
-    sysctl -w net.ipv6.conf.all.disable_ipv6=1
-    sysctl -w net.ipv6.conf.default.disable_ipv6=1
-
-    # Start tor.service for new configuration
-    # =======================================
-    printf "\\n${bblue}%s${endc} ${bgreen}%s${endc}\\n" "==>" "Start Tor service"
-
-    if systemctl start tor.service 2>/dev/null; then
-        printf "${bcyan}%s${endc} ${bgreen}%s${endc}\\n" \
-               "[ ok ]" "Tor service started"
-    else
-        die "[ failed ] systemd error, exit!"
-    fi
-
-    # iptables settings
-    # =================
-    #
-    # Setup iptables rules
+# Setup new iptables rules
+setup_iptables() {
     printf "\\n${bblue}%s${endc} ${bgreen}%s${endc}\\n" "==>" "Setup new iptables rules"
 
     # Backup current iptables rules
@@ -445,8 +351,66 @@ start() {
     iptables -A OUTPUT -m owner --uid-owner $tor_uid -j ACCEPT
     iptables -A OUTPUT -j REJECT
 
-    #printf "${bcyan}%s${endc} ${bgreen}%s${endc}\\n\\n" \
-    #    "[ ok ]" "iptables rules set"
+    printf "${bcyan}%s${endc} ${bgreen}%s${endc}\\n" \
+        "[ ok ]" "iptables rules set"
+}
+
+
+# ===================================================================
+# Start transparent proxy
+# ===================================================================
+start() {
+    banner
+    check_root
+    sleep 2
+    check_defaults
+
+    # stop tor.service before changing tor settings
+    if systemctl is-active tor.service >/dev/null 2>&1; then
+        systemctl stop tor.service
+    fi
+
+    printf "\\n${bcyan}%s${endc} ${bgreen}%s${endc}\\n" \
+           "::" "Starting Transparent Proxy"
+
+    # DNS settings: `/etc/resolv.conf`:
+    # =================================
+    #
+    # Configure system's DNS resolver to use Tor's DNSPort
+    # on the loopback interface, i.e. write nameserver 127.0.0.1
+    # to `/etc/resolv.conf` file
+    printf "${bblue}%s${endc} ${bgreen}%s${endc}\\n" \
+           "==>" "Configure system's DNS resolver to use Tor's DNSPort"
+
+    # backup current resolv.conf
+    if ! cp -vf /etc/resolv.conf "$backup_dir/resolv.conf.backup"; then
+        die "[ failed ] can't copy resolv.conf to the backup directory"
+    fi
+
+    # write new nameserver
+    printf "%s\\n" "nameserver 127.0.0.1" > /etc/resolv.conf
+    sleep 1
+
+    # Disable IPv6 with sysctl
+    # ========================
+    printf "\\n${bblue}%s${endc} ${bgreen}%s${endc}\\n" "==>" "Disable IPv6 with sysctl"
+
+    sysctl -w net.ipv6.conf.all.disable_ipv6=1
+    sysctl -w net.ipv6.conf.default.disable_ipv6=1
+
+    # Start tor.service for new configuration
+    # =======================================
+    printf "\\n${bblue}%s${endc} ${bgreen}%s${endc}\\n" "==>" "Start Tor service"
+
+    if systemctl start tor.service 2>/dev/null; then
+        printf "${bcyan}%s${endc} ${bgreen}%s${endc}\\n" \
+               "[ ok ]" "Tor service started"
+    else
+        die "[ failed ] systemd error, exit!"
+    fi
+
+    # set iptables rules
+    setup_iptables
     printf "\\n"
 
     # check program status
@@ -520,11 +484,7 @@ stop() {
 
     cp -vf "$backup_dir/torrc.backup" /etc/tor/torrc
 
-    # Enable firewall ufw
-    enable_ufw
 
-    # End program
-    # ===========
     printf "\\n${bcyan}%s${endc} ${bgreen}%s${endc}\\n" \
            "[-]" "Transparent Proxy stopped"
 }
