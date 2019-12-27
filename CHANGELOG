@@ -112,3 +112,12 @@ Update README: improve section "Security"
 
 Moved the iptables instructions to a separate function "setup_iptables()"
 Remove functions for manage 'ufw' (debloat)
+
+
+/** 1.20.1 / 27 Dec 2019 **/
+
+Fix parsing of command line arguments on 'main()' function: see 'ISSUE #33'
+Change function name: 'check_defaults()' -> 'check_settings()'
+Added instruction for reload systemd daemons on function 'check_settings()'
+Cleanup function 'usage()'
+Added 'banner()' to function 'stop()'

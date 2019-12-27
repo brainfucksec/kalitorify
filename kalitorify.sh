@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 # ===================================================================
-#
 # kalitorify.sh
 #
 # Kali Linux - Transparent proxy through Tor
@@ -10,6 +9,7 @@
 #
 # Kalitorify is KISS version of Parrot AnonSurf Module, developed
 # by "Pirates' Crew" of FrozenBox - https://github.com/parrotsec/anonsurf
+#
 #
 # GNU GENERAL PUBLIC LICENSE
 #
@@ -25,17 +25,16 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
 # ===================================================================
 
 
 # ===================================================================
 # General settings
 # ===================================================================
-
+#
 # Program information
 readonly prog_name="kalitorify"
-readonly version="1.20.0"
+readonly version="1.20.1"
 readonly signature="Copyright (C) 2015-2019 Brainfuck"
 readonly git_url="https://github.com/brainfucksec/kalitorify"
 
@@ -58,7 +57,7 @@ export byellow=$'\e[1;96m'
 # ===================================================================
 # Set program's directories and files
 # ===================================================================
-
+#
 # Configuration files: /usr/share/kalitorify/data
 # Backup files: /usr/share/kalitorify/backups
 readonly config_dir="/usr/share/kalitorify/data"
@@ -68,7 +67,7 @@ readonly backup_dir="/usr/share/kalitorify/backups"
 # ===================================================================
 # Network settings
 # ===================================================================
-
+#
 # The UID that Tor runs as (varies from system to system)
 #`id -u debian-tor` #Debian/Ubuntu
 readonly tor_uid="$(id -u debian-tor)"
@@ -85,9 +84,6 @@ readonly virtual_addr_net="10.192.0.0/10"
 # LAN destinations that shouldn't be routed through Tor
 readonly non_tor="127.0.0.0/8 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16"
 
-# End settings
-# ===================================================================
-
 
 # ===================================================================
 # Show program banner
@@ -101,7 +97,7 @@ printf "${bwhite}
                                 |___| v$version
 
 =[ Transparent proxy through Tor
-=[ BrainfuckSec
+=[ brainfucksec
 ${endc}\\n\\n"
 }
 
@@ -137,12 +133,12 @@ print_version() {
 # ===================================================================
 # Check default settings
 # ===================================================================
-
+#
 # Check:
-# -> required dependencies (tor, curl)
-# -> program folders
-# -> tor `torrc` configuration file
-check_defaults() {
+# -> required dependencies: tor, curl
+# -> program folders, see: $backup_dir, $config_dir
+# -> tor configuration file: /etc/tor/torrc
+check_settings() {
     printf "${bcyan}%s${endc} ${bgreen}%s${endc}\\n" \
            "::" "Check program settings"
 
@@ -169,7 +165,7 @@ check_defaults() {
     # Check: file `/etc/tor/torrc`
     # ============================
     #
-    # reference file: `/usr/share/kalitorify/data/torrc`
+    # file to copy: `/usr/share/kalitorify/data/torrc`
     #
     # if torrc not exists copy from reference file
     if [[ ! -f /etc/tor/torrc ]]; then
@@ -220,6 +216,15 @@ check_defaults() {
             fi
         fi
     fi
+
+    # reload systemd daemons
+    printf "\\n${bblue}%s${endc} ${bgreen}%s${endc}\n" \
+           "==>" "Reload systemd daemons"
+
+    systemctl --system daemon-reload
+
+    printf "${bcyan}%s${endc} ${bgreen}%s${endc}\\n" \
+           "[ ok ]" "systemd daemons reloaded"
 }
 
 
@@ -256,7 +261,7 @@ check_ip() {
 # ===================================================================
 # Check status of program and services
 # ===================================================================
-
+#
 # Check:
 # -> tor.service
 # -> tor settings
@@ -312,7 +317,7 @@ check_status() {
 # ===================================================================
 # iptables settings
 # ===================================================================
-
+#
 # Setup new iptables rules
 setup_iptables() {
     printf "\\n${bblue}%s${endc} ${bgreen}%s${endc}\\n" "==>" "Setup new iptables rules"
@@ -363,7 +368,7 @@ start() {
     banner
     check_root
     sleep 2
-    check_defaults
+    check_settings
 
     # stop tor.service before changing tor settings
     if systemctl is-active tor.service >/dev/null 2>&1; then
@@ -424,9 +429,10 @@ start() {
 # ===================================================================
 # Stop transparent proxy
 # ===================================================================
-
+#
 # Stop connection with Tor Network and return to clearnet navigation
 stop() {
+    banner
     check_root
 
     printf "${bcyan}%s${endc} ${bgreen}%s${endc}\\n" \
@@ -515,41 +521,31 @@ restart() {
 # Show help menù
 # ===================================================================
 usage() {
-    printf "${blue}%s${endc}\\n" "$prog_name $version"
-    printf "${white}%s${endc}\\n" "Kali Linux - Transparent proxy through Tor"
-    printf "${white}%s${endc}\\n\\n" "$signature"
+    printf "%s\\n" "$prog_name $version"
+    printf "%s\\n" "Kali Linux - Transparent proxy through Tor"
+    printf "%s\\n\\n" "$signature"
 
-    printf "${green}%s${endc}\\n\\n" "Usage:"
+    printf "%s\\n\\n" "Usage: $prog_name [option]"
 
-    printf "${white}%s${endc} ${red}%s${endc} ${white}%s${endc} ${red}%s${endc}\\n" \
-        "┌─╼" "$USER" "╺─╸" "$(hostname)"
-    printf "${white}%s${endc} ${green}%s${endc}\\n\\n" "└───╼" "$prog_name [option]"
+    printf "%s\\n\\n" "Options:"
 
-    printf "${green}%s${endc}\\n\\n" "Options:"
+    printf "%s\\n" "-h, --help      show this help message and exit"
 
-    printf "${white}%s${endc}\\n" \
-           "-h, --help      show this help message and exit"
+    printf "%s\\n" "-t, --tor       start transparent proxy through tor"
 
-    printf "${white}%s${endc}\\n" \
-           "-t, --tor       start transparent proxy through tor"
+    printf "%s\\n" "-c, --clearnet  reset iptables and return to clearnet navigation"
 
-    printf "${white}%s${endc}\\n" \
-           "-c, --clearnet  reset iptables and return to clearnet navigation"
+    printf "%s\\n" "-s, --status    check status of program and services"
 
-    printf "${white}%s${endc}\\n" \
-           "-s, --status    check status of program and services"
+    printf "%s\\n" "-i, --ipinfo    show public IP"
 
-    printf "${white}%s${endc}\\n" \
-           "-i, --ipinfo    show public IP"
+    printf "%s\\n" "-r, --restart   restart tor service and change Tor exit node"
 
-    printf "${white}%s${endc}\\n" \
-           "-r, --restart   restart tor service and change Tor exit node"
+    printf "%s\\n\\n" "-v, --version   display program version and exit"
 
-    printf "${white}%s${endc}\\n\\n" \
-           "-v, --version   display program version and exit"
+    printf "%s\\n" "Project URL: $git_url"
+    printf "%s\\n" "Report bugs: $git_url/issues"
 
-    printf "${green}%s${endc} ${white}%s${endc}\\n" "Project URL:" "$git_url"
-    printf "${green}%s${endc} ${white}%s${endc}\\n" "Report bugs:" "$git_url/issues"
     exit 0
 }
 
@@ -557,7 +553,7 @@ usage() {
 # ===================================================================
 # Main function
 # ===================================================================
-
+#
 # Parse command line arguments and start program
 main() {
     if [[ "$#" -eq 0 ]]; then
@@ -570,7 +566,6 @@ main() {
         case "$1" in
             -t | --tor)
                 start
-                shift
                 ;;
             -c | --clearnet)
                 stop
