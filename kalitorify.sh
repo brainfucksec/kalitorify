@@ -240,6 +240,7 @@ check_ip() {
         'http://ip-api.com/'
         'https://ipinfo.io/'
         'https://api.myip.com'
+        'https://ipleak.net/json/'
     )
 
     # if the first request fails try with the next
