@@ -239,7 +239,7 @@ check_ip() {
     url_list=(
         'http://ip-api.com/'
         'https://ipinfo.io/'
-        'https://api.myip.com'
+        'https://api.myip.com/'
         'https://ipleak.net/json/'
     )
 
