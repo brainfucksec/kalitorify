@@ -121,3 +121,8 @@ Change function name: 'check_defaults()' -> 'check_settings()'
 Added instruction for reload systemd daemons on function 'check_settings()'
 Cleanup function 'usage()'
 Added 'banner()' to function 'stop()'
+
+
+/** 1.20.2 / 05 Jan 2020 **/
+
+Add new IP check API (see PULL REQUEST #36)
