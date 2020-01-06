@@ -5,7 +5,7 @@
 #
 # Kali Linux - Transparent proxy through Tor
 #
-# Copyright (C) 2015-2019 Brainfuck
+# Copyright (C) 2015-2020 Brainfuck
 #
 # Kalitorify is KISS version of Parrot AnonSurf Module, developed
 # by "Pirates' Crew" of FrozenBox - https://github.com/parrotsec/anonsurf
@@ -34,8 +34,8 @@
 #
 # Program information
 readonly prog_name="kalitorify"
-readonly version="1.20.2"
-readonly signature="Copyright (C) 2015-2019 Brainfuck"
+readonly version="1.21.0"
+readonly signature="Copyright (C) 2015-2020 Brainfuck"
 readonly git_url="https://github.com/brainfucksec/kalitorify"
 
 # Colors for terminal output
@@ -131,7 +131,7 @@ print_version() {
 
 
 # ===================================================================
-# Check default settings
+# Check program settings
 # ===================================================================
 #
 # Check:
@@ -165,7 +165,7 @@ check_settings() {
     # Check: file `/etc/tor/torrc`
     # ============================
     #
-    # file to copy: `/usr/share/kalitorify/data/torrc`
+    # file to copy: /usr/share/kalitorify/data/torrc
     #
     # if torrc not exists copy from reference file
     if [[ ! -f /etc/tor/torrc ]]; then
@@ -204,13 +204,13 @@ check_settings() {
             printf "${bblue}%s${endc} ${bgreen}%s${endc}\\n" \
                    "==>" "Setting file: /etc/tor/torrc"
 
-            # backup original tor `/etc/tor/torrc` file
+            # backup original tor /etc/tor/torrc file
             # in the backup directory
             if ! cp -vf /etc/tor/torrc "$backup_dir/torrc.backup"; then
                 die "[ failed ] can't copy original tor 'torrc' file in the backup directory"
             fi
 
-            # copy new `torrc` file with settings for kalitorify
+            # copy new torrc file with settings for kalitorify
             if ! cp -vf "$config_dir/torrc" /etc/tor/torrc; then
                 die "[ failed ] can't setup '/etc/tor/torrc'"
             fi
@@ -225,6 +225,76 @@ check_settings() {
 
     printf "${bcyan}%s${endc} ${bgreen}%s${endc}\\n" \
            "[ ok ]" "systemd daemons reloaded"
+}
+
+
+# ===================================================================
+# iptables settings
+# ===================================================================
+#
+# Setup new iptables rules:
+#
+# This function give the arguments for start() and stop() function
+# tor_proxy -> start() (setup rules for tor transparent proxy)
+# default   -> stop() (restore default iptables)
+setup_iptables() {
+    case "$1" in
+        tor_proxy)
+            printf "\\n${bblue}%s${endc} ${bgreen}%s${endc}\\n" "==>" "Setup new iptables rules"
+
+            # Backup current iptables rules
+            iptables-save > "$backup_dir/iptables.backup"
+
+            # Flush current iptables rules
+            iptables -F
+            iptables -X
+            iptables -t nat -F
+            iptables -t nat -X
+
+            # set iptables *nat
+            iptables -t nat -A OUTPUT -m owner --uid-owner $tor_uid -j RETURN
+            iptables -t nat -A OUTPUT -p udp --dport 53 -j REDIRECT --to-ports $dns_port
+            iptables -t nat -A OUTPUT -p tcp --dport 53 -j REDIRECT --to-ports $dns_port
+            iptables -t nat -A OUTPUT -p udp -m owner --uid-owner $tor_uid -m udp --dport 53 -j REDIRECT --to-ports $dns_port
+
+            iptables -t nat -A OUTPUT -p tcp -d $virtual_addr_net -j REDIRECT --to-ports $trans_port
+            iptables -t nat -A OUTPUT -p udp -d $virtual_addr_net -j REDIRECT --to-ports $trans_port
+
+            # allow lan access for hosts in $non_tor (local ip addresses)
+            for lan in $non_tor 127.0.0.0/9 127.128.0.0/10; do
+                iptables -t nat -A OUTPUT -d "$lan" -j RETURN
+                iptables -A OUTPUT -d "$lan" -j ACCEPT
+            done
+
+            # redirect all other output to Tor TransPort
+            iptables -t nat -A OUTPUT -p tcp --syn -j REDIRECT --to-ports $trans_port
+            iptables -t nat -A OUTPUT -p udp -j REDIRECT --to-ports $trans_port
+            iptables -t nat -A OUTPUT -p icmp -j REDIRECT --to-ports $trans_port
+
+            # set iptables *filter
+            iptables -A OUTPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+            # allow only Tor output
+            iptables -A OUTPUT -m owner --uid-owner $tor_uid -j ACCEPT
+            iptables -A OUTPUT -j REJECT
+
+            printf "${bcyan}%s${endc} ${bgreen}%s${endc}\\n" \
+                "[ ok ]" "iptables rules set"
+        ;;
+
+        default)
+            printf "${bblue}%s${endc} ${bgreen}%s${endc}\\n" "==>" "Restore default iptables rules"
+
+            # Flush iptables rules
+            iptables -F
+            iptables -X
+            iptables -t nat -F
+            iptables -t nat -X
+
+            # Restore iptables from backup
+            iptables-restore < "${backup_dir}/iptables.backup"
+        ;;
+    esac
 }
 
 
@@ -297,7 +367,7 @@ check_status() {
     local hostport="localhost:9050"
     local url="https://check.torproject.org/"
 
-    # curl: `-L` and `tac` for avoid error: (23) Failed writing body
+    # curl: `-L` and `tac` options for avoid error: "(23) Failed writing body"
     # https://github.com/kubernetes/helm/issues/2802
     # https://stackoverflow.com/questions/16703647/why-curl-return-and-error-23-failed-writing-body
     if curl -s -m 10 --socks5 "$hostport" --socks5-hostname "$hostport" -L "$url" \
@@ -312,53 +382,6 @@ check_status() {
 
     # Check current public IP
     check_ip
-}
-
-
-# ===================================================================
-# iptables settings
-# ===================================================================
-#
-# Setup new iptables rules
-setup_iptables() {
-    printf "\\n${bblue}%s${endc} ${bgreen}%s${endc}\\n" "==>" "Setup new iptables rules"
-
-    # Backup current iptables rules
-    iptables-save > "$backup_dir/iptables.backup"
-
-    # Flush current iptables rules
-    iptables -F
-    iptables -t nat -F
-
-    # set iptables *nat
-    iptables -t nat -A OUTPUT -m owner --uid-owner $tor_uid -j RETURN
-    iptables -t nat -A OUTPUT -p udp --dport 53 -j REDIRECT --to-ports $dns_port
-    iptables -t nat -A OUTPUT -p tcp --dport 53 -j REDIRECT --to-ports $dns_port
-    iptables -t nat -A OUTPUT -p udp -m owner --uid-owner $tor_uid -m udp --dport 53 -j REDIRECT --to-ports $dns_port
-
-    iptables -t nat -A OUTPUT -p tcp -d $virtual_addr_net -j REDIRECT --to-ports $trans_port
-    iptables -t nat -A OUTPUT -p udp -d $virtual_addr_net -j REDIRECT --to-ports $trans_port
-
-    # allow lan access for hosts in $non_tor (local ip addresses)
-    for lan in $non_tor 127.0.0.0/9 127.128.0.0/10; do
-        iptables -t nat -A OUTPUT -d "$lan" -j RETURN
-        iptables -A OUTPUT -d "$lan" -j ACCEPT
-    done
-
-    # redirect all other output to Tor TransPort
-    iptables -t nat -A OUTPUT -p tcp --syn -j REDIRECT --to-ports $trans_port
-    iptables -t nat -A OUTPUT -p udp -j REDIRECT --to-ports $trans_port
-    iptables -t nat -A OUTPUT -p icmp -j REDIRECT --to-ports $trans_port
-
-    # set iptables *filter
-    iptables -A OUTPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
-
-    # allow only Tor output
-    iptables -A OUTPUT -m owner --uid-owner $tor_uid -j ACCEPT
-    iptables -A OUTPUT -j REJECT
-
-    printf "${bcyan}%s${endc} ${bgreen}%s${endc}\\n" \
-        "[ ok ]" "iptables rules set"
 }
 
 
@@ -379,8 +402,8 @@ start() {
     printf "\\n${bcyan}%s${endc} ${bgreen}%s${endc}\\n" \
            "::" "Starting Transparent Proxy"
 
-    # DNS settings: `/etc/resolv.conf`:
-    # =================================
+    # DNS settings: /etc/resolv.conf:
+    # ================================
     #
     # Configure system's DNS resolver to use Tor's DNSPort
     # on the loopback interface, i.e. write nameserver 127.0.0.1
@@ -415,9 +438,10 @@ start() {
         die "[ failed ] systemd error, exit!"
     fi
 
-    # set iptables rules
-    setup_iptables
+    # Set new iptables rules
+    setup_iptables tor_proxy
     printf "\\n"
+    sleep 3
 
     # check program status
     check_status
@@ -440,17 +464,8 @@ stop() {
            "::" "Stopping Transparent Proxy"
     sleep 2
 
-    # Restore default iptables rules:
-    # ===============================
-    #
-    printf "${bblue}%s${endc} ${bgreen}%s${endc}\\n" "==>" "Restore default iptables rules"
-
-    # Flush iptables rules
-    iptables -F
-    iptables -t nat -F
-
-    # Restore iptables from backup
-    iptables-restore < "${backup_dir}/iptables.backup"
+    # Restore default iptables rules
+    setup_iptables default
 
     printf "${bcyan}%s${endc} ${bgreen}%s${endc}\\n" \
         "[ ok ]" "iptables rules restored"
@@ -478,8 +493,8 @@ stop() {
     fi
     sleep 1
 
-    # Re-enable IPv6
-    # ==============
+    # Enable IPv6
+    # ===========
     printf "\\n${bblue}%s${endc} ${bgreen}%s${endc}\\n" "==>" "Enable IPv6"
     sysctl -w net.ipv6.conf.all.disable_ipv6=0
     sysctl -w net.ipv6.conf.default.disable_ipv6=0
@@ -531,17 +546,11 @@ usage() {
     printf "%s\\n\\n" "Options:"
 
     printf "%s\\n" "-h, --help      show this help message and exit"
-
     printf "%s\\n" "-t, --tor       start transparent proxy through tor"
-
     printf "%s\\n" "-c, --clearnet  reset iptables and return to clearnet navigation"
-
     printf "%s\\n" "-s, --status    check status of program and services"
-
     printf "%s\\n" "-i, --ipinfo    show public IP"
-
     printf "%s\\n" "-r, --restart   restart tor service and change Tor exit node"
-
     printf "%s\\n\\n" "-v, --version   display program version and exit"
 
     printf "%s\\n" "Project URL: $git_url"
@@ -596,6 +605,5 @@ main() {
         shift
     done
 }
-
 
 main "$@"

@@ -126,3 +126,13 @@ Added 'banner()' to function 'stop()'
 /** 1.20.2 / 05 Jan 2020 **/
 
 Add new IP check API (see PULL REQUEST #36)
+
+
+/** 1.21.0 / 06 Jan 2020 **/
+
+`setup_iptables()` function:
+    - Add arguments for tor and default rules
+    - Improve iptables flush
+    - Move up in the code (see commit)
+
+Changes on `usage()` function
