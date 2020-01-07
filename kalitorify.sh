@@ -34,7 +34,7 @@
 #
 # Program information
 readonly prog_name="kalitorify"
-readonly version="1.21.0"
+readonly version="1.21.1"
 readonly signature="Copyright (C) 2015-2020 Brainfuck"
 readonly git_url="https://github.com/brainfucksec/kalitorify"
 
@@ -293,6 +293,9 @@ setup_iptables() {
 
             # Restore iptables from backup
             iptables-restore < "${backup_dir}/iptables.backup"
+
+            printf "${bcyan}%s${endc} ${bgreen}%s${endc}\\n" \
+                   "[ ok ]" "iptables rules restored"
         ;;
     esac
 }
@@ -441,7 +444,6 @@ start() {
     # Set new iptables rules
     setup_iptables tor_proxy
     printf "\\n"
-    sleep 3
 
     # check program status
     check_status
@@ -466,9 +468,6 @@ stop() {
 
     # Restore default iptables rules
     setup_iptables default
-
-    printf "${bcyan}%s${endc} ${bgreen}%s${endc}\\n" \
-        "[ ok ]" "iptables rules restored"
 
     # Stop tor.service
     printf "\\n${bblue}%s${endc} ${bgreen}%s${endc}\\n" "==>" "Stop tor service"

@@ -136,3 +136,8 @@ Add new IP check API (see PULL REQUEST #36)
     - Move up in the code (see commit)
 
 Changes on `usage()` function
+
+
+/** 1.21.1 / 07 Jan 2020 **/
+
+Little fixes (setup_iptables(), start() functions)
