@@ -141,3 +141,8 @@ Changes on `usage()` function
 /** 1.21.1 / 07 Jan 2020 **/
 
 Little fixes (setup_iptables(), start() functions)
+
+
+/** 1.22.0 / 11 Jan 2020 **/
+
+Improve iptables rules (see PULL REQUEST #37)

@@ -34,7 +34,7 @@
 #
 # Program information
 readonly prog_name="kalitorify"
-readonly version="1.21.1"
+readonly version="1.22.0"
 readonly signature="Copyright (C) 2015-2020 Brainfuck"
 readonly git_url="https://github.com/brainfucksec/kalitorify"
 
@@ -79,7 +79,7 @@ readonly trans_port="9040"
 readonly dns_port="5353"
 
 # Tor VirtualAddrNetworkIPv4
-readonly virtual_addr_net="10.192.0.0/10"
+readonly virtual_address="10.192.0.0/10"
 
 # LAN destinations that shouldn't be routed through Tor
 readonly non_tor="127.0.0.0/8 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16"
@@ -246,37 +246,72 @@ setup_iptables() {
             iptables-save > "$backup_dir/iptables.backup"
 
             # Flush current iptables rules
+            # ============================
             iptables -F
             iptables -X
             iptables -t nat -F
             iptables -t nat -X
 
-            # set iptables *nat
+            # *nat OUTPUT (For local redirection)
+            # ===================================
+            #
+            # nat .onion addresses
+            iptables -t nat -A OUTPUT -d $virtual_address -p tcp -m tcp --tcp-flags FIN,SYN,RST,ACK SYN -j REDIRECT --to-ports $trans_port
+
+            # nat dns requests to Tor
+            iptables -t nat -A OUTPUT -d 127.0.0.1/32 -p udp -m udp --dport 53 -j REDIRECT --to-ports $dns_port
+
+            # Don't nat the Tor process, the loopback, or the local network
             iptables -t nat -A OUTPUT -m owner --uid-owner $tor_uid -j RETURN
-            iptables -t nat -A OUTPUT -p udp --dport 53 -j REDIRECT --to-ports $dns_port
-            iptables -t nat -A OUTPUT -p tcp --dport 53 -j REDIRECT --to-ports $dns_port
-            iptables -t nat -A OUTPUT -p udp -m owner --uid-owner $tor_uid -m udp --dport 53 -j REDIRECT --to-ports $dns_port
+            iptables -t nat -A OUTPUT -o lo -j RETURN
 
-            iptables -t nat -A OUTPUT -p tcp -d $virtual_addr_net -j REDIRECT --to-ports $trans_port
-            iptables -t nat -A OUTPUT -p udp -d $virtual_addr_net -j REDIRECT --to-ports $trans_port
-
-            # allow lan access for hosts in $non_tor (local ip addresses)
-            for lan in $non_tor 127.0.0.0/9 127.128.0.0/10; do
-                iptables -t nat -A OUTPUT -d "$lan" -j RETURN
-                iptables -A OUTPUT -d "$lan" -j ACCEPT
+            # Allow lan access for hosts in $non_tor
+            for lan in $non_tor; do
+                iptables -t nat -A OUTPUT -d $lan -j RETURN
             done
 
-            # redirect all other output to Tor TransPort
-            iptables -t nat -A OUTPUT -p tcp --syn -j REDIRECT --to-ports $trans_port
-            iptables -t nat -A OUTPUT -p udp -j REDIRECT --to-ports $trans_port
-            iptables -t nat -A OUTPUT -p icmp -j REDIRECT --to-ports $trans_port
+            # Redirects all other pre-routing and output to Tor's TransPort
+            iptables -t nat -A OUTPUT -p tcp -m tcp --tcp-flags FIN,SYN,RST,ACK SYN -j REDIRECT --to-ports $trans_port
 
-            # set iptables *filter
-            iptables -A OUTPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+            # *filter INPUT
+            # =============
+            iptables -A INPUT -m state --state ESTABLISHED -j ACCEPT
+            iptables -A INPUT -i lo -j ACCEPT
 
-            # allow only Tor output
-            iptables -A OUTPUT -m owner --uid-owner $tor_uid -j ACCEPT
-            iptables -A OUTPUT -j REJECT
+            # Drop everything else
+            iptables -A INPUT -j DROP
+
+            # *filter FORWARD
+            # ===============
+            iptables -A FORWARD -j DROP
+
+            # *filter OUTPUT
+            # ==============
+            #
+            # Fix for potential kernel transproxy packet leaks
+            # see: https://lists.torproject.org/pipermail/tor-talk/2014-March/032507.html
+            iptables -A OUTPUT -m conntrack --ctstate INVALID -j DROP
+
+            iptables -A OUTPUT -m state --state INVALID -j DROP
+            iptables -A OUTPUT -m state --state ESTABLISHED -j ACCEPT
+
+            # Allow Tor process output
+            iptables -A OUTPUT -m owner --uid-owner $tor_uid -p tcp -m tcp --tcp-flags FIN,SYN,RST,ACK SYN -m state --state NEW -j ACCEPT
+
+            # Allow loopback output
+            iptables -A OUTPUT -d 127.0.0.1/32 -o lo -j ACCEPT
+
+            # Tor transproxy magic
+            iptables -A OUTPUT -d 127.0.0.1/32 -p tcp -m tcp --dport $trans_port --tcp-flags FIN,SYN,RST,ACK SYN -j ACCEPT
+
+            # Drop everything else
+            iptables -A OUTPUT -j DROP
+
+            # Set default policies to DROP
+            # ============================
+            iptables -P INPUT DROP
+            iptables -P FORWARD DROP
+            iptables -P OUTPUT DROP
 
             printf "${bcyan}%s${endc} ${bgreen}%s${endc}\\n" \
                 "[ ok ]" "iptables rules set"
