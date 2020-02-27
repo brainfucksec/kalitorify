@@ -14,6 +14,9 @@ Transparent Proxy through Tor for Kali Linux
 <a href="https://github.com/brainfucksec/kalitorify/network/members"><img src="https://img.shields.io/github/forks/brainfucksec/kalitorify.svg"></a>
 </p>
 
+<p align="center">
+[![asciicast](https://asciinema.org/a/305600.svg)](https://asciinema.org/a/305600)
+</p>
 
 ## About kalitorify
 
