@@ -21,7 +21,7 @@ Transparent Proxy through Tor for Kali Linux
 In simple terms, with kalitorify you can redirect all traffic of your Kali Linux operating system through the Tor Network.
 
 
-## What is Tor?
+### What is Tor?
 
 if you don't know the Tor Network and the Tor Project (but even if you know them), I suggest you read the information from here:
 
@@ -30,7 +30,7 @@ Tor Anonimity Network on [Wikipedia](https://en.wikipedia.org/wiki/Tor_%28anonym
 Tor Project [Website](https://www.torproject.org/)
 
 
-## What is Transparent Proxy through Tor?
+### What is Transparent Proxy through Tor?
 
 Transparent proxy is an intermediary system that sit between a user and a content provider. When a user makes a request to a web server, the transparent proxy intercepts the request to perform various actions including caching, redirection and authentication.
 
@@ -66,7 +66,7 @@ sudo make install
 
 ### Please read this section carefully before starting kalitorify
 
-#### Kalitorify and anonymity
+### Kalitorify and anonymity
 
 **kalitorify is a bash script to start a transparent proxy through Tor to be used for a safe navigation during communications, searches or other activities with Kali Linux, but does not guarantee 100% anonymity.**
 
@@ -83,7 +83,7 @@ Source: https://trac.torproject.org/projects/tor/wiki/doc/TransparentProxy#Brief
 
 ---
 
-####  Hostname and MAC Address security risks
+###  Hostname and MAC Address security risks
 
 Applications can still learn your computer's hostname, MAC address, serial number, timezone, etc. and those with root privileges can disable the firewall entirely. In other words, transparent torification with iptables protects against accidental connections and DNS leaks by misconfigured software, it is not sufficient to protect against malware or software with serious security vulnerabilities.
 
@@ -97,13 +97,13 @@ Source: https://wiki.archlinux.org/index.php/Tor
 
 ---
 
-#### Transparent Proxy with kalitorify and Tor Browser
+### Transparent Proxy with kalitorify and Tor Browser
 
 **Don't start Tor Browser when transparent browsing (kalitorify) is active, this to** [avoid Tor over Tor Scenarios](https://www.whonix.org/wiki/DoNot#Allow_Tor_over_Tor_Scenarios).
 
 ---
 
-#### Checking for leaks
+### Checking for leaks
 
 After starting kalitorify you can use [tcpdump](https://www.tcpdump.org/) to check if there are any internet activity other the Tor:
 
@@ -187,13 +187,25 @@ The available commands are listed below:
 
 ---
 
-## Thanks
+## Demo
+
+[![asciicast](https://asciinema.org/a/305806.svg)](https://asciinema.org/a/305806)
+
+---
+
+## Credits
 
 * kalitorify is KISS version of [Parrot AnonSurf Module](https://github.com/parrotsec/anonsurf), developed by [Parrot Project Team](https://docs.parrotsec.org/developers). Thank you guys for give me the way in developing this program.
 
-* This program could not exist without the guides of the [Tor Project official website](https://www.torproject.org/)
+* This program could not exist without:
 
-* A special thanks goes also to the [Whonix](https://www.whonix.org/) Team and their [documentation](https://www.whonix.org/wiki/Documentation)
+    * The guides of the [Tor Project official website](https://www.torproject.org/)
+
+    * The [Whonix](https://www.whonix.org/) Team and their [documentation](https://www.whonix.org/wiki/Documentation)
+
+    * All the people who contribute [Code Contributors](https://github.com/brainfucksec/kalitorify/graphs/contributors)
+
+---
 
 ## Donate
 
