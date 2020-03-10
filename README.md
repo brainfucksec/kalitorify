@@ -201,7 +201,7 @@ The available commands are listed below:
 
     * The [Whonix](https://www.whonix.org/) Team and their [documentation](https://www.whonix.org/wiki/Documentation)
 
-    * All the people who contribute [Code Contributors](https://github.com/brainfucksec/kalitorify/graphs/contributors)
+    * All the people who contribute: [[Code Contributors]](https://github.com/brainfucksec/kalitorify/graphs/contributors)
 
 ---
 
