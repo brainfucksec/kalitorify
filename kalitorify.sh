@@ -34,7 +34,7 @@
 #
 # Program information
 readonly prog_name="kalitorify"
-readonly version="1.22.0"
+readonly version="1.22.1"
 readonly signature="Copyright (C) 2015-2020 Brainfuck"
 readonly git_url="https://github.com/brainfucksec/kalitorify"
 
@@ -243,7 +243,9 @@ setup_iptables() {
             printf "\\n${bblue}%s${endc} ${bgreen}%s${endc}\\n" "==>" "Setup new iptables rules"
 
             # Backup current iptables rules
-            iptables-save > "$backup_dir/iptables.backup"
+            if ! [[ -f /etc/iptables.rules ]]; then
+                iptables-save > "$backup_dir/iptables.backup"
+            fi
 
             # Flush current iptables rules
             # ============================
@@ -325,12 +327,17 @@ setup_iptables() {
             iptables -X
             iptables -t nat -F
             iptables -t nat -X
+            iptables -P INPUT ACCEPT
+            iptables -P FORWARD ACCEPT
+            iptables -P OUTPUT ACCEPT
 
-            # Restore iptables from backup
-            iptables-restore < "${backup_dir}/iptables.backup"
+            # Restore iptables from backup if exists
+            if ! [[ -f "${backup_dir}/iptables.backup" ]]; then
+                iptables-restore < "${backup_dir}/iptables.backup"
 
-            printf "${bcyan}%s${endc} ${bgreen}%s${endc}\\n" \
-                   "[ ok ]" "iptables rules restored"
+                printf "${bcyan}%s${endc} ${bgreen}%s${endc}\\n" \
+                       "[ ok ]" "iptables rules restored"
+            fi
         ;;
     esac
 }
@@ -552,20 +559,22 @@ stop() {
 restart() {
     check_root
 
-    printf "${bcyan}%s${endc} ${bgreen}%s${endc}\\n" \
-           "::" "Restart Tor service and change IP"
+    if systemctl is-active tor.service >/dev/null 2>&1; then
+        printf "${bcyan}%s${endc} ${bgreen}%s${endc}\\n" \
+               "::" "Restart Tor service and change IP"
+        systemctl restart tor.service
+        sleep 3
 
-    systemctl restart tor.service
-    sleep 3
+        printf "${bcyan}%s${endc} ${bgreen}%s${endc}\\n\\n" \
+               "[ ok ]" "Tor Exit Node changed"
 
-    printf "${bcyan}%s${endc} ${bgreen}%s${endc}\\n\\n" \
-           "[ ok ]" "Tor Exit Node changed"
-
-    # Check current public IP
-    check_ip
-    exit 0
+        # Check current public IP
+        check_ip
+        exit 0
+    else
+        die "[-] Tor service is not running! exit"
+    fi
 }
-
 
 # ===================================================================
 # Show help menù

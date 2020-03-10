@@ -66,7 +66,11 @@ sudo make install
 
 ### Please read this section carefully before starting kalitorify
 
-### Kalitorify and anonymity
+**kalitorify is produced independently from the Tor anonimity software and carries no guarantee from the Tor Project about quality, suitability or anything else, please read these documents to know how to use the Tor network safely:**
+
+[Tor General FAQ](https://www.torproject.org/docs/faq.html.en)
+
+[Whonix Do Not recommendations](https://www.whonix.org/wiki/DoNot)
 
 **kalitorify is a bash script to start a transparent proxy through Tor to be used for a safe navigation during communications, searches or other activities with Kali Linux, but does not guarantee 100% anonymity.**
 
@@ -74,12 +78,6 @@ About Transparent Torification, please read [Transparent Proxy Leaks](https://tr
 See [Whonix](https://www.whonix.org/) for a complete, ready-made VM based solution (alternatively using multiple physical computers) built around the Isolating Proxy and Transparent Proxy [Anonymizing Middlebox design](https://trac.torproject.org/projects/tor/wiki/doc/TransparentProxy#AnonymizingMiddlebox).
 
 Source: https://trac.torproject.org/projects/tor/wiki/doc/TransparentProxy#BriefNotes
-
-**kalitorify is produced independently from the Tor anonimity software and carries no guarantee from the Tor Project about quality, suitability or anything else, please read these documents to know how to use the Tor network safely:**
-
-[Tor General FAQ](https://www.torproject.org/docs/faq.html.en)
-
-[Whonix Do Not recommendations](https://www.whonix.org/wiki/DoNot)
 
 ---
 
@@ -144,7 +142,7 @@ Source: https://trac.torproject.org/projects/tor/wiki/doc/TransparentProxy#Check
 
 Please, before starting kalitorify make sure you have read the section about [Security](#security).
 
-**Before starting the program make sure to disable the firewall if you have one.**
+**Before starting the program make sure to disable your firewall.**
 
 Using the program is simple, the command-line options follow the [GNU Coding Standards](https://www.gnu.org/prep/standards/html_node/Command_002dLine-Interfaces.html), you can use the short and long options, the commands syntax is:
 
@@ -203,7 +201,7 @@ The available commands are listed below:
 
     * The [Whonix](https://www.whonix.org/) Team and their [documentation](https://www.whonix.org/wiki/Documentation)
 
-    * All the [Code Contributors](https://github.com/brainfucksec/kalitorify/graphs/contributors)
+    * All the people who contribute [Code Contributors](https://github.com/brainfucksec/kalitorify/graphs/contributors)
 
 ---
 

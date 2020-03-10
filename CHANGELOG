@@ -146,3 +146,9 @@ Little fixes (setup_iptables(), start() functions)
 /** 1.22.0 / 11 Jan 2020 **/
 
 Improve iptables rules (see PULL REQUEST #37)
+
+
+/** 1.22.1 / 10 Mar 2020 **/
+
+Fix error due to iptables flush (see: ISSUE #41)
+Improve `restart()` function
