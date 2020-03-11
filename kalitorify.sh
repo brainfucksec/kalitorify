@@ -586,16 +586,12 @@ stop() {
 # ===================================================================
 check_update() {
     check_root
-    
-    cp -vf /etc/apt/sources.list /etc/apt/sources.list.original 
-    sed -i 's|https|tor+https|g' /etc/apt/sources.list
-    echo "deb tor+https://deb.debian.org/debian-security $ID_CODENAME/updates main contrib non-free" >> /etc/apt/sources.list
 
     if grep -Fxq "tor+https" /etc/apt/sources.list; then
 		printf "${bcyan}%s${endc} ${bgreen}%s${endc}\\n" \
                "::" "Check updates on Tor network"
-	       
-	       
+
+
         apt update && apt upgrade -y && sleep 3
 
         printf "${bcyan}%s${endc} ${bgreen}%s${endc}\\n\\n" \
