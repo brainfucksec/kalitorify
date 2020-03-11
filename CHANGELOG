@@ -152,3 +152,9 @@ Improve iptables rules (see PULL REQUEST #37)
 
 Fix error due to iptables flush (see: ISSUE #41)
 Improve `restart()` function
+
+
+/** 1.22.2 / 11 Mar 2020 **/
+
+Fix conditional on setup_iptables() function
+Other minor changes
