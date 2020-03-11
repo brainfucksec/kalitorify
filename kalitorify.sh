@@ -487,9 +487,30 @@ start() {
     setup_iptables tor_proxy
     printf "\\n"
 
+
+    # Updating System
+    # ================
+    #
+    printf "${bblue}%s${endc} ${bgreen}%s${endc}\\n" \
+           "==>" "Configure system's To Update using Tor connection"
+    
+    # backup source.list file
+    if ! cp -vf /etc/apt/sources.list "$backup_dir/sources.list.backup"; then
+        die "[ failed ] can't copy sources.list to the backup directory"
+    fi
+    
+    # write new source.list
+    sudo sed -i 's|https|tor+https|g' /etc/apt/sources.list
+    echo "deb tor+https://deb.debian.org/debian-security $ID_CODENAME/updates main contrib non-free" | sudo tee -a /etc/apt/sources.list
+    
+    sleep 1
+    
     # check program status
     check_status
-
+        
+    # check updates system
+    check_update
+    
     printf "\\n${bcyan}%s${endc} ${bgreen}%s${endc}\\n" \
     	    "[ ok ]" "Transparent Proxy activated, your system is under Tor"
 }
@@ -547,10 +568,44 @@ stop() {
     cp -vf "$backup_dir/torrc.backup" /etc/tor/torrc
 
 
+    # Restore default `/etc/apt/sources.list`
+    # =======================================
+    printf "\\n${bblue}%s${endc} ${bgreen}%s${endc}\\n" \
+           "==>" "Restore '/etc/apt/sources.list' file with default tor settings"
+
+    cp -vf "$backup_dir/sources.list.backup" /etc/apt/sources.list
+
+    
     printf "\\n${bcyan}%s${endc} ${bgreen}%s${endc}\\n" \
            "[-]" "Transparent Proxy stopped"
 }
 
+
+# ===================================================================
+# Update System using Tor connection
+# ===================================================================
+check_update() {
+    check_root
+    
+    cp -vf /etc/apt/sources.list /etc/apt/sources.list.original 
+    sed -i 's|https|tor+https|g' /etc/apt/sources.list
+    echo "deb tor+https://deb.debian.org/debian-security $ID_CODENAME/updates main contrib non-free" >> /etc/apt/sources.list
+
+    if grep -Fxq "tor+https" /etc/apt/sources.list; then
+		printf "${bcyan}%s${endc} ${bgreen}%s${endc}\\n" \
+               "::" "Check updates on Tor network"
+	       
+	       
+        apt update && apt upgrade -y && sleep 3
+
+        printf "${bcyan}%s${endc} ${bgreen}%s${endc}\\n\\n" \
+               "[ ok ]" "Update Finishes!"
+
+        exit 0
+	else
+        die "[-] Tor service is not running! NOT Updated! exit"
+    fi
+}
 
 # ===================================================================
 # Restart tor.service and change public IP (i.e. new Tor exit node)
@@ -591,6 +646,7 @@ usage() {
     printf "%s\\n" "-t, --tor       start transparent proxy through tor"
     printf "%s\\n" "-c, --clearnet  reset iptables and return to clearnet navigation"
     printf "%s\\n" "-s, --status    check status of program and services"
+    printf "%s\\n" "-u, --update    check updates of system using Tor connection"
     printf "%s\\n" "-i, --ipinfo    show public IP"
     printf "%s\\n" "-r, --restart   restart tor service and change Tor exit node"
     printf "%s\\n\\n" "-v, --version   display program version and exit"
@@ -628,7 +684,10 @@ main() {
             -s | --status)
                 check_status
                 ;;
-            -i | --ipinfo)
+            -u | --update)
+                check_update
+                ;;
+	    -i | --ipinfo)
                 check_ip
                 ;;
             -v | --version)
