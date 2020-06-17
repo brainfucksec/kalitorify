@@ -7,7 +7,7 @@ Transparent Proxy through Tor for Kali Linux
 </p>
 
 <p align="center">
-<a href="https://github.com/brainfucksec/kalitorify/releases"><img src="https://img.shields.io/badge/version-1.23.0-blue"></a>
+<a href="https://github.com/brainfucksec/kalitorify/releases"><img src="https://img.shields.io/badge/version-1.23.1-blue"></a>
 <a href="https://github.com/brainfucksec/kalitorify/commits/master"><img src="https://img.shields.io/badge/build-passing-brightgreen.svg"></a>
 <a href="https://github.com/brainfucksec/kalitorify/blob/master/README.md"><img src="https://img.shields.io/badge/docs-passing-brightgreen.svg"></a>
 <a href="https://github.com/brainfucksec/kalitorify/blob/master/LICENSE"><img src="https://img.shields.io/github/license/brainfucksec/kalitorify.svg"></a>
@@ -52,7 +52,7 @@ Download with `git`:
 git clone https://github.com/brainfucksec/kalitorify
 ```
 
-Download release (package of the latest git version): https://github.com/brainfucksec/kalitorify/releases
+Download [release](https://github.com/brainfucksec/kalitorify/releases) (package of the latest git version)
 
 ### Install dependencies:
 ```bash
@@ -70,7 +70,7 @@ sudo make install
 
 ### Reboot:
 
-Services and programs that use kalitorify (such as iptables), work at the kernel level, at the end of the installation reboots the operating system.
+Services and programs that use kalitorify (such as iptables) work at the kernel level, at the end of the installation reboot the operating system to avoid conflicts.
 
 ---
 

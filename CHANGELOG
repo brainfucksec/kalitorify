@@ -167,3 +167,9 @@ of unnecessary backup of `etc/iptables.rules` file.
 
 Improve output (remove unnecessary verbosity).
 Add `msg()` function, avoiding `printf` repetition
+
+
+/** 1.23.1 / 17 Jun 2020 **/
+
+Error exceptions: add `exit` with (1) in current functions and not in
+`msg()` function.

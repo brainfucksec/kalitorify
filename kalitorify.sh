@@ -34,7 +34,7 @@
 #
 # Program information
 readonly prog_name="kalitorify"
-readonly version="1.23.0"
+readonly version="1.23.1"
 readonly signature="Copyright (C) 2015-2020 Brainfuck"
 readonly git_url="https://github.com/brainfucksec/kalitorify"
 
@@ -103,14 +103,6 @@ ${endc}\\n\\n"
 
 
 # ===================================================================
-# Print a message and exit with (1) when an error occurs
-# ===================================================================
-#die() {
-#    printf "${red}%s${endc}\\n" "$@" >&2
-#    exit 1
-#}
-
-# ===================================================================
 # Helper function for formatting printf
 # ===================================================================
 #
@@ -118,12 +110,11 @@ ${endc}\\n\\n"
 # instead of `printf format [argument]...`
 msg() {
     case "$1" in
-        # errors = print message and exit with (1)
+        # error messages (1)
         err)
             printf "${red}%s${endc}\\n" "$2" >&2
-            exit 1
         ;;
-        # information messages
+        # information
         info)
             printf "${bcyan}%s${endc} ${bgreen}%s${endc}\\n" "::" "$2"
         ;;
@@ -141,6 +132,7 @@ msg() {
 check_root() {
     if [[ "$(id -u)" -ne 0 ]]; then
         msg err "[ failed ] Please run this program as a root!"
+        exit 1
     fi
 }
 
@@ -169,16 +161,19 @@ check_settings() {
     for package in "${dependencies[@]}"; do
         if ! hash "${package}" 2>/dev/null; then
             msg err "[ failed ] '${package}' isn't installed, exit"
+            exit 1
         fi
     done
 
     # Check: default directories
     if [ ! -d "$backup_dir" ]; then
         msg err "[ failed ] directory '$backup_dir' not exist, run makefile first!"
+        exit 1
     fi
 
     if [ ! -d "$config_dir" ]; then
         msg err "[ failed ] directory '$config_dir' not exist, run makefile first!"
+        exit 1
     fi
 
     # Check: file `/etc/tor/torrc`
@@ -190,6 +185,7 @@ check_settings() {
 
         if ! cp "$config_dir/torrc" /etc/tor/torrc; then
             msg err "[ failed ] can't modify '/etc/tor/torrc'"
+            exit 1
         fi
     # else if exists check if have the required strings
     else
@@ -220,11 +216,13 @@ check_settings() {
             # backup original file
             if ! cp /etc/tor/torrc "$backup_dir/torrc.backup"; then
                 msg err "[ failed ] can't copy original tor 'torrc' file in the backup directory"
+                exit 1
             fi
 
             # copy new torrc file
             if ! cp "$config_dir/torrc" /etc/tor/torrc; then
                 msg err "[ failed ] can't modify '/etc/tor/torrc'"
+                exit 1
             fi
         fi
     fi
@@ -381,6 +379,7 @@ check_status() {
                "[ ok ]" "Tor service is active"
     else
         msg err "[-] Tor service is not running! exit"
+        exit 1
     fi
 
     # Check tor network settings
@@ -441,6 +440,7 @@ start() {
     # backup current resolv.conf
     if ! cp /etc/resolv.conf "$backup_dir/resolv.conf.backup"; then
         msg err "[ failed ] can't modify /etc/resolv.conf"
+        exit 1
     fi
 
     # write new nameserver
@@ -457,6 +457,7 @@ start() {
 
     if ! systemctl start tor.service >/dev/null 2>&1; then
         msg err "[ failed ] systemd error, exit!"
+        exit 1
     fi
 
     # Set new iptables rules
@@ -534,6 +535,7 @@ restart() {
         exit 0
     else
         msg err "[-] Tor service is not running! exit"
+        exit 1
     fi
 }
 
