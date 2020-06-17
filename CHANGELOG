@@ -158,3 +158,12 @@ Improve `restart()` function
 
 Fix conditional on setup_iptables() function
 Other minor changes
+
+
+/** 1.23.0 / 17 Jun 2020 **/
+
+Fix function setup_iptables(), remove instruction
+of unnecessary backup of `etc/iptables.rules` file.
+
+Improve output (remove unnecessary verbosity).
+Add `msg()` function, avoiding `printf` repetition

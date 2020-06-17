@@ -7,7 +7,7 @@ Transparent Proxy through Tor for Kali Linux
 </p>
 
 <p align="center">
-<a href="https://github.com/brainfucksec/kalitorify/releases"><img src="https://img.shields.io/badge/version-1.22.2-blue"></a>
+<a href="https://github.com/brainfucksec/kalitorify/releases"><img src="https://img.shields.io/badge/version-1.23.0-blue"></a>
 <a href="https://github.com/brainfucksec/kalitorify/commits/master"><img src="https://img.shields.io/badge/build-passing-brightgreen.svg"></a>
 <a href="https://github.com/brainfucksec/kalitorify/blob/master/README.md"><img src="https://img.shields.io/badge/docs-passing-brightgreen.svg"></a>
 <a href="https://github.com/brainfucksec/kalitorify/blob/master/LICENSE"><img src="https://img.shields.io/github/license/brainfucksec/kalitorify.svg"></a>
@@ -20,6 +20,7 @@ Transparent Proxy through Tor for Kali Linux
 
 In simple terms, with kalitorify you can redirect all traffic of your Kali Linux operating system through the Tor Network.
 
+**This program was created for the Kali Linux operating system (Kali Linux rolling 2020.x) , don't run on other Linux distributions if you're not sure what you're doing.**
 
 ### What is Tor?
 
@@ -44,21 +45,32 @@ For more information about the Transparent Proxy through Tor please read the [To
 
 ## Install
 
+### Download kalitorify:
+
+Download with `git`:
+```bash
+git clone https://github.com/brainfucksec/kalitorify
+```
+
+Download release (package of the latest git version): https://github.com/brainfucksec/kalitorify/releases
+
 ### Install dependencies:
 ```bash
-sudo apt update && sudo apt full-upgrade -y
+sudo apt-get update && sudo apt-get dist-upgrade -y
 
-sudo apt install tor -y
+sudo apt-get install -y tor curl
 ```
 
 ### Install kalitorify:
 ```bash
-git clone https://github.com/brainfucksec/kalitorify
-
 cd kalitorify/
 
 sudo make install
 ```
+
+### Reboot:
+
+Services and programs that use kalitorify (such as iptables), work at the kernel level, at the end of the installation reboots the operating system.
 
 ---
 
@@ -138,9 +150,8 @@ Source: https://trac.torproject.org/projects/tor/wiki/doc/TransparentProxy#Check
 
 ## Usage
 
-**This program was created for the Kali Linux operating system, don't run on other Linux distributions if you're not sure what you're doing.**
 
-Please, before starting kalitorify make sure you have read the section about [Security](#security).
+**Please, before starting kalitorify make sure you have read the section about** [Security](#security).
 
 **Before starting the program make sure to disable your firewall.**
 
@@ -189,13 +200,15 @@ The available commands are listed below:
 
 [![asciicast](https://asciinema.org/a/305806.svg)](https://asciinema.org/a/305806)
 
+Warning: the example video might refer to an older version.
+
 ---
 
 ## Credits
 
-* kalitorify is KISS version of [Parrot AnonSurf Module](https://github.com/parrotsec/anonsurf), developed by [Parrot Project Team](https://docs.parrotsec.org/developers). Thank you guys for give me the way in developing this program.
+* kalitorify is a KISS version of [Parrot AnonSurf Module](https://github.com/parrotsec/anonsurf), developed by [Parrot Project Team](https://docs.parrotsec.org/developers). Thank you guys for give me the way in developing this program.
 
-* This program could not exist without:
+* Also, thanks to:
 
     * The guides of the [Tor Project official website](https://www.torproject.org/)
 
@@ -207,7 +220,7 @@ The available commands are listed below:
 
 ## Donate
 
-I accept Bitcoin donations. This will help me to pay various costs. My Bitcoin address is:
+You can support kalitorify by making a donation to this Bitcoin address:
 
 ```
 1B39SnAXcR2bkxNpNy3AuckgaTshqNc2ce
