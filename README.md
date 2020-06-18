@@ -152,9 +152,9 @@ Source: https://trac.torproject.org/projects/tor/wiki/doc/TransparentProxy#Check
 
 **Before starting kalitorify:**
 
-    * make sure you have read the section about [Security](#security).
-    * disable your firewall if is active.
-    * make a backup of the iptables rules if they are present, see: [iptables](https://wiki.debian.org/iptables)
+1 - Make sure you have read the section about [Security](#security).
+2 - Disable your firewall if is active.
+3 - Make a backup of the iptables rules if they are present, see: [iptables](https://wiki.debian.org/iptables)
 
 Using the program is simple, the command-line options follow the [GNU Coding Standards](https://www.gnu.org/prep/standards/html_node/Command_002dLine-Interfaces.html), you can use the short and long options, the commands syntax is:
 
