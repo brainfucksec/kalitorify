@@ -7,7 +7,7 @@ Transparent Proxy through Tor for Kali Linux
 </p>
 
 <p align="center">
-<a href="https://github.com/brainfucksec/kalitorify/releases"><img src="https://img.shields.io/badge/version-1.23.1-blue"></a>
+<a href="https://github.com/brainfucksec/kalitorify/releases"><img src="https://img.shields.io/badge/version-1.23.2-blue"></a>
 <a href="https://github.com/brainfucksec/kalitorify/commits/master"><img src="https://img.shields.io/badge/build-passing-brightgreen.svg"></a>
 <a href="https://github.com/brainfucksec/kalitorify/blob/master/README.md"><img src="https://img.shields.io/badge/docs-passing-brightgreen.svg"></a>
 <a href="https://github.com/brainfucksec/kalitorify/blob/master/LICENSE"><img src="https://img.shields.io/github/license/brainfucksec/kalitorify.svg"></a>
@@ -150,23 +150,31 @@ Source: https://trac.torproject.org/projects/tor/wiki/doc/TransparentProxy#Check
 
 ## Usage
 
+**Before starting kalitorify:
 
-**Please, before starting kalitorify make sure you have read the section about** [Security](#security).
-
-**Before starting the program make sure to disable your firewall.**
+    * make sure you have read the section about** [Security](#security).
+    * **disable your firewall if is active.
+    * make a backup of the iptables rules if they are present, see:** [iptables](https://wiki.debian.org/iptables)
 
 Using the program is simple, the command-line options follow the [GNU Coding Standards](https://www.gnu.org/prep/standards/html_node/Command_002dLine-Interfaces.html), you can use the short and long options, the commands syntax is:
 
-`<program name> --<option>`
+`kalitorify --[option]`
+
+or
+
+`kalitorify -[option]`
 
 For example, to display the help menù, run command `kalitorify` with the `--help` or `-h` option:
 ```bash
 kalitorify -h
 ```
 
-The available commands are listed below:
+To start the transparent proxy through Tor, use the option `--tor` or `-t`:
+```bash
+kalitorify -t
+```
 
-**kalitorify [option]**
+The available commands are listed below:
 
 ### Options:
 

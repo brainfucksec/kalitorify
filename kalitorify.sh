@@ -34,7 +34,7 @@
 #
 # Program information
 readonly prog_name="kalitorify"
-readonly version="1.23.1"
+readonly version="1.23.2"
 readonly signature="Copyright (C) 2015-2020 Brainfuck"
 readonly git_url="https://github.com/brainfucksec/kalitorify"
 
@@ -254,7 +254,6 @@ setup_iptables() {
             iptables -t nat -F
             iptables -t nat -X
 
-
             ## *nat OUTPUT (For local redirection)
             #
             # nat .onion addresses
@@ -323,11 +322,6 @@ setup_iptables() {
             iptables -P INPUT ACCEPT
             iptables -P FORWARD ACCEPT
             iptables -P OUTPUT ACCEPT
-
-            # Restore iptables from backup if exists
-            if [[ -f "${backup_dir}/iptables.backup" ]]; then
-                iptables-restore < "${backup_dir}/iptables.backup" >/dev/null 2>&1
-            fi
         ;;
     esac
 }

@@ -173,3 +173,8 @@ Add `msg()` function, avoiding `printf` repetition
 
 Error exceptions: add `exit` with (1) in current functions and not in
 `msg()` function.
+
+
+/** 1.23.2 / 18 Jun 2020 **/
+
+Delete instructions for backup iptables (the user has to check for iptables rules by themselves)
