@@ -218,7 +218,7 @@ Warning: the example video might refer to an older version.
 
 * "KALI LINUX ™" is a trademark of Offensive Security. Please see: https://www.kali.org
 
-* "Tor" and is a trademark of The Tor Project, Inc.. Please see: https://www.torproject.org
+* "Tor" is a trademark of The Tor Project, Inc.. Please see: https://www.torproject.org
 
 * kalitorify is a KISS version of [Parrot AnonSurf Module](https://github.com/parrotsec/anonsurf), developed by [Parrot Project Team](https://docs.parrotsec.org/developers). Thank you guys for give me the way in developing this program.
 
