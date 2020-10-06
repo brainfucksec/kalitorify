@@ -34,7 +34,7 @@
 #
 # Program information
 readonly prog_name="kalitorify"
-readonly version="1.24.0"
+readonly version="1.24.1"
 readonly signature="Copyright (C) 2015-2020 Brainfuck"
 readonly git_url="https://github.com/brainfucksec/kalitorify"
 
@@ -331,7 +331,7 @@ check_ip() {
             continue
         fi
 
-        printf "${b}${green}%s${reset} ${b}%s${reset}\n" "[!]" "IP Address details:"
+        printf "${b}${green}%s${reset} ${b}%s${reset}\n" "[ I ]" "IP Address details:"
         printf "%s\\n" "${request}"
         break
     done
