@@ -34,7 +34,7 @@
 #
 # Program information
 readonly prog_name="kalitorify"
-readonly version="1.24.1"
+readonly version="1.24.2"
 readonly signature="Copyright (C) 2015-2020 Brainfuck"
 readonly git_url="https://github.com/brainfucksec/kalitorify"
 
@@ -84,9 +84,6 @@ readonly non_tor="127.0.0.0/8 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16"
 # ===================================================================
 # Show program banner
 # ===================================================================
-#
-# Thanks to: https://github.com/dylanaraps/neofetch
-# for the Kali Linux ASCII logo
 banner() {
 
 printf "${b}${white}
@@ -331,7 +328,7 @@ check_ip() {
             continue
         fi
 
-        printf "${b}${green}%s${reset} ${b}%s${reset}\n" "[ I ]" "IP Address details:"
+        printf "${b}${green}%s${reset} ${b}%s${reset}\n" "[ i ]" "IP Address details:"
         printf "%s\\n" "${request}"
         break
     done
