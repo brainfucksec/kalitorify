@@ -5,7 +5,7 @@ Format:
 
 /** version number / date **/
 
-[ committer ] username
+[committer] username
 
 arguments
 
@@ -13,7 +13,7 @@ arguments
 
 /** 1.24.0 / 2020-10-03 **/
 
-[ committer ] brainfucksec
+[committer] brainfucksec
 
 Clean CHANGELOG file, please see `CHANGELOG.old` file for old changes.
 
@@ -22,3 +22,9 @@ IMPORTANT:
 Only changes that are important to users will be written to this file.
 Please see git `/commits/master` for technical details of the program changes.
 
+
+/** 1.24.3 / 2020-12-10 **/
+
+[committer] brainfucksec
+
+Add exception (check tor service) on `stop()` function.

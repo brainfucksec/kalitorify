@@ -34,7 +34,7 @@
 #
 # Program information
 readonly prog_name="kalitorify"
-readonly version="1.24.2"
+readonly version="1.24.3"
 readonly signature="Copyright (C) 2015-2020 Brainfuck"
 readonly git_url="https://github.com/brainfucksec/kalitorify"
 
@@ -85,7 +85,6 @@ readonly non_tor="127.0.0.0/8 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16"
 # Show program banner
 # ===================================================================
 banner() {
-
 printf "${b}${white}
  _____     _ _ _           _ ___
 |  |  |___| |_| |_ ___ ___|_|  _|_ _
@@ -112,17 +111,22 @@ die() {
 # ===================================================================
 check_root() {
     if [[ "$(id -u)" -ne 0 ]]; then
-        die "[ failed ] Please run this program as a root!"
+        die "[error] Please run this program as a root!"
     fi
 }
 
 
 # ===================================================================
-# Display program version
+# Display program version and other information
 # ===================================================================
 print_version() {
     printf "%s\\n" "${prog_name} ${version}"
-	exit 0
+    printf "%s\\n" "${signature}"
+    printf "%s\\n" "License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>"
+    printf "%s\\n" "This is free software: you are free to change and redistribute it."
+    printf "%s\\n" "There is NO WARRANTY, to the extent permitted by law."
+
+    exit 0
 }
 
 
@@ -140,17 +144,17 @@ check_settings() {
     declare -a dependencies=('tor' 'curl')
     for package in "${dependencies[@]}"; do
         if ! hash "${package}" 2>/dev/null; then
-            die "[ failed ] '${package}' isn't installed, exit"
+            die "[error] '${package}' isn't installed, exit"
         fi
     done
 
     # Check: default directories
     if [ ! -d "${backup_dir}" ]; then
-        die "[ failed ] directory '${backup_dir}' not exist, run makefile first!"
+        die "[error] directory '${backup_dir}' not exist, run makefile first!"
     fi
 
     if [ ! -d "${config_dir}" ]; then
-        die "[ failed ] directory '${config_dir}' not exist, run makefile first!"
+        die "[error] directory '${config_dir}' not exist, run makefile first!"
     fi
 
     # Check: file `/etc/tor/torrc`
@@ -161,7 +165,7 @@ check_settings() {
         printf "${b}${green}%s${reset} %s\\n" "==>" "Copy file: /etc/tor/torrc"
 
         if ! cp "${config_dir}/torrc" /etc/tor/torrc; then
-            die "[ failed ] can't modify '/etc/tor/torrc'"
+            die "[error] can't modify '/etc/tor/torrc'"
         fi
     # else if exists check if have the required strings
     else
@@ -191,21 +195,19 @@ check_settings() {
 
             # backup original file
             if ! cp /etc/tor/torrc "${backup_dir}/torrc.backup"; then
-                die "[ failed ] can't copy original tor 'torrc' file in the backup directory"
+                die "[error] can't backup '/etc/tor/torrc'"
             fi
 
             # copy new torrc file
             if ! cp "${config_dir}/torrc" /etc/tor/torrc; then
-                die "[ failed ] can't modify '/etc/tor/torrc'"
+                die "[error] can't modify '/etc/tor/torrc'"
             fi
         fi
     fi
 
     # reload systemd daemons
-    printf "\\n${b}${green}%s${reset} %s\\n" "==>" "Reload systemd daemons"
+    printf "${b}${green}%s${reset} %s\\n" "==>" "Reload systemd daemons"
     systemctl --system daemon-reload
-    printf "${b}${green}%s${reset} ${b}%s${reset}\\n" \
-            "[ ok ]" "systemd daemons reloaded"
 }
 
 
@@ -328,7 +330,7 @@ check_ip() {
             continue
         fi
 
-        printf "${b}${green}%s${reset} ${b}%s${reset}\n" "[ i ]" "IP Address details:"
+        printf "${b}%s${reset}\\n" "IP Address details:"
         printf "%s\\n" "${request}"
         break
     done
@@ -349,7 +351,7 @@ check_status() {
 
     if systemctl is-active tor.service >/dev/null 2>&1; then
         printf "${b}${green}%s${reset} ${b}%s${reset}\\n\\n" \
-                "[ ok ]" "Tor service is active"
+                "[ok]" "Tor service is active"
     else
         die "[-] Tor service is not running! exit"
     fi
@@ -362,7 +364,7 @@ check_status() {
     printf "${b}${cyan}%s${reset} ${b}%s${reset}\\n" \
                 "::" "Check Tor network settings"
 
-    # curl options details:
+    # curl option details:
     #   --socks5 <host[:port]> SOCKS5 proxy on given host + port
     #   --socks5-hostname <host[:port]> SOCKS5 proxy, pass host name to proxy
     #
@@ -375,7 +377,7 @@ check_status() {
     if curl -s -m 10 --socks5 "${hostport}" --socks5-hostname "${hostport}" -L "${url}" \
         | cat | tac | grep -q 'Congratulations'; then
         printf "${b}${green}%s${reset} ${b}%s${reset}\\n\\n" \
-                "[ ok ]" "Your system is configured to use Tor"
+                "[ok]" "Your system is configured to use Tor"
     else
         printf "${b}${red}%s${reset}\\n\\n" "[!] Your system is not using Tor"
         printf "%s\\n" "try another Tor circuit with '${prog_name} --restart'"
@@ -394,7 +396,6 @@ start() {
     banner
     check_root
     sleep 2
-    check_settings
 
     # stop tor.service before changing tor settings
     if systemctl is-active tor.service >/dev/null 2>&1; then
@@ -404,7 +405,7 @@ start() {
     printf "\\n${b}${cyan}%s${reset} ${b}%s${reset}\\n" \
             "::" "Starting Transparent Proxy"
 
-    # DNS settings: /etc/resolv.conf:
+    # DNS settings: `/etc/resolv.conf`:
     #
     # Configure system's DNS resolver to use Tor's DNSPort
     # on the loopback interface, i.e. write nameserver 127.0.0.1
@@ -413,12 +414,11 @@ start() {
 
     # backup current resolv.conf
     if ! cp /etc/resolv.conf "${backup_dir}/resolv.conf.backup"; then
-        die "[ failed ] can't modify /etc/resolv.conf"
+        die "[error] can't backup '/etc/resolv.conf'"
     fi
 
     # write new nameserver
     printf "%s\\n" "nameserver 127.0.0.1" > /etc/resolv.conf
-
 
     # Disable IPv6 with sysctl
     printf "${b}${green}%s${reset} %s\\n" "==>" "Disable IPv6 with sysctl"
@@ -429,7 +429,7 @@ start() {
     printf "${b}${green}%s${reset} %s\\n" "==>" "Start Tor service"
 
     if ! systemctl start tor.service >/dev/null 2>&1; then
-        die "[ failed ] systemd error, exit!"
+        die "[error] can't start tor service, exit!"
     fi
 
     # Set new iptables rules
@@ -439,8 +439,8 @@ start() {
     # check program status
     check_status
 
-    printf "\\n${b}${green}%s${reset} ${b}%s${endc}\\n" \
-    	   "[ ok ]" "Transparent Proxy activated, your system is under Tor"
+    printf "\\n${b}${green}%s${reset} ${b}%s${reset}\\n" \
+            "[ok]" "Transparent Proxy activated, your system is under Tor"
 }
 
 
@@ -453,40 +453,46 @@ stop() {
     banner
     check_root
 
-    printf "${b}${cyan}%s${reset} ${b}%s${reset}\\n" \
-            "::" "Stopping Transparent Proxy"
+    # Dont'run function, if tor.service isn't running.
+    if systemctl is-active tor.service >/dev/null 2>&1; then
+        printf "${b}${cyan}%s${reset} ${b}%s${reset}\\n" \
+                "::" "Stopping Transparent Proxy"
 
-    # Resets default iptables rules
-    setup_iptables default
+        # Resets default iptables rules
+        setup_iptables default
 
-    # Stop tor.service
-    printf "${b}${green}%s${reset} %s\\n" "==>" "Stop tor service"
-    systemctl stop tor.service
+        # Stop tor.service
+        printf "${b}${green}%s${reset} %s\\n" "==>" "Stop tor service"
+        systemctl stop tor.service
 
-    # Restore `/etc/resolv.conf`:
-    #
-    # restore file with `resolvconf` program if exists
-    # otherwise copy the original file from backup directory
-    printf "${b}${green}%s${reset} %s\\n" \
-            "==>" "Restore /etc/resolv.conf file with default DNS"
+        # Restore `/etc/resolv.conf`:
+        #
+        # restore file with `resolvconf` program if exists
+        # otherwise copy the original file from backup directory
+        printf "${b}${green}%s${reset} %s\\n" \
+                "==>" "Restore /etc/resolv.conf file with default DNS"
 
-    if hash resolvconf 2>/dev/null; then
-        resolvconf -u
+        if hash resolvconf 2>/dev/null; then
+            resolvconf -u
+        else
+            cp "${backup_dir}/resolv.conf.backup" /etc/resolv.conf
+        fi
+
+        # Enable IPv6
+        printf "${b}${green}%s${reset} %s\\n" "==>" "Enable IPv6"
+        sysctl -w net.ipv6.conf.all.disable_ipv6=0 >/dev/null 2>&1
+        sysctl -w net.ipv6.conf.default.disable_ipv6=0 >/dev/null 2>&1
+
+        # Restore default `/etc/tor/torrc`
+        printf "${b}${green}%s${reset} %s\\n" "==>" "Restore default '/etc/tor/torrc'"
+        cp "${backup_dir}/torrc.backup" /etc/tor/torrc
+
+        printf "\\n${b}${green}%s${reset} ${b}%s${reset}\\n" \
+                "[-]" "Transparent Proxy stopped"
+        exit 0
     else
-        cp "${backup_dir}/resolv.conf.backup" /etc/resolv.conf
+        die "[-] Tor service is not running! exit"
     fi
-
-    # Enable IPv6
-    printf "${b}${green}%s${reset} %s\\n" "==>" "Enable IPv6"
-    sysctl -w net.ipv6.conf.all.disable_ipv6=0 >/dev/null 2>&1
-    sysctl -w net.ipv6.conf.default.disable_ipv6=0 >/dev/null 2>&1
-
-    # Restore default `/etc/tor/torrc`
-    printf "${b}${green}%s${reset} %s\\n" "==>" "Restore default '/etc/tor/torrc'"
-    cp "${backup_dir}/torrc.backup" /etc/tor/torrc
-
-    printf "\\n${b}${green}%s${reset} ${b}%s${reset}\\n" \
-            "[-]" "Transparent Proxy stopped"
 }
 
 
@@ -504,7 +510,7 @@ restart() {
         sleep 1
 
         printf "${b}${green}%s${reset} ${b}%s${reset}\\n\\n" \
-                "[ ok ]" "Tor Exit Node changed"
+                "[ok]" "Tor Exit Node changed"
 
         # Check current public IP
         check_ip
