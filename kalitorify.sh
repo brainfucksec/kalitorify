@@ -3,6 +3,8 @@
 # ===================================================================
 # kalitorify.sh
 #
+# version: 1.24.4
+#
 # Kali Linux - Transparent proxy through Tor
 #
 # Copyright (C) 2015-2020 Brainfuck
@@ -34,7 +36,7 @@
 #
 # Program information
 readonly prog_name="kalitorify"
-readonly version="1.24.3"
+readonly version="1.24.4"
 readonly signature="Copyright (C) 2015-2020 Brainfuck"
 readonly git_url="https://github.com/brainfucksec/kalitorify"
 
@@ -149,22 +151,20 @@ check_settings() {
     done
 
     # Check: default directories
-    if [ ! -d "${backup_dir}" ]; then
+    if [[ ! -d "${backup_dir}" ]]; then
         die "[error] directory '${backup_dir}' not exist, run makefile first!"
     fi
 
-    if [ ! -d "${config_dir}" ]; then
+    if [[ ! -d "${config_dir}" ]]; then
         die "[error] directory '${config_dir}' not exist, run makefile first!"
     fi
 
     # Check: file `/etc/tor/torrc`
     #
-    # if /etc/tor/torrc not exists copy the file from ${config_dir}/torrc
+    # if /etc/tor/torrc not exists copy the file from $config_dir/torrc
     if [[ ! -f /etc/tor/torrc ]]; then
-
         printf "${b}${green}%s${reset} %s\\n" "==>" "Copy file: /etc/tor/torrc"
-
-        if ! cp "${config_dir}/torrc" /etc/tor/torrc; then
+        if ! cp -f "${config_dir}/torrc" /etc/tor/torrc; then
             die "[error] can't modify '/etc/tor/torrc'"
         fi
     # else if exists check if have the required strings
@@ -194,12 +194,12 @@ check_settings() {
             printf "${b}${green}%s${reset} %s\\n" "==>" "Setting file: /etc/tor/torrc"
 
             # backup original file
-            if ! cp /etc/tor/torrc "${backup_dir}/torrc.backup"; then
+            if ! cp -f /etc/tor/torrc "${backup_dir}/torrc.backup"; then
                 die "[error] can't backup '/etc/tor/torrc'"
             fi
 
             # copy new torrc file
-            if ! cp "${config_dir}/torrc" /etc/tor/torrc; then
+            if ! cp -f "${config_dir}/torrc" /etc/tor/torrc; then
                 die "[error] can't modify '/etc/tor/torrc'"
             fi
         fi
@@ -396,6 +396,7 @@ start() {
     banner
     check_root
     sleep 2
+    check_settings
 
     # stop tor.service before changing tor settings
     if systemctl is-active tor.service >/dev/null 2>&1; then

@@ -28,3 +28,12 @@ Please see git `/commits/master` for technical details of the program changes.
 [committer] brainfucksec
 
 Add exception (check tor service) on `stop()` function.
+
+
+/** 1.24.4 / 2020-12-21 **/
+
+[committer] brainfucksec
+
+BUGFIX, fix `start()` function (add `check_settings()`).
+
+See: ISSUE #52
