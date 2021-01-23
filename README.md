@@ -7,7 +7,7 @@ Transparent Proxy through Tor for Kali Linux
 </p>
 
 <p align="center">
-<a href="https://github.com/brainfucksec/kalitorify/releases"><img src="https://img.shields.io/badge/version-1.24.4-blue"></a>
+<a href="https://github.com/brainfucksec/kalitorify/releases"><img src="https://img.shields.io/badge/version-1.25.0-blue"></a>
 <a href="https://github.com/brainfucksec/kalitorify/commits/master"><img src="https://img.shields.io/badge/build-passing-brightgreen.svg"></a>
 <a href="https://github.com/brainfucksec/kalitorify/blob/master/README.md"><img src="https://img.shields.io/badge/docs-passing-brightgreen.svg"></a>
 <a href="https://github.com/brainfucksec/kalitorify/blob/master/LICENSE"><img src="https://img.shields.io/github/license/brainfucksec/kalitorify.svg"></a>
@@ -208,7 +208,7 @@ The available commands are listed below:
 
 ## Demo
 
-[![asciicast](https://asciinema.org/a/378393.svg)](https://asciinema.org/a/378393)
+[![asciicast](https://asciinema.org/a/386518.svg)](https://asciinema.org/a/386518)
 
 Warning: the example video might refer to an older version.
 
@@ -236,7 +236,7 @@ Warning: the example video might refer to an older version.
 
 ## Donate
 
-You can support kalitorify by making a donation to this Bitcoin address:
+Support kalitorify by making a donation to this Bitcoin address:
 
 ```
 1B39SnAXcR2bkxNpNy3AuckgaTshqNc2ce

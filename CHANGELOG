@@ -37,3 +37,11 @@ Add exception (check tor service) on `stop()` function.
 BUGFIX, fix `start()` function (add `check_settings()`).
 
 See: ISSUE #52
+
+
+/** 1.25.0 / 2021-01-XX **/
+
+[committer] brainfucksec
+
+Improve function for check program settings
+Improve output messages

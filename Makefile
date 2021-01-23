@@ -1,5 +1,5 @@
 PROGRAM_NAME=kalitorify
-VERSION=1.24.4
+VERSION=1.25.0
 
 DATA_DIR=/usr/share
 DOCS_DIR=$(DATA_DIR)/doc
