@@ -7,7 +7,7 @@ Transparent Proxy through Tor for Kali Linux
 </p>
 
 <p align="center">
-<a href="https://github.com/brainfucksec/kalitorify/releases"><img src="https://img.shields.io/badge/version-1.25.0-blue"></a>
+<a href="https://github.com/brainfucksec/kalitorify/releases"><img src="https://img.shields.io/badge/version-1.26.0-blue"></a>
 <a href="https://github.com/brainfucksec/kalitorify/commits/master"><img src="https://img.shields.io/badge/build-passing-brightgreen.svg"></a>
 <a href="https://github.com/brainfucksec/kalitorify/blob/master/README.md"><img src="https://img.shields.io/badge/docs-passing-brightgreen.svg"></a>
 <a href="https://github.com/brainfucksec/kalitorify/blob/master/LICENSE"><img src="https://img.shields.io/github/license/brainfucksec/kalitorify.svg"></a>
@@ -22,7 +22,7 @@ In simple terms, with kalitorify you can redirect all traffic of your Kali Linux
 
 **This program was created for the Kali Linux operating system (Kali Linux rolling 2020.x) , don't run on other Linux distributions if you're not sure what you're doing.**
 
-### What is Tor?
+### About Tor
 
 if you don't know the Tor Network and the Tor Project (but even if you know them), I suggest you read the information from here:
 
@@ -31,7 +31,7 @@ Tor Anonimity Network on [Wikipedia](https://en.wikipedia.org/wiki/Tor_%28anonym
 Tor Project [Website](https://www.torproject.org/)
 
 
-### What is Transparent Proxy through Tor?
+### What is Transparent Proxy through Tor
 
 Transparent proxy is an intermediary system that sit between a user and a content provider. When a user makes a request to a web server, the transparent proxy intercepts the request to perform various actions including caching, redirection and authentication.
 
@@ -45,7 +45,7 @@ For more information about the Transparent Proxy through Tor please read the [To
 
 ## Install
 
-### Download kalitorify:
+### Download:
 
 Download with `git`:
 ```bash
@@ -71,6 +71,56 @@ sudo make install
 ### Reboot:
 
 Services and programs that use kalitorify (such as iptables) work at the kernel level, at the end of the installation reboot the operating system to avoid conflicts.
+
+---
+
+## Usage
+
+**Before starting kalitorify:**
+
+1 - Make sure you have read the [Security](#security) section.
+
+2 - Disable your firewall if is active.
+
+3 - Make a backup of the iptables rules if they are present, see: [iptables](https://wiki.debian.org/iptables)
+
+### Commands
+
+**Start transparent proxy through Tor:**
+```bash
+kalitorify --tor
+```
+
+**Return to clearnet:**
+```bash
+kalitorify --clearnet
+```
+
+### Commands list:
+
+**-h, --help**
+
+    show this help message and exit
+
+**-t, --tor**
+
+    start transparent proxy through tor
+
+**-c, --clearnet**
+
+    reset iptables and return to clearnet navigation
+
+**-s, --status**
+
+    check status of program and services
+
+**-i, --ipinfo**
+
+    show public IP address
+
+**-r, --restart**
+
+    restart tor service and change IP address
 
 ---
 
@@ -145,64 +195,6 @@ tcpdump -n -f -p -i eth0 not arp and not host IP.TO.TOR.GUARD
 You are not supposed to see any output other than the first two header lines. You can remove `and not host IP` to see how it would look like otherwise.
 
 Source: https://trac.torproject.org/projects/tor/wiki/doc/TransparentProxy#Checkingforleaks
-
----
-
-## Usage
-
-**Before starting kalitorify:**
-
-1 - Make sure you have read the section about [Security](#security).
-
-2 - Disable your firewall if is active.
-
-3 - Make a backup of the iptables rules if they are present, see: [iptables](https://wiki.debian.org/iptables)
-
-Using the program is simple, the command-line options follow the [GNU Coding Standards](https://www.gnu.org/prep/standards/html_node/Command_002dLine-Interfaces.html), you can use the short and long options, the commands syntax is:
-
-`kalitorify --[option]`
-
-or
-
-`kalitorify -[option]`
-
-For example, to display the help menù, run command `kalitorify` with the `--help` or `-h` option:
-```bash
-kalitorify -h
-```
-
-To start the transparent proxy through Tor, use the option `--tor` or `-t`:
-```bash
-kalitorify -t
-```
-
-The available commands are listed below:
-
-### Options:
-
-**-h, --help**
-
-    show this help message and exit
-
-**-t, --tor**
-
-    start transparent proxy through tor
-
-**-c, --clearnet**
-
-    reset iptables and return to clearnet navigation
-
-**-s, --status**
-
-    check status of program and services
-
-**-i, --ipinfo**
-
-    show public IP
-
-**-r, --restart**
-
-    restart tor service and change IP
 
 ---
 

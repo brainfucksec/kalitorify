@@ -15,7 +15,7 @@ arguments
 
 [committer] brainfucksec
 
-Clean CHANGELOG file, please see `CHANGELOG.old` file for old changes.
+New CHANGELOG file
 
 IMPORTANT:
 
@@ -39,9 +39,17 @@ BUGFIX, fix `start()` function (add `check_settings()`).
 See: ISSUE #52
 
 
-/** 1.25.0 / 2021-01-XX **/
+/** 1.25.0 / 2021-01-23 **/
 
 [committer] brainfucksec
 
 Improve function for check program settings
 Improve output messages
+
+
+/** 1.26.0 / 2021-04-19 **/
+
+[committer] brainfucksec
+
+Update README
+Little changes on output messages

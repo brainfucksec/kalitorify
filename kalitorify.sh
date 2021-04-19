@@ -1,40 +1,42 @@
 #!/usr/bin/env bash
 
-# ===================================================================
-# kalitorify.sh
-#
-# version: 1.25.0
-#
-# Kali Linux - Transparent proxy through Tor
-#
-# Copyright (C) 2015-2021 Brainfuck
-#
-# Kalitorify is KISS version of Parrot AnonSurf Module, developed
-# by "Pirates' Crew" of FrozenBox - https://github.com/parrotsec/anonsurf
-#
-#
-# GNU GENERAL PUBLIC LICENSE
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-# ===================================================================
+################################################################################
+#                                                                              #
+# kalitorify.sh                                                                #
+#                                                                              #
+# version: 1.26.0                                                              #
+#                                                                              #
+# Kali Linux - Transparent proxy through Tor                                   #
+#                                                                              #
+# Copyright (C) 2015-2021 Brainfuck                                            #
+#                                                                              #
+# Kalitorify is KISS version of Parrot AnonSurf Module, developed              #
+# by "Pirates' Crew" of FrozenBox - https://github.com/parrotsec/anonsurf      #
+#                                                                              #
+#                                                                              #
+# GNU GENERAL PUBLIC LICENSE                                                   #
+#                                                                              #
+# This program is free software: you can redistribute it and/or modify         #
+# it under the terms of the GNU General Public License as published by         #
+# the Free Software Foundation, either version 3 of the License, or            #
+# (at your option) any later version.                                          #
+#                                                                              #
+# This program is distributed in the hope that it will be useful,              #
+# but WITHOUT ANY WARRANTY; without even the implied warranty of               #
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                #
+# GNU General Public License for more details.                                 #
+#                                                                              #
+# You should have received a copy of the GNU General Public License            #
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.        #
+#                                                                              #
+################################################################################
 
 
 ## General
 #
 # program information
 readonly prog_name="kalitorify"
-readonly version="1.25.0"
+readonly version="1.26.0"
 readonly signature="Copyright (C) 2021 Brainfuck"
 readonly git_url="https://github.com/brainfucksec/kalitorify"
 
@@ -56,7 +58,6 @@ export reset="$(tput sgr0)"
 readonly config_dir="/usr/share/kalitorify/data"
 # backups:
 readonly backup_dir="/usr/share/kalitorify/backups"
-
 
 ## Network settings
 #
@@ -94,15 +95,28 @@ ${reset}\\n\\n"
 
 ## Print a message and exit with (1) when an error occurs
 die() {
-    printf "${red}%s${reset}\\n" "$@" >&2
+    printf "${red}%s${reset}\\n" "[ERROR] $@" >&2
     exit 1
+}
+
+
+## Print information
+info() {
+    printf "${b}${blue}%s${reset} ${b}%s${reset}\\n" "::" "${@}"
+
+}
+
+
+## Print `OK` messages
+msg() {
+    printf "${b}${green}%s${reset} %s\\n\\n" "[OK]" "${@}"
 }
 
 
 ## Check if the program run as a root
 check_root() {
     if [[ "${UID}" -ne 0 ]]; then
-        die "[ERROR] Please run this program as a root!"
+        die "Please run this program as a root!"
     fi
 }
 
@@ -124,25 +138,25 @@ print_version() {
 # - program folders, see: ${backup_dir}, ${config_dir}
 # - tor configuration file: /etc/tor/torrc
 check_settings() {
-    printf "${b}${cyan}%s${reset} ${b}%s${reset}\\n" "::" "Check program settings"
+    info "Check program settings"
 
     declare -a dependencies=('tor' 'curl')
     for package in "${dependencies[@]}"; do
         if ! hash "${package}" 2>/dev/null; then
-            die "[ERROR] '${package}' isn't installed, exit"
+            die "'${package}' isn't installed, exit"
         fi
     done
 
     if [[ ! -d "${backup_dir}" ]]; then
-        die "[ERROR] directory '${backup_dir}' not exist, run makefile first!"
+        die "directory '${backup_dir}' not exist, run makefile first!"
     fi
 
     if [[ ! -d "${config_dir}" ]]; then
-        die "[ERROR] directory '${config_dir}' not exist, run makefile first!"
+        die "directory '${config_dir}' not exist, run makefile first!"
     fi
 
     if [[ ! -f /etc/tor/torrc ]]; then
-        die "[ERROR] /etc/tor/torrc file not exist, check Tor configuration"
+        die "/etc/tor/torrc file not exist, check Tor configuration"
     fi
 
     # check torrc settings
@@ -168,19 +182,19 @@ check_settings() {
        [[ "$string4" -ne 0 ]] ||
        [[ "$string5" -ne 0 ]]; then
 
-        printf "${b}${green}%s${reset} %s\\n" "==>" "Set /etc/tor/torrc"
+        printf "%s\\n" "Set /etc/tor/torrc"
 
         if ! cp -f /etc/tor/torrc "${backup_dir}/torrc.backup"; then
-            die "[ERROR] can't backup '/etc/tor/torrc'"
+            die "can't backup '/etc/tor/torrc'"
         fi
 
         if ! cp -f "${config_dir}/torrc" /etc/tor/torrc; then
-            die "[ERROR] can't copy new '/etc/tor/torrc'"
+            die "can't copy new '/etc/tor/torrc'"
         fi
     fi
 
     # reload systemd daemons
-    printf "${b}${green}%s${reset} %s\\n" "==>" "Reload systemd daemons"
+    printf "%s\\n" "Reload systemd daemons"
     systemctl --system daemon-reload
 }
 
@@ -191,12 +205,12 @@ check_settings() {
 # for set/restore iptables.
 #
 # Args:
-# tor_proxy -> set rules for Tor transparent proxy
-# default   -> restore default rules
+#   tor_proxy -> set rules for Tor transparent proxy
+#   default   -> restore default rules
 setup_iptables() {
     case "$1" in
         tor_proxy)
-            printf "${b}${green}%s${reset} %s\\n" "==>" "Set iptables rules"
+            printf "%s\\n" "Set iptables rules"
 
             ## Flush current iptables rules
             iptables -F
@@ -265,8 +279,7 @@ setup_iptables() {
         ;;
 
         default)
-            printf "${b}${green}%s${reset} %s\\n" \
-                    "==>" "Restore default iptables rules"
+            printf "%s\\n" "Restore default iptables rules"
 
             # Flush iptables rules
             iptables -F
@@ -286,8 +299,7 @@ setup_iptables() {
 # Make an HTTP request to the URL in the list, if the first request fails try
 # with the next, then print the IP address.
 check_ip() {
-    printf "${b}${cyan}%s${reset} ${b}%s${reset}\\n" "::" \
-            "Check public IP address"
+    info "Check public IP address"
 
     local url_list=(
         'https://ipleak.net/json/'
@@ -316,21 +328,18 @@ check_ip() {
 # - tor settings (check if Tor works correctly)
 # - public IP Address
 check_status() {
-    printf "${b}${cyan}%s${reset} ${b}%s${reset}\\n" \
-            "::" "Check current status of Tor service"
+    info "Check current status of Tor service"
 
     if systemctl is-active tor.service >/dev/null 2>&1; then
-        printf "${b}${green}%s${reset} ${b}%s${reset}\\n\\n" \
-                "[OK]" "Tor service is active"
+        msg "Tor service is active"
     else
-        die "[-] Tor service is not running! exit"
+        die "Tor service is not running! exit"
     fi
 
     # make an HTTP request with curl at: https://check.torproject.org/
     # and grep the necessary strings from the HTML page to test connection
     # with Tor
-    printf "${b}${cyan}%s${reset} ${b}%s${reset}\\n" \
-                "::" "Check Tor network settings"
+    info "Check Tor network settings"
 
     # curl option details:
     #   --socks5 <host[:port]> SOCKS5 proxy on given host + port
@@ -344,8 +353,7 @@ check_status() {
 
     if curl -s -m 10 --socks5 "${hostport}" --socks5-hostname "${hostport}" -L "${url}" \
         | cat | tac | grep -q 'Congratulations'; then
-        printf "${b}${green}%s${reset} ${b}%s${reset}\\n\\n" \
-                "[OK]" "Your system is configured to use Tor"
+        msg "Your system is configured to use Tor"
     else
         printf "${red}%s${reset}\\n\\n" "[!] Your system is not using Tor"
         printf "%s\\n" "try another Tor circuit with '${prog_name} --restart'"
@@ -363,49 +371,48 @@ start() {
     sleep 2
     check_settings
 
-    # stop tor.service before changing tor settings
+    # don't run function if tor.service is running!
     if systemctl is-active tor.service >/dev/null 2>&1; then
-        systemctl stop tor.service
+        die "Tor service already active stop it first"
     fi
 
-    printf "\\n${b}${cyan}%s${reset} ${b}%s${reset}\\n" \
-            "::" "Starting Transparent Proxy"
+    printf "\\n"
+    info "Starting Transparent Proxy"
 
     # DNS settings: /etc/resolv.conf:
     #
-    # configure system's DNS resolver to use Tor's DNSPort
-    # on the loopback interface, i.e. write nameserver 127.0.0.1
-    # to `/etc/resolv.conf` file
-    printf "${b}${green}%s${reset} %s\\n" "==>" "Configure DNS to use Tor's DNSPort"
+    # write nameserver 127.0.0.1 to `/etc/resolv.conf` file
+    # i.e. use Tor DNSPort (see: /etc/tor/torrc)
+    printf "%s\\n" "Configure resolv.conf file to use Tor DNSPort"
 
     # backup current resolv.conf
     if ! cp /etc/resolv.conf "${backup_dir}/resolv.conf.backup"; then
-        die "[ERROR] can't backup '/etc/resolv.conf'"
+        die "can't backup '/etc/resolv.conf'"
     fi
 
     # write new nameserver
     printf "%s\\n" "nameserver 127.0.0.1" > /etc/resolv.conf
 
     # disable IPv6 with sysctl
-    printf "${b}${green}%s${reset} %s\\n" "==>" "Disable IPv6 with sysctl"
+    printf "%s\\n" "Disable IPv6 with sysctl"
     sysctl -w net.ipv6.conf.all.disable_ipv6=1 >/dev/null 2>&1
     sysctl -w net.ipv6.conf.default.disable_ipv6=1 >/dev/null 2>&1
 
-    # start tor.service for new configuration
-    printf "${b}${green}%s${reset} %s\\n" "==>" "Start Tor service"
+    # start tor.service
+    printf "%s\\n" "Start Tor service"
 
     if ! systemctl start tor.service >/dev/null 2>&1; then
-        die "[ERROR] can't start tor service, exit!"
+        die "can't start tor service, exit!"
     fi
 
     # set new iptables rules
     setup_iptables tor_proxy
-    printf "\\n"
 
     # check program status
+    printf "\\n"
     check_status
 
-    printf "\\n${b}${green}%s${reset} ${b}%s${reset}\\n" \
+    printf "\\n${b}${green}%s${reset} %s\\n" \
             "[OK]" "Transparent Proxy activated, your system is under Tor"
 }
 
@@ -416,23 +423,21 @@ start() {
 stop() {
     check_root
 
-    # dont'run function, if tor.service isn't running!
+    # don't run function if tor.service is NOT running!
     if systemctl is-active tor.service >/dev/null 2>&1; then
-        printf "${b}${cyan}%s${reset} ${b}%s${reset}\\n" \
-                "::" "Stopping Transparent Proxy"
+        info "Stopping Transparent Proxy"
 
         # resets default iptables rules
         setup_iptables default
 
-        printf "${b}${green}%s${reset} %s\\n" "==>" "Stop tor service"
+        printf "%s\\n" "Stop tor service"
         systemctl stop tor.service
 
         # restore /etc/resolv.conf:
         #
         # restore file with resolvconf program if exists
         # otherwise copy the original file from backup directory
-        printf "${b}${green}%s${reset} %s\\n" \
-                "==>" "Restore /etc/resolv.conf file with default DNS"
+        printf "%s\\n" "Restore default DNS"
 
         if hash resolvconf 2>/dev/null; then
             resolvconf -u
@@ -441,19 +446,19 @@ stop() {
         fi
 
         # enable IPv6
-        printf "${b}${green}%s${reset} %s\\n" "==>" "Enable IPv6"
+        printf "%s\\n" "Enable IPv6"
         sysctl -w net.ipv6.conf.all.disable_ipv6=0 >/dev/null 2>&1
         sysctl -w net.ipv6.conf.default.disable_ipv6=0 >/dev/null 2>&1
 
         # restore default `/etc/tor/torrc`
-        printf "${b}${green}%s${reset} %s\\n" "==>" "Restore default '/etc/tor/torrc'"
+        printf "%s\\n" "Restore default /etc/tor/torrc"
         cp "${backup_dir}/torrc.backup" /etc/tor/torrc
 
-        printf "\\n${b}${green}%s${reset} ${b}%s${reset}\\n" \
+        printf "\\n${b}${green}%s${reset} %s\\n" \
                 "[-]" "Transparent Proxy stopped"
         exit 0
     else
-        die "[-] Tor service is not running! exit"
+        die "Tor service is not running! exit"
     fi
 }
 
@@ -465,19 +470,16 @@ restart() {
     check_root
 
     if systemctl is-active tor.service >/dev/null 2>&1; then
-        printf "${b}${cyan}%s${reset} ${b}%s${reset}\\n" \
-                "::" "Restart Tor service and change Tor Exit Node"
+        info "Change IP address"
 
         systemctl restart tor.service
         sleep 1
 
-        printf "${b}${green}%s${reset} ${b}%s${reset}\\n\\n" \
-                "[OK]" "Tor Exit Node changed"
-
+        msg "IP address changed"
         check_ip
         exit 0
     else
-        die "[-] Tor service is not running! exit"
+        die "Tor service is not running! exit"
     fi
 }
 
@@ -497,7 +499,7 @@ usage() {
     printf "%s\\n" "-c, --clearnet  reset iptables and return to clearnet navigation"
     printf "%s\\n" "-s, --status    check status of program and services"
     printf "%s\\n" "-i, --ipinfo    show public IP address"
-    printf "%s\\n" "-r, --restart   restart tor service and change Tor exit node"
+    printf "%s\\n" "-r, --restart   restart tor service and change IP address"
     printf "%s\\n\\n" "-v, --version   display program version and exit"
 
     printf "%s\\n" "Project URL: ${git_url}"
@@ -551,5 +553,7 @@ main() {
     done
 }
 
-main "$@"
+
+# Call main
+main "${@}"
 
