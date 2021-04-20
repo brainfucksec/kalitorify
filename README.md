@@ -16,11 +16,11 @@ Transparent Proxy through Tor for Kali Linux
 
 ## About kalitorify
 
-**kalitorify** is a shell script for [Kali Linux](https://www.kali.org/) which use [iptables](https://www.netfilter.org/projects/iptables/index.html) settings to create a **Transparent Proxy through the Tor Network**, the program also allows you to perform various checks like checking the Tor Exit Node (i.e. your public IP when you are under Tor proxy), or if Tor has been configured correctly checking service and network settings.
+**kalitorify** is a shell script for [Kali Linux](https://www.kali.org/) which use [iptables](https://www.netfilter.org/projects/iptables/index.html) settings to create a **Transparent Proxy through the Tor Network**, the program also allows you to perform various checks like checking the Tor Exit Node (i.e. your public IP address when you are under Tor proxy), or if Tor has been configured correctly checking service and network settings.
 
 In simple terms, with kalitorify you can redirect all traffic of your Kali Linux operating system through the Tor Network.
 
-**This program was created for the Kali Linux operating system (Kali Linux rolling 2020.x) , don't run on other Linux distributions if you're not sure what you're doing.**
+**This program was created for the Kali Linux operating system (Kali Linux rolling 2021.x) , don't run on other Linux distributions if you're not sure what you're doing.**
 
 ### About Tor
 
@@ -84,7 +84,7 @@ Services and programs that use kalitorify (such as iptables) work at the kernel 
 
 3 - Make a backup of the iptables rules if they are present, see: [iptables](https://wiki.debian.org/iptables)
 
-### Commands
+### Commands:
 
 **Start transparent proxy through Tor:**
 ```bash
