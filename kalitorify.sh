@@ -4,7 +4,7 @@
 #                                                                              #
 # kalitorify.sh                                                                #
 #                                                                              #
-# version: 1.26.0                                                              #
+# version: 1.26.1                                                              #
 #                                                                              #
 # Kali Linux - Transparent proxy through Tor                                   #
 #                                                                              #
@@ -36,7 +36,7 @@
 #
 # program information
 readonly prog_name="kalitorify"
-readonly version="1.26.0"
+readonly version="1.26.1"
 readonly signature="Copyright (C) 2021 Brainfuck"
 readonly git_url="https://github.com/brainfucksec/kalitorify"
 
@@ -366,15 +366,16 @@ check_status() {
 
 ## Start transparent proxy through Tor
 start() {
-    banner
     check_root
+
+    # Exit if tor.service is already active
+    if systemctl is-active tor.service >/dev/null 2>&1; then
+        die "Tor service is already active, stop it first"
+    fi
+
+    banner
     sleep 2
     check_settings
-
-    # don't run function if tor.service is running!
-    if systemctl is-active tor.service >/dev/null 2>&1; then
-        die "Tor service already active stop it first"
-    fi
 
     printf "\\n"
     info "Starting Transparent Proxy"
