@@ -1,5 +1,5 @@
 <p align="center">
-<img src="logo.png" alt="kalitorify">
+<img src="img/logo.png" alt="kalitorify">
 </p>
 
 <p align="center">
@@ -228,8 +228,20 @@ Warning: the example video might refer to an older version.
 
 ## Donate
 
-Support kalitorify by making a donation to this Bitcoin address:
+Support kalitorify by making a donation:
+
+**Bitcoin**
+
+![.](img/bitcoin-address.gif)
 
 ```
 1B39SnAXcR2bkxNpNy3AuckgaTshqNc2ce
+```
+
+**Monero**
+
+![.](img/monero-address.gif)
+
+```
+42HrxGUKPzNNJKFguPfFhXQajwNDnhLbogy6EWexWw9Sh5pTumVk7dkcD2PB4MuFgD1m8rnaR3pr1g852BWUTpXaTo9rQyr
 ```
