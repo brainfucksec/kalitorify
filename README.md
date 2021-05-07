@@ -232,7 +232,7 @@ Support kalitorify by making a donation:
 
 **Bitcoin**
 
-![.](img/bitcoin-address.gif)
+![.](img/bitcoin.webp)
 
 ```
 1B39SnAXcR2bkxNpNy3AuckgaTshqNc2ce
@@ -240,7 +240,7 @@ Support kalitorify by making a donation:
 
 **Monero**
 
-![.](img/monero-address.gif)
+![.](img/monero.webp)
 
 ```
 42HrxGUKPzNNJKFguPfFhXQajwNDnhLbogy6EWexWw9Sh5pTumVk7dkcD2PB4MuFgD1m8rnaR3pr1g852BWUTpXaTo9rQyr
