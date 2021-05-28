@@ -175,13 +175,25 @@ check_settings() {
     grep -q -x 'DNSPort 5353' /etc/tor/torrc
     local string5=$?
 
+     grep -q -x 'HiddenServiceDir /var/lib/tor/hidden_service/' /etc/tor/torrc
+     local string6=$?
+
+     grep -q -x 'HiddenServicePort 30303 127.0.0.1:30303' /etc/tor/torrc
+     local string7=$?
+
+     grep -q -x 'HiddenServiceDir /var/lib/tor/ssh_hidden_service/' /etc/tor/torrc
+     local string8=$?
+
     # if required strings does not exists copy file from /usr/share/kalitorify
     if [[ "$string1" -ne 0 ]] ||
        [[ "$string2" -ne 0 ]] ||
        [[ "$string3" -ne 0 ]] ||
        [[ "$string4" -ne 0 ]] ||
-       [[ "$string5" -ne 0 ]]; then
-
+       [[ "$string5" -ne 0 ]] ||
+       [[ "$string6" -ne 0 ]] ||
+       [[ "$string7" -ne 0 ]] ||
+       [[ "$string8" -ne 0 ]] ||
+       [[ "$string9" -ne 0 ]]; then
         printf "%s\\n" "Set /etc/tor/torrc"
 
         if ! cp -f /etc/tor/torrc "${backup_dir}/torrc.backup"; then
