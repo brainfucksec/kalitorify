@@ -62,3 +62,9 @@ Little changes on output messages
 Update README
 Improve code
 
+
+/** 1.26.2 / 2021-09-14 **/
+
+[committer] brainfucksec
+
+Update data/torrc, Makefile

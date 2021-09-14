@@ -56,7 +56,7 @@ TransPort 9040 IsolateClientAddr IsolateClientProtocol IsolateDestAddr IsolateDe
 ## be specified multiple times to bind to multiple addresses/ports.
 ## If a unix domain socket ## is used, you may quote the path using
 ## standard C escape sequences. (Default: 9050)
-SocksPort 9050
+SocksPort 9050 IsolateClientAddr IsolateClientProtocol IsolateDestAddr IsolateDestPort
 
 ##  DNSPort [address:]port|auto [isolation flags]
 ##

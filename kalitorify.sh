@@ -4,11 +4,11 @@
 #                                                                              #
 # kalitorify.sh                                                                #
 #                                                                              #
-# version: 1.26.1                                                              #
+# version: 1.26.2                                                              #
 #                                                                              #
 # Kali Linux - Transparent proxy through Tor                                   #
 #                                                                              #
-# Copyright (C) 2015-2021 Brainfuck                                            #
+# Copyright (C) 2015-2021 Brainf+ck                                            #
 #                                                                              #
 # Kalitorify is KISS version of Parrot AnonSurf Module, developed              #
 # by "Pirates' Crew" of FrozenBox - https://github.com/parrotsec/anonsurf      #
@@ -36,8 +36,8 @@
 #
 # program information
 readonly prog_name="kalitorify"
-readonly version="1.26.1"
-readonly signature="Copyright (C) 2021 Brainfuck"
+readonly version="1.26.2"
+readonly signature="Copyright (C) 2021 Brainf+ck"
 readonly git_url="https://github.com/brainfucksec/kalitorify"
 
 # set colors for stdout
@@ -134,12 +134,13 @@ print_version() {
 
 ## Check program settings
 #
-# - required packages: tor, curl
-# - program folders, see: ${backup_dir}, ${config_dir}
+# - packages: tor, curl
+# - program directories, see: ${backup_dir}, ${config_dir}
 # - tor configuration file: /etc/tor/torrc
 check_settings() {
     info "Check program settings"
 
+    # packages
     declare -a dependencies=('tor' 'curl')
     for package in "${dependencies[@]}"; do
         if ! hash "${package}" 2>/dev/null; then
@@ -147,6 +148,7 @@ check_settings() {
         fi
     done
 
+    # directories
     if [[ ! -d "${backup_dir}" ]]; then
         die "directory '${backup_dir}' not exist, run makefile first!"
     fi
@@ -155,32 +157,33 @@ check_settings() {
         die "directory '${config_dir}' not exist, run makefile first!"
     fi
 
+    # torrc file
     if [[ ! -f /etc/tor/torrc ]]; then
         die "/etc/tor/torrc file not exist, check Tor configuration"
     fi
 
-    # check torrc settings
     grep -q -x 'VirtualAddrNetworkIPv4 10.192.0.0/10' /etc/tor/torrc
-    local string1=$?
+    local rstring1=$?
 
     grep -q -x 'AutomapHostsOnResolve 1' /etc/tor/torrc
-    local string2=$?
+    local rstring2=$?
 
     grep -q -x 'TransPort 9040 IsolateClientAddr IsolateClientProtocol IsolateDestAddr IsolateDestPort' /etc/tor/torrc
-    local string3=$?
+    local rstring3=$?
 
     grep -q -x 'SocksPort 9050' /etc/tor/torrc
-    local string4=$?
+    local rstring4=$?
 
     grep -q -x 'DNSPort 5353' /etc/tor/torrc
-    local string5=$?
+    local rstring5=$?
 
-    # if required strings does not exists copy file from /usr/share/kalitorify
-    if [[ "$string1" -ne 0 ]] ||
-       [[ "$string2" -ne 0 ]] ||
-       [[ "$string3" -ne 0 ]] ||
-       [[ "$string4" -ne 0 ]] ||
-       [[ "$string5" -ne 0 ]]; then
+    # if required strings does not exists in torrc file copy file
+    # from /usr/share/kalitorify
+    if [[ "$rstring1" -ne 0 ]] ||
+       [[ "$rstring2" -ne 0 ]] ||
+       [[ "$rstring3" -ne 0 ]] ||
+       [[ "$rstring4" -ne 0 ]] ||
+       [[ "$rstring5" -ne 0 ]]; then
 
         printf "%s\\n" "Set /etc/tor/torrc"
 
@@ -201,10 +204,12 @@ check_settings() {
 
 ## iptables settings
 #
-# This function is used with args in start() and stop()
+# This function is used with args in start() and stop() functions
 # for set/restore iptables.
 #
-# Args:
+# Usage: setup_iptables <arg>
+#
+#   args:
 #   tor_proxy -> set rules for Tor transparent proxy
 #   default   -> restore default rules
 setup_iptables() {
@@ -296,15 +301,15 @@ setup_iptables() {
 
 ## Check public IP address
 #
-# Make an HTTP request to the URL in the list, if the first request fails try
-# with the next, then print the IP address.
+# Make an HTTP request to the ip api service on the list, if the
+# first request fails try with the next, then print the IP address
 check_ip() {
     info "Check public IP address"
 
     local url_list=(
         'https://ipleak.net/json/'
-        'https://api.myip.com/'
         'https://ipinfo.io/'
+        'https://api.myip.com/'
         'http://ip-api.com/'
     )
 
