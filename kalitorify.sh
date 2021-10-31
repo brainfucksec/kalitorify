@@ -4,7 +4,7 @@
 #                                                                              #
 # kalitorify.sh                                                                #
 #                                                                              #
-# version: 1.26.2                                                              #
+# version: 1.26.3                                                              #
 #                                                                              #
 # Kali Linux - Transparent proxy through Tor                                   #
 #                                                                              #
@@ -36,7 +36,7 @@
 #
 # program information
 readonly prog_name="kalitorify"
-readonly version="1.26.2"
+readonly version="1.26.3"
 readonly signature="Copyright (C) 2021 Brainf+ck"
 readonly git_url="https://github.com/brainfucksec/kalitorify"
 
@@ -481,7 +481,7 @@ restart() {
         systemctl restart tor.service
         sleep 1
 
-        msg "IP address changed"
+        #msg "IP address changed"
         check_ip
         exit 0
     else
@@ -555,7 +555,7 @@ main() {
                 exit 1
                 ;;
         esac
-        shift
+        exit 0
     done
 }
 
