@@ -69,8 +69,18 @@ Improve code
 
 Update data/torrc, Makefile
 
+
 /** 1.26.3 / 2021-10-31
 
 [committer] brainfucksec
 
 Fix main() function
+
+
+/** 1.26.4 / 2021-11-06 **/
+
+[committer] brainfucksec
+
+Fix function for error handling
+Update README (update links, instructions)
+

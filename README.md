@@ -7,7 +7,7 @@ Transparent Proxy through Tor for Kali Linux
 </p>
 
 <p align="center">
-<a href="https://github.com/brainfucksec/kalitorify/tags"><img src="https://img.shields.io/badge/version-1.26.3-blue"></a>
+<a href="https://github.com/brainfucksec/kalitorify/tags"><img src="https://img.shields.io/badge/version-1.26.4-blue"></a>
 <a href="https://github.com/brainfucksec/kalitorify/commits/master"><img src="https://img.shields.io/badge/build-passing-brightgreen.svg"></a>
 <a href="https://github.com/brainfucksec/kalitorify/blob/master/README.md"><img src="https://img.shields.io/badge/docs-passing-brightgreen.svg"></a>
 <a href="https://github.com/brainfucksec/kalitorify/blob/master/LICENSE"><img src="https://img.shields.io/github/license/brainfucksec/kalitorify.svg"></a>
@@ -39,7 +39,7 @@ Transparent proxy is an intermediary system that sit between a user and a conten
 
 Transparent proxy via Tor means that every network application will make its TCP connections through Tor; no application will be able to reveal your IP address by connecting directly.
 
-For more information about the Transparent Proxy through Tor please read the [Tor project wiki](https://trac.torproject.org/projects/tor/wiki/doc/TransparentProxy)
+For more information about the Transparent Proxy through Tor please read the [Tor project wiki](https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TransparentProxy)
 
 ---
 
@@ -48,21 +48,21 @@ For more information about the Transparent Proxy through Tor please read the [To
 ### Download:
 
 Download with `git`:
-```bash
+```term
 git clone https://github.com/brainfucksec/kalitorify
 ```
 
 Download [release package](https://github.com/brainfucksec/kalitorify/tags) (package of the latest git version)
 
 ### Install dependencies:
-```bash
+```term
 sudo apt-get update && sudo apt-get dist-upgrade -y
 
 sudo apt-get install -y tor curl
 ```
 
 ### Install kalitorify:
-```bash
+```term
 cd kalitorify/
 
 sudo make install
@@ -87,12 +87,12 @@ Services and programs that use kalitorify (such as iptables) work at the kernel 
 ### Commands:
 
 **Start transparent proxy through Tor:**
-```bash
+```term
 kalitorify --tor
 ```
 
 **Return to clearnet:**
-```bash
+```term
 kalitorify --clearnet
 ```
 
@@ -124,22 +124,33 @@ kalitorify --clearnet
 
 ---
 
+## Uninstall
+```term
+cd kalitorify/
+
+sudo make uninstall
+```
+
+
+
+---
+
 ## Security
 
 ### Please read this section carefully before starting kalitorify
 
 **kalitorify is produced independently from the Tor anonimity software and carries no guarantee from the Tor Project about quality, suitability or anything else, please read these documents to know how to use the Tor network safely:**
 
-[Tor General FAQ](https://www.torproject.org/docs/faq.html.en)
+[Tor FAQ](https://support.torproject.org/faq/)
 
 [Whonix Do Not recommendations](https://www.whonix.org/wiki/DoNot)
 
 **kalitorify is a bash script to start a transparent proxy through Tor to be used for a safe navigation during communications, searches or other activities with Kali Linux, but does not guarantee 100% anonymity.**
 
-About Transparent Torification, please read [Transparent Proxy Leaks](https://trac.torproject.org/projects/tor/wiki/doc/TransparentProxyLeaks) (mostly Microsoft Windows related) and/or consider an [Isolating Proxy](https://trac.torproject.org/projects/tor/wiki/doc/TorifyHOWTO/IsolatingProxy) as alternative.
-See [Whonix](https://www.whonix.org/) for a complete, ready-made VM based solution (alternatively using multiple physical computers) built around the Isolating Proxy and Transparent Proxy [Anonymizing Middlebox design](https://trac.torproject.org/projects/tor/wiki/doc/TransparentProxy#AnonymizingMiddlebox).
+About Transparent Torification, please read [Transparent Proxy Leaks](https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TransparentProxyLeaks) (mostly Microsoft Windows related) and/or consider an [Isolating Proxy](https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TorifyHOWTO/IsolatingProxy) as alternative.
+See [Whonix](https://www.whonix.org/) for a complete, ready-made VM based solution (alternatively using multiple physical computers) built around the Isolating Proxy and Transparent Proxy [Anonymizing Middlebox design](https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TransparentProxy#AnonymizingMiddlebox).
 
-Source: https://trac.torproject.org/projects/tor/wiki/doc/TransparentProxy#BriefNotes
+See: [Tor Project's wiki:Brief Notes](https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TransparentProxy#brief-notes)
 
 ---
 
@@ -168,13 +179,13 @@ Source: https://wiki.archlinux.org/index.php/Tor
 After starting kalitorify you can use [tcpdump](https://www.tcpdump.org/) to check if there are any internet activity other the Tor:
 
 First, get your network interface:
-```bash
+```term
 ip -o addr
 ```
 
 or
 
-```bash
+```term
 tcpdump -D
 ```
 
@@ -183,12 +194,12 @@ We'll assume its `eth0`.
 Next you need to identify the Tor guard IP, you can use `ss`, `netstat` or `GETINFO entry-guards` through the tor controller to identify the guard IP.
 
 Example with `ss`:
-```bash
+```term
 ss -ntp | grep "$(cat /var/run/tor/tor.pid)"
 ```
 
 With the interface and guard IP at hand, we can now use `tcpdump` to check for possible non-tor leaks. Replace IP.TO.TOR.GUARD with the IP you got from the `ss` output.
-```bash
+```term
 tcpdump -n -f -p -i eth0 not arp and not host IP.TO.TOR.GUARD
 ```
 
@@ -208,11 +219,11 @@ Warning: the example video might refer to an older version.
 
 ## Credits
 
-* kalitorify is a KISS version of [Parrot AnonSurf Module](https://github.com/parrotsec/anonsurf), developed by [Parrot Project Team](https://docs.parrotsec.org/developers). Thank you guys for give me the way in developing this program.
+* kalitorify is a KISS version of [Parrot AnonSurf Module](https://nest.parrot.sh/packages/tools/anonsurf) of [Parrot OS](https://www.parrotsec.org/). Thank you guys for give me the way in developing this program.
 
 * The realization of this program was possible only with:
 
-    * The guides of the [Tor Project official website](https://www.torproject.org/)
+    * The [Tor Project documentation](https://gitlab.torproject.org/tpo/tpa/team/-/wikis/home)
 
     * The [Whonix](https://www.whonix.org/) Team and their [documentation](https://www.whonix.org/wiki/Documentation)
 

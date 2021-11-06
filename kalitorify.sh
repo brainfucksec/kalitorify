@@ -4,7 +4,7 @@
 #                                                                              #
 # kalitorify.sh                                                                #
 #                                                                              #
-# version: 1.26.3                                                              #
+# version: 1.26.4                                                              #
 #                                                                              #
 # Kali Linux - Transparent proxy through Tor                                   #
 #                                                                              #
@@ -36,7 +36,7 @@
 #
 # program information
 readonly prog_name="kalitorify"
-readonly version="1.26.3"
+readonly version="1.26.4"
 readonly signature="Copyright (C) 2021 Brainf+ck"
 readonly git_url="https://github.com/brainfucksec/kalitorify"
 
@@ -95,7 +95,7 @@ ${reset}\\n\\n"
 
 ## Print a message and exit with (1) when an error occurs
 die() {
-    printf "${red}%s${reset}\\n" "[ERROR] $@" >&2
+    printf "${red}%s${reset}\\n" "[ERROR] $*" >&2
     exit 1
 }
 
