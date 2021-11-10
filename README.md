@@ -243,15 +243,15 @@ Support kalitorify by making a donation:
 
 **Bitcoin**
 
-![.](img/bitcoin.webp)
+![.](img/bitcoin.png)
 
 ```
-1B39SnAXcR2bkxNpNy3AuckgaTshqNc2ce
+1J4LsZh94DYwMcnXj7YhKQ13A85x74GZGu
 ```
 
 **Monero**
 
-![.](img/monero.webp)
+![.](img/xmr.png)
 
 ```
 42HrxGUKPzNNJKFguPfFhXQajwNDnhLbogy6EWexWw9Sh5pTumVk7dkcD2PB4MuFgD1m8rnaR3pr1g852BWUTpXaTo9rQyr
