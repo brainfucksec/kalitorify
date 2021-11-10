@@ -251,7 +251,7 @@ Support kalitorify by making a donation:
 
 **Monero**
 
-![.](img/xmr.png)
+![.](img/monero.png)
 
 ```
 42HrxGUKPzNNJKFguPfFhXQajwNDnhLbogy6EWexWw9Sh5pTumVk7dkcD2PB4MuFgD1m8rnaR3pr1g852BWUTpXaTo9rQyr
