@@ -246,7 +246,7 @@ Support kalitorify by making a donation:
 ![.](img/bitcoin.png)
 
 ```
-1J4LsZh94DYwMcnXj7YhKQ13A85x74GZGu
+19vqscjZcpa22qScPoQEuHJyyiyKokZ6C3
 ```
 
 **Monero**
