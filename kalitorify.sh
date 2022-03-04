@@ -4,11 +4,11 @@
 #                                                                              #
 # kalitorify.sh                                                                #
 #                                                                              #
-# version: 1.26.4                                                              #
+# version: 1.27.0                                                              #
 #                                                                              #
 # Kali Linux - Transparent proxy through Tor                                   #
 #                                                                              #
-# Copyright (C) 2015-2021 Brainf+ck                                            #
+# Copyright (C) 2015-2022 brainf+ck                                            #
 #                                                                              #
 # Kalitorify is KISS version of Parrot AnonSurf Module, developed              #
 # by "Pirates' Crew" of FrozenBox - https://github.com/parrotsec/anonsurf      #
@@ -36,8 +36,8 @@
 #
 # program information
 readonly prog_name="kalitorify"
-readonly version="1.26.4"
-readonly signature="Copyright (C) 2021 Brainf+ck"
+readonly version="1.27.0"
+readonly signature="Copyright (C) 2022 brainf+ck"
 readonly git_url="https://github.com/brainfucksec/kalitorify"
 
 # set colors for stdout
@@ -51,13 +51,9 @@ export white="$(tput setaf 7)"
 export b="$(tput bold)"
 export reset="$(tput sgr0)"
 
-
 ## Directories
-#
-# config files:
-readonly config_dir="/usr/share/kalitorify/data"
-# backups:
-readonly backup_dir="/usr/share/kalitorify/backups"
+readonly config_dir="/usr/share/kalitorify/data"    # config files
+readonly backup_dir="/usr/share/kalitorify/backups" # backups
 
 ## Network settings
 #
@@ -157,43 +153,19 @@ check_settings() {
         die "directory '${config_dir}' not exist, run makefile first!"
     fi
 
-    # torrc file
+    # replace torrc file
     if [[ ! -f /etc/tor/torrc ]]; then
         die "/etc/tor/torrc file not exist, check Tor configuration"
     fi
 
-    grep -q -x 'VirtualAddrNetworkIPv4 10.192.0.0/10' /etc/tor/torrc
-    local rstring1=$?
+    printf "%s\\n" "Set /etc/tor/torrc"
 
-    grep -q -x 'AutomapHostsOnResolve 1' /etc/tor/torrc
-    local rstring2=$?
+    if ! cp -f /etc/tor/torrc "${backup_dir}/torrc.backup"; then
+        die "can't backup '/etc/tor/torrc'"
+    fi
 
-    grep -q -x 'TransPort 9040 IsolateClientAddr IsolateClientProtocol IsolateDestAddr IsolateDestPort' /etc/tor/torrc
-    local rstring3=$?
-
-    grep -q -x 'SocksPort 9050' /etc/tor/torrc
-    local rstring4=$?
-
-    grep -q -x 'DNSPort 5353' /etc/tor/torrc
-    local rstring5=$?
-
-    # if required strings does not exists in torrc file copy file
-    # from /usr/share/kalitorify
-    if [[ "$rstring1" -ne 0 ]] ||
-       [[ "$rstring2" -ne 0 ]] ||
-       [[ "$rstring3" -ne 0 ]] ||
-       [[ "$rstring4" -ne 0 ]] ||
-       [[ "$rstring5" -ne 0 ]]; then
-
-        printf "%s\\n" "Set /etc/tor/torrc"
-
-        if ! cp -f /etc/tor/torrc "${backup_dir}/torrc.backup"; then
-            die "can't backup '/etc/tor/torrc'"
-        fi
-
-        if ! cp -f "${config_dir}/torrc" /etc/tor/torrc; then
-            die "can't copy new '/etc/tor/torrc'"
-        fi
+    if ! cp -f "${config_dir}/torrc" /etc/tor/torrc; then
+        die "can't copy new '/etc/tor/torrc'"
     fi
 
     # reload systemd daemons
@@ -356,11 +328,11 @@ check_status() {
     local hostport="localhost:9050"
     local url="https://check.torproject.org/"
 
-    if curl -s -m 10 --socks5 "${hostport}" --socks5-hostname "${hostport}" -L "${url}" \
+    if curl -s -m 5 --socks5 "${hostport}" --socks5-hostname "${hostport}" -L "${url}" \
         | cat | tac | grep -q 'Congratulations'; then
         msg "Your system is configured to use Tor"
     else
-        printf "${red}%s${reset}\\n\\n" "[!] Your system is not using Tor"
+        printf "${red}%s${reset}\\n\\n" "Your system is not using Tor!"
         printf "%s\\n" "try another Tor circuit with '${prog_name} --restart'"
         exit 1
     fi
@@ -480,8 +452,6 @@ restart() {
 
         systemctl restart tor.service
         sleep 1
-
-        #msg "IP address changed"
         check_ip
         exit 0
     else
@@ -558,7 +528,6 @@ main() {
         exit 0
     done
 }
-
 
 # Call main
 main "${@}"
