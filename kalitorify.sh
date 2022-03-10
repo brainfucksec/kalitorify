@@ -4,7 +4,7 @@
 #                                                                              #
 # kalitorify.sh                                                                #
 #                                                                              #
-# version: 1.27.0                                                              #
+# version: 1.27.1                                                              #
 #                                                                              #
 # Kali Linux - Transparent proxy through Tor                                   #
 #                                                                              #
@@ -36,7 +36,7 @@
 #
 # program information
 readonly prog_name="kalitorify"
-readonly version="1.27.0"
+readonly version="1.27.1"
 readonly signature="Copyright (C) 2022 brainf+ck"
 readonly git_url="https://github.com/brainfucksec/kalitorify"
 
@@ -318,18 +318,14 @@ check_status() {
     # with Tor
     info "Check Tor network settings"
 
-    # curl option details:
+    # curl socks options:
     #   --socks5 <host[:port]> SOCKS5 proxy on given host + port
     #   --socks5-hostname <host[:port]> SOCKS5 proxy, pass host name to proxy
-    #
-    #   `-L` and `tac` options for avoid error: "(23) Failed writing body"
-    #   https://github.com/kubernetes/helm/issues/2802
-    #   https://stackoverflow.com/questions/16703647/why-curl-return-and-error-23-failed-writing-body
     local hostport="localhost:9050"
     local url="https://check.torproject.org/"
 
-    if curl -s -m 5 --socks5 "${hostport}" --socks5-hostname "${hostport}" -L "${url}" \
-        | cat | tac | grep -q 'Congratulations'; then
+    if curl -s -m 6 --socks5 "${hostport}" --socks5-hostname "${hostport}" "${url}" \
+        | grep -q 'Congratulations'; then
         msg "Your system is configured to use Tor"
     else
         printf "${red}%s${reset}\\n\\n" "Your system is not using Tor!"

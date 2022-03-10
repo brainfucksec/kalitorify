@@ -84,3 +84,10 @@ Fix main() function
 Fix function for error handling
 Update README (update links, instructions)
 
+
+/** 1.27.1 / 2022-03-10 **/
+
+[committer] brainfucksec
+
+Fix curl request in check_status() function (kalitorify -s, --status)
+
