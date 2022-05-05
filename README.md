@@ -69,10 +69,6 @@ cd kalitorify/
 sudo make install
 ```
 
-### Reboot:
-
-Services and programs that use kalitorify (such as iptables) work at the kernel level, at the end of the installation reboot the operating system to avoid conflicts.
-
 ---
 
 ## Usage
