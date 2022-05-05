@@ -4,7 +4,7 @@
 #                                                                              #
 # kalitorify.sh                                                                #
 #                                                                              #
-# version: 1.27.1                                                              #
+# version: 1.27.2                                                              #
 #                                                                              #
 # Kali Linux - Transparent proxy through Tor                                   #
 #                                                                              #
@@ -36,7 +36,7 @@
 #
 # program information
 readonly prog_name="kalitorify"
-readonly version="1.27.1"
+readonly version="1.27.2"
 readonly signature="Copyright (C) 2022 brainf+ck"
 readonly git_url="https://github.com/brainfucksec/kalitorify"
 
@@ -279,10 +279,9 @@ check_ip() {
     info "Check public IP address"
 
     local url_list=(
-        'https://ipleak.net/json/'
+        'https://ipapi.co/json'
         'https://ipinfo.io/'
         'https://api.myip.com/'
-        'http://ip-api.com/'
     )
 
     for url in "${url_list[@]}"; do

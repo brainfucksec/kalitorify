@@ -91,3 +91,10 @@ Update README (update links, instructions)
 
 Fix curl request in check_status() function (kalitorify -s, --status)
 
+
+/** 1.27.2 / 2022-05-05 **/
+
+[committer] brainfucksec
+
+Change list if IP address API service (function check_ip())
+
