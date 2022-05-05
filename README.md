@@ -253,9 +253,9 @@ Warning: the example video might refer to an older version.
 
 ---
 
-## Donate
+## Donations
 
-Support kalitorify by making a donation:
+Please donate a litte to support my projects:
 
 **Bitcoin**
 
