@@ -98,3 +98,10 @@ Fix curl request in check_status() function (kalitorify -s, --status)
 
 Change list if IP address API service (function check_ip())
 
+
+/** 1.27.3 / 2022-05-05 **/
+
+[committer] brainfucksec
+
+Fix function check_ip()
+
