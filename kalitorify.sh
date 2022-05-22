@@ -4,14 +4,15 @@
 #                                                                              #
 # kalitorify.sh                                                                #
 #                                                                              #
-# version: 1.27.3                                                              #
+# version: 1.28.0                                                              #
 #                                                                              #
 # Kali Linux - Transparent proxy through Tor                                   #
 #                                                                              #
 # Copyright (C) 2015-2022 brainf+ck                                            #
 #                                                                              #
-# Kalitorify is KISS version of Parrot AnonSurf Module, developed              #
-# by "Pirates' Crew" of FrozenBox - https://github.com/parrotsec/anonsurf      #
+# Kalitorify is KISS version of Parrot AnonSurf Module of Parrot OS:           #
+# - https://www.parrotsec.org                                                  #
+# - https://nest.parrot.sh/packages/tools/anonsurf                             #
 #                                                                              #
 #                                                                              #
 # GNU GENERAL PUBLIC LICENSE                                                   #
@@ -36,24 +37,21 @@
 #
 # program information
 readonly prog_name="kalitorify"
-readonly version="1.27.3"
+readonly version="1.28.0"
 readonly signature="Copyright (C) 2022 brainf+ck"
 readonly git_url="https://github.com/brainfucksec/kalitorify"
 
 # set colors for stdout
 export red="$(tput setaf 1)"
 export green="$(tput setaf 2)"
-export yellow="$(tput setaf 3)"
 export blue="$(tput setaf 4)"
-export magenta="$(tput setaf 5)"
-export cyan="$(tput setaf 6)"
 export white="$(tput setaf 7)"
 export b="$(tput bold)"
 export reset="$(tput sgr0)"
 
 ## Directories
-readonly config_dir="/usr/share/kalitorify/data"    # config files
-readonly backup_dir="/usr/share/kalitorify/backups" # backups
+readonly data_dir="/usr/share/kalitorify/data"      # config files
+readonly backup_dir="/var/lib/kalitorify/backups"   # backups
 
 ## Network settings
 #
@@ -131,7 +129,7 @@ print_version() {
 ## Check program settings
 #
 # - packages: tor, curl
-# - program directories, see: ${backup_dir}, ${config_dir}
+# - program directories, see: ${data_dir}, ${backup_dir}
 # - tor configuration file: /etc/tor/torrc
 check_settings() {
     info "Check program settings"
@@ -149,8 +147,8 @@ check_settings() {
         die "directory '${backup_dir}' not exist, run makefile first!"
     fi
 
-    if [[ ! -d "${config_dir}" ]]; then
-        die "directory '${config_dir}' not exist, run makefile first!"
+    if [[ ! -d "${data_dir}" ]]; then
+        die "directory '${data_dir}' not exist, run makefile first!"
     fi
 
     # replace torrc file
@@ -164,7 +162,7 @@ check_settings() {
         die "can't backup '/etc/tor/torrc'"
     fi
 
-    if ! cp -f "${config_dir}/torrc" /etc/tor/torrc; then
+    if ! cp -f "${data_dir}/torrc" /etc/tor/torrc; then
         die "can't copy new '/etc/tor/torrc'"
     fi
 
@@ -182,8 +180,8 @@ check_settings() {
 # Usage: setup_iptables <arg>
 #
 #   args:
-#   tor_proxy -> set rules for Tor transparent proxy
-#   default   -> restore default rules
+#       tor_proxy -> set rules for Tor transparent proxy
+#       default   -> restore default rules
 setup_iptables() {
     case "$1" in
         tor_proxy)
@@ -284,7 +282,7 @@ check_ip() {
     )
 
     for url in "${url_list[@]}"; do
-        local request="$(curl -s "$url")"
+        local request="$(curl -s -m 5 "$url")"
         local response="$?"
 
         if [[ "$response" -ne 0 ]]; then
@@ -315,6 +313,7 @@ check_status() {
     # and grep the necessary strings from the HTML page to test connection
     # with Tor
     info "Check Tor network settings"
+    sleep 1
 
     # curl socks options:
     #   --socks5 <host[:port]> SOCKS5 proxy on given host + port
@@ -322,7 +321,7 @@ check_status() {
     local hostport="localhost:9050"
     local url="https://check.torproject.org/"
 
-    if curl -s -m 6 --socks5 "${hostport}" --socks5-hostname "${hostport}" "${url}" \
+    if curl -s -m 5 --socks5 "${hostport}" --socks5-hostname "${hostport}" "${url}" \
         | grep -q 'Congratulations'; then
         msg "Your system is configured to use Tor"
     else
@@ -353,7 +352,7 @@ start() {
 
     # DNS settings: /etc/resolv.conf:
     #
-    # write nameserver 127.0.0.1 to `/etc/resolv.conf` file
+    # write nameserver 127.0.0.1 to /etc/resolv.conf file
     # i.e. use Tor DNSPort (see: /etc/tor/torrc)
     printf "%s\\n" "Configure resolv.conf file to use Tor DNSPort"
 
@@ -422,12 +421,11 @@ stop() {
         sysctl -w net.ipv6.conf.all.disable_ipv6=0 >/dev/null 2>&1
         sysctl -w net.ipv6.conf.default.disable_ipv6=0 >/dev/null 2>&1
 
-        # restore default `/etc/tor/torrc`
+        # restore default /etc/tor/torrc
         printf "%s\\n" "Restore default /etc/tor/torrc"
         cp "${backup_dir}/torrc.backup" /etc/tor/torrc
 
-        printf "\\n${b}${green}%s${reset} %s\\n" \
-                "[-]" "Transparent Proxy stopped"
+        printf "\\n${b}${green}%s${reset} %s\\n" "[-]" "Transparent Proxy stopped"
         exit 0
     else
         die "Tor service is not running! exit"
@@ -437,7 +435,8 @@ stop() {
 
 ## Restart
 #
-# restart tor.service (i.e. get new Tor exit node) and change public IP Address
+# restart tor.service (i.e. get new Tor exit node)
+# and change public IP Address
 restart() {
     check_root
 

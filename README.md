@@ -7,7 +7,7 @@ Transparent Proxy through Tor for Kali Linux
 </p>
 
 <p align="center">
-<a href="https://github.com/brainfucksec/kalitorify/tags"><img src="https://img.shields.io/badge/version-1.27.3-blue"></a>
+<a href="https://github.com/brainfucksec/kalitorify/tags"><img src="https://img.shields.io/badge/version-1.28.0-blue"></a>
 <a href="https://github.com/brainfucksec/kalitorify/commits/master"><img src="https://img.shields.io/badge/build-passing-brightgreen.svg"></a>
 <a href="https://github.com/brainfucksec/kalitorify/blob/master/README.md"><img src="https://img.shields.io/badge/docs-passing-brightgreen.svg"></a>
 <a href="https://github.com/brainfucksec/kalitorify/blob/master/LICENSE"><img src="https://img.shields.io/github/license/brainfucksec/kalitorify.svg"></a>
@@ -30,8 +30,7 @@ if you don't know the Tor Network and the Tor Project (but even if you know them
 
 [Tor Project Website](https://www.torproject.org/)
 
-
-### What is Transparent Proxy through Tor
+### What is Transparent Proxy through Tor?
 
 Transparent proxy is an intermediary system that sit between a user and a content provider. When a user makes a request to a web server, the transparent proxy intercepts the request to perform various actions including caching, redirection and authentication.
 
@@ -141,9 +140,10 @@ sudo make uninstall
 Note: If you have deleted the git folder after installation, you can remove the program manually:
 
 ```term
-sudo rm -rf /usr/local/bin/kalitorify \
+sudo rm -ri /usr/local/bin/kalitorify \
 /usr/share/kalitorify \
-/usr/share/doc/kalitorify
+/usr/share/doc/kalitorify \
+/var/lib/kalitorify
 ```
 
 ---
