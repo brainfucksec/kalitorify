@@ -140,7 +140,7 @@ sudo make uninstall
 Note: If you have deleted the git folder after installation, you can remove the program manually:
 
 ```term
-sudo rm -ri /usr/local/bin/kalitorify \
+sudo rm -ri /usr/bin/kalitorify \
 /usr/share/kalitorify \
 /usr/share/doc/kalitorify \
 /var/lib/kalitorify
