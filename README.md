@@ -7,10 +7,10 @@ Transparent Proxy through Tor for Kali Linux
 </p>
 
 <p align="center">
-<a href="https://github.com/brainfucksec/kalitorify/tags"><img src="https://img.shields.io/badge/version-1.29.0-blue"></a>
-<a href="https://github.com/brainfucksec/kalitorify/commits/master"><img src="https://img.shields.io/badge/build-passing-brightgreen.svg"></a>
+<a href="https://github.com/brainfucksec/kalitorify/commits/master"><img src="https://img.shields.io/badge/version-1.29.0-blue"></a>
 <a href="https://github.com/brainfucksec/kalitorify/blob/master/README.md"><img src="https://img.shields.io/badge/docs-passing-brightgreen.svg"></a>
 <a href="https://github.com/brainfucksec/kalitorify/blob/master/LICENSE"><img src="https://img.shields.io/github/license/brainfucksec/kalitorify.svg"></a>
+<a href="https://github.com/brainfucksec/kalitorify/graphs/contributors"><img src="https://img.shields.io/github/contributors/brainfucksec/kalitorify.svg"></a>
 <a href="https://github.com/brainfucksec/kalitorify/network/members"><img src="https://img.shields.io/github/forks/brainfucksec/kalitorify.svg"></a>
 </p>
 
