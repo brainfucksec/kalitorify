@@ -113,3 +113,10 @@ Fix function check_ip()
 Change directory for program executable (old: /usr/local/bin/kalitorify, new: /usr/bin/kalitorify)
 Change backup directory (old: /usr/share/kalitorify/backups, new: /var/lib/kalitorify/backups)
 Change Makefile
+
+
+/** 1.29.0 / 2022-05-31 **/
+
+[committer] brainfucksec
+
+Fix function for check Tor settings, some changes (see: commit, commit message)

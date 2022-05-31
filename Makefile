@@ -1,5 +1,5 @@
 PROGRAM_NAME=kalitorify
-VERSION=1.28.0
+VERSION=1.29.0
 
 DATA_DIR=/usr/share
 BACKUP_DIR=/var/lib

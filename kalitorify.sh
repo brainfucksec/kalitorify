@@ -4,7 +4,7 @@
 #                                                                              #
 # kalitorify.sh                                                                #
 #                                                                              #
-# version: 1.28.0                                                              #
+# version: 1.29.0                                                              #
 #                                                                              #
 # Kali Linux - Transparent proxy through Tor                                   #
 #                                                                              #
@@ -37,7 +37,7 @@
 #
 # program information
 readonly prog_name="kalitorify"
-readonly version="1.28.0"
+readonly version="1.29.0"
 readonly signature="Copyright (C) 2022 brainf+ck"
 readonly git_url="https://github.com/brainfucksec/kalitorify"
 
@@ -126,12 +126,13 @@ print_version() {
 }
 
 
-## Check program settings
+## Configure general settings
 #
 # - packages: tor, curl
 # - program directories, see: ${data_dir}, ${backup_dir}
 # - tor configuration file: /etc/tor/torrc
-check_settings() {
+# - DNS settings: /etc/resolv.conf
+setup_general() {
     info "Check program settings"
 
     # packages
@@ -166,6 +167,20 @@ check_settings() {
         die "can't copy new '/etc/tor/torrc'"
     fi
 
+    # DNS settings: /etc/resolv.conf:
+    #
+    # write nameserver 127.0.0.1 to /etc/resolv.conf file
+    # i.e. use Tor DNSPort (see: /etc/tor/torrc)
+    printf "%s\\n" "Configure resolv.conf file to use Tor DNSPort"
+
+    # backup current resolv.conf
+    if ! cp /etc/resolv.conf "${backup_dir}/resolv.conf.backup"; then
+        die "can't backup '/etc/resolv.conf'"
+    fi
+
+    # write new nameserver
+    printf "%s\\n" "nameserver 127.0.0.1" > /etc/resolv.conf
+
     # reload systemd daemons
     printf "%s\\n" "Reload systemd daemons"
     systemctl --system daemon-reload
@@ -179,7 +194,7 @@ check_settings() {
 #
 # Usage: setup_iptables <arg>
 #
-#   args:
+# function args:
 #       tor_proxy -> set rules for Tor transparent proxy
 #       default   -> restore default rules
 setup_iptables() {
@@ -274,15 +289,18 @@ setup_iptables() {
 # Make an HTTP request to the ip api service on the list, if the
 # first request fails try with the next, then print the IP address
 check_ip() {
-    info "Check public IP address"
 
+    # IP API URLs list
     local url_list=(
         'https://ipinfo.io/'
         'https://api.myip.com/'
+        'https://ifconfig.me'
     )
 
+    info "Check public IP address"
+
     for url in "${url_list[@]}"; do
-        local request="$(curl -s -m 5 "$url")"
+        local request="$(curl -s "$url")"
         local response="$?"
 
         if [[ "$response" -ne 0 ]]; then
@@ -313,16 +331,14 @@ check_status() {
     # and grep the necessary strings from the HTML page to test connection
     # with Tor
     info "Check Tor network settings"
-    sleep 1
 
-    # curl socks options:
+    # curl SOCKS options:
     #   --socks5 <host[:port]> SOCKS5 proxy on given host + port
     #   --socks5-hostname <host[:port]> SOCKS5 proxy, pass host name to proxy
     local hostport="localhost:9050"
     local url="https://check.torproject.org/"
 
-    if curl -s -m 5 --socks5 "${hostport}" --socks5-hostname "${hostport}" "${url}" \
-        | grep -q 'Congratulations'; then
+    if curl --socks5 "${hostport}" --socks5-hostname "${hostport}" -s "${url}" | cat | grep -q "Congratulations"; then
         msg "Your system is configured to use Tor"
     else
         printf "${red}%s${reset}\\n\\n" "Your system is not using Tor!"
@@ -345,26 +361,12 @@ start() {
 
     banner
     sleep 2
-    check_settings
+    setup_general
 
     printf "\\n"
     info "Starting Transparent Proxy"
 
-    # DNS settings: /etc/resolv.conf:
-    #
-    # write nameserver 127.0.0.1 to /etc/resolv.conf file
-    # i.e. use Tor DNSPort (see: /etc/tor/torrc)
-    printf "%s\\n" "Configure resolv.conf file to use Tor DNSPort"
-
-    # backup current resolv.conf
-    if ! cp /etc/resolv.conf "${backup_dir}/resolv.conf.backup"; then
-        die "can't backup '/etc/resolv.conf'"
-    fi
-
-    # write new nameserver
-    printf "%s\\n" "nameserver 127.0.0.1" > /etc/resolv.conf
-
-    # disable IPv6 with sysctl
+    # disable IPv6
     printf "%s\\n" "Disable IPv6 with sysctl"
     sysctl -w net.ipv6.conf.all.disable_ipv6=1 >/dev/null 2>&1
     sysctl -w net.ipv6.conf.default.disable_ipv6=1 >/dev/null 2>&1
@@ -406,8 +408,8 @@ stop() {
 
         # restore /etc/resolv.conf:
         #
-        # restore file with resolvconf program if exists
-        # otherwise copy the original file from backup directory
+        # restore file with resolvconf if exists otherwise copy the original
+        # file from backup directory.
         printf "%s\\n" "Restore default DNS"
 
         if hash resolvconf 2>/dev/null; then
